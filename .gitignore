@@ -1,0 +1,13 @@
+# Logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Test coverage directory
+coverage
+.nyc_output
+
+# Secrets
+test/util/config.js

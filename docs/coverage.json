@@ -1,0 +1,70 @@
+{
+  "coverage": "61.17%",
+  "expectCount": 85,
+  "actualCount": 52,
+  "files": {
+    "lib/Relationship.js": {
+      "expectCount": 30,
+      "actualCount": 10,
+      "undocumentLines": [
+        77,
+        64,
+        71,
+        82,
+        255,
+        234,
+        130,
+        257,
+        216,
+        120,
+        198,
+        58,
+        232,
+        123,
+        128,
+        133,
+        214,
+        113,
+        118,
+        196
+      ]
+    },
+    "lib/Node.js": {
+      "expectCount": 35,
+      "actualCount": 33,
+      "undocumentLines": [
+        4,
+        94
+      ]
+    },
+    "lib/NodeCollection.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        6,
+        8,
+        35,
+        18
+      ]
+    },
+    "lib/DB.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        5
+      ]
+    },
+    "lib/Graph.js": {
+      "expectCount": 14,
+      "actualCount": 9,
+      "undocumentLines": [
+        25,
+        63,
+        64,
+        61,
+        62
+      ]
+    }
+  }
+}

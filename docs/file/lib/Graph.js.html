@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">lib/Graph.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html">Graph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">lib/Graph.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;
+
+const Relationship = require(&apos;./Relationship&apos;)
+const neo4j = require(&apos;neo4j-driver/lib/v1&apos;)
+
+const _db = Symbol()
+
+/**
+ * Object-Graph Map
+ *
+ * @class Graph
+ */
+class Graph {
+
+	/**
+	 * Get a database instance.
+	 *
+	 * @readonly
+	 * @static
+	 *
+	 * @memberOf Graph
+	 */
+	static get db()
+	{
+		this[_db] = this[_db] || require(&apos;./DB&apos;)
+
+		return this[_db]
+	}
+
+	/**
+	 * Build a graph from query results.
+	 * Map variables returned from the query to Nodes
+	 *
+	 * @static
+	 * @param {string} query The search query.
+	 * @param {object} parameters The parameters used in the search query.
+	 * @param {object} models variables and Node models as key-value pairs.
+	 * @returns {Graph} The resulting graph.
+	 *
+	 * @memberOf Graph
+	 */
+	static build(query, parameters, models)
+	{
+		return this.db.query(query, parameters)
+			.then(result =&gt;
+			{
+				return new this(result, models)
+			})
+	}
+
+	/**
+	 * Creates an instance of Graph.
+	 *
+	 * @param {neo4j.Result} result Result of a query.
+	 * @param {object} models variables and Node models as key-value pairs.
+	 *
+	 * @memberOf Graph
+	 */
+	constructor(result, models)
+	{
+		this.nodes         = new Map()
+		this.relationships = new Map()
+		this.map           = new Map()
+		this.models        = models
+
+		for (const record of result.records)
+		{
+			record.forEach(this.add.bind(this))
+		}
+	}
+
+	/**
+	 * Add one or more entities to the graph
+	 *
+	 * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]} entity One or more entities
+	 * @param {string} key The key associated with this
+	 *
+	 * @memberOf Graph
+	 */
+	add(entity, key)
+	{
+		if (Array.isArray(entity))
+		{
+			for (const item of entity)
+			{
+				this.add(item, key)
+			}
+			return
+		}
+
+		const type = this.getEntityType(entity)
+		const id = entity.identity.toNumber()
+
+		entity.$key = key
+
+		if (key in this.models)
+		{
+			entity = new this.models[key](entity, this)
+		}
+
+		if (this[type].has(id) &amp;&amp; key in this.models)
+		{
+			const current = this[type].get(id)
+
+			// Upgrade entity to Model
+			if (current.$key)
+			{
+				const arr = this.map[current.$key]
+
+				if (arr.includes(current))
+				{
+					arr.splice(arr.indexOf(current), 1)
+				}
+			}
+
+			this[type].set(id, entity)
+		}
+		else if (!this[type].has(id))
+		{
+			this[type].set(id, entity)
+		}
+
+		if (key)
+		{
+			this.map[key] = this.map[key] || []
+			this.map[key].push(entity)
+		}
+	}
+
+	/**
+	 * Remove one or more entities from the graph
+	 *
+	 * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]|Node|Node[]|Relationship|Relationship[]} obj One or more objects
+	 *
+	 * @memberOf Graph
+	 */
+	remove(obj)
+	{
+		if (Array.isArray(obj))
+		{
+			for (const item of obj)
+			{
+				this.remove(item)
+			}
+			return
+		}
+
+		const entity = obj.$entity || obj
+		const id = entity.identity.toNumber()
+		const type = this.getEntityType(entity)
+
+		this[type].delete(id)
+
+		if (entity.$key)
+		{
+			const map = this.map[entity.$key]
+			const i = map.indexOf(entity)
+
+			if (i &gt;= 0)
+			{
+				map.splice(i, 1)
+			}
+		}
+	}
+
+	/**
+	 * Get the type of the entity
+	 *
+	 * @param {any} entity Entity object
+	 * @returns {string} &apos;nodes&apos; or &apos;relationships&apos;
+	 *
+	 * @memberOf Graph
+	 */
+	getEntityType(entity)
+	{
+		if (entity instanceof neo4j.types.Node)
+		{
+			return &apos;nodes&apos;
+		}
+
+		if (entity instanceof neo4j.types.Relationship)
+		{
+			return &apos;relationships&apos;
+		}
+
+		throw &apos;Type not implemented.&apos;
+	}
+
+	/**
+	 * Get Relationship from the graph
+	 *
+	 * @param {Node} start Start node
+	 * @param {Node} end End node
+	 * @param {Function} $Relationship Relationship class
+	 * @returns {Relationship} Relationship or null if no match was found
+	 *
+	 * @memberOf Graph
+	 */
+	getRelationship(start, end, $Relationship)
+	{
+		let relationship = null
+
+		for (const [, item] of this.relationships)
+		{
+			const entity = item.$entity || item
+
+			if (entity.type !== $Relationship.type)
+			{
+				continue
+			}
+
+			if (entity.start.equals(start.$id) &amp;&amp; !entity.end.equals(end.$id) &amp;&amp; $Relationship.direction === Relationship.OUT)
+			{
+				relationship = item
+				break
+			}
+
+			if (entity.start.equals(end.$id) &amp;&amp; !entity.end.equals(start.$id) &amp;&amp; $Relationship.direction === Relationship.IN)
+			{
+				relationship = item
+				break
+			}
+		}
+
+		if (!relationship)
+		{
+			return null
+		}
+
+		if (!(relationship instanceof $Relationship))
+		{
+			relationship = new $Relationship(relationship, this)
+			this.relationships.set(relationship.$id, relationship)
+		}
+
+		return relationship
+	}
+
+	/**
+	 * Get related nodes
+	 *
+	 * @param {Node} node Start node
+	 * @param {Function} $Relationship Relationship class
+	 * @returns {Node[]} Related nodes
+	 *
+	 * @memberOf Graph
+	 */
+	getRelated(node, $Relationship)
+	{
+		const entity = node.$entity
+		const results = []
+
+		for (const rel of this.relationships.values())
+		{
+			let other = null
+
+			if (rel.type !== $Relationship.type)
+			{
+				continue
+			}
+
+			if ($Relationship.direction === Relationship.OUT &amp;&amp; rel.start.equals(entity.identity))
+			{
+				other = this.nodes.get(rel.end.toNumber())
+			}
+			else if ($Relationship.direction === Relationship.IN &amp;&amp; rel.end.equals(entity.identity))
+			{
+				other = this.nodes.get(rel.start.toNumber())
+			}
+			else
+			{
+				continue
+			}
+
+			if (!(other instanceof $Relationship.Model))
+			{
+				other = new $Relationship.Model(other, this)
+				this.nodes.set(other.$id, other)
+			}
+
+			if ($Relationship.singular)
+			{
+				return other
+			}
+
+			results.push(other)
+		}
+
+		return results
+	}
+}
+
+module.exports = Graph
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,4699 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "name": "lib/DB.js",
+    "content": "'use strict'\n\nconst neo4j = require('neo4j-driver/lib/v1')\n\nconst DB = {\n\tinit(host, user, pass, config)\n\t{\n\t\tif (this.driver)\n\t\t{\n\t\t\tthis.driver.close()\n\t\t}\n\n\t\tthis.server = null\n\t\tthis.driver = neo4j.driver(host, neo4j.auth.basic(user, pass), config || {})\n\n\t\tthis.driver.onCompleted = meta =>\n\t\t{\n\t\t\tthis.server = meta.server\n\t\t}\n\t},\n\n\tsession()\n\t{\n\t\tconst session = this.driver.session()\n\n\t\treturn session\n\n\t\t// Always return promises (disables streaming functionality)\n\t\t// return promisify(session)\n\t},\n\n\tbeginTransaction(session = null)\n\t{\n\t\tsession = session || this.session()\n\n\t\tconst transaction = session.beginTransaction()\n\n\t\ttransaction.session = session\n\t\ttransaction.$nodes = []\n\n\t\treturn transaction\n\t\t// return promisify(transaction)\n\t},\n\n\tquery(query, parameters)\n\t{\n\t\tconst session = this.driver.session()\n\n\t\treturn session.run(query, parameters)\n\t\t\t.then(result =>\n\t\t\t{\n\t\t\t\tsession.close()\n\t\t\t\treturn result\n\t\t\t})\n\t},\n\n\texit()\n\t{\n\t\tthis.driver.close()\n\n\t\t// delete this.session\n\t\tdelete this.driver\n\t\tdelete this.server\n\t}\n}\n\nmodule.exports = DB\n",
+    "static": true,
+    "longname": "lib/DB.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 1,
+    "kind": "variable",
+    "name": "neo4j",
+    "memberof": "lib/DB.js",
+    "static": true,
+    "longname": "lib/DB.js~neo4j",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/DB.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 2,
+    "kind": "variable",
+    "name": "DB",
+    "memberof": "lib/DB.js",
+    "static": true,
+    "longname": "lib/DB.js~DB",
+    "access": null,
+    "export": true,
+    "importPath": "neo-maggoo/lib/DB.js",
+    "importStyle": "DB",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "{\"init\": function, \"session\": function, \"beginTransaction\": function, \"query\": function, \"exit\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 3,
+    "kind": "file",
+    "name": "lib/Graph.js",
+    "content": "'use strict'\n\nconst Relationship = require('./Relationship')\nconst neo4j = require('neo4j-driver/lib/v1')\n\nconst _db = Symbol()\n\n/**\n * Object-Graph Map\n *\n * @class Graph\n */\nclass Graph {\n\n\t/**\n\t * Get a database instance.\n\t *\n\t * @readonly\n\t * @static\n\t *\n\t * @memberOf Graph\n\t */\n\tstatic get db()\n\t{\n\t\tthis[_db] = this[_db] || require('./DB')\n\n\t\treturn this[_db]\n\t}\n\n\t/**\n\t * Build a graph from query results.\n\t * Map variables returned from the query to Nodes\n\t *\n\t * @static\n\t * @param {string} query The search query.\n\t * @param {object} parameters The parameters used in the search query.\n\t * @param {object} models variables and Node models as key-value pairs.\n\t * @returns {Graph} The resulting graph.\n\t *\n\t * @memberOf Graph\n\t */\n\tstatic build(query, parameters, models)\n\t{\n\t\treturn this.db.query(query, parameters)\n\t\t\t.then(result =>\n\t\t\t{\n\t\t\t\treturn new this(result, models)\n\t\t\t})\n\t}\n\n\t/**\n\t * Creates an instance of Graph.\n\t *\n\t * @param {neo4j.Result} result Result of a query.\n\t * @param {object} models variables and Node models as key-value pairs.\n\t *\n\t * @memberOf Graph\n\t */\n\tconstructor(result, models)\n\t{\n\t\tthis.nodes         = new Map()\n\t\tthis.relationships = new Map()\n\t\tthis.map           = new Map()\n\t\tthis.models        = models\n\n\t\tfor (const record of result.records)\n\t\t{\n\t\t\trecord.forEach(this.add.bind(this))\n\t\t}\n\t}\n\n\t/**\n\t * Add one or more entities to the graph\n\t *\n\t * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]} entity One or more entities\n\t * @param {string} key The key associated with this\n\t *\n\t * @memberOf Graph\n\t */\n\tadd(entity, key)\n\t{\n\t\tif (Array.isArray(entity))\n\t\t{\n\t\t\tfor (const item of entity)\n\t\t\t{\n\t\t\t\tthis.add(item, key)\n\t\t\t}\n\t\t\treturn\n\t\t}\n\n\t\tconst type = this.getEntityType(entity)\n\t\tconst id = entity.identity.toNumber()\n\n\t\tentity.$key = key\n\n\t\tif (key in this.models)\n\t\t{\n\t\t\tentity = new this.models[key](entity, this)\n\t\t}\n\n\t\tif (this[type].has(id) && key in this.models)\n\t\t{\n\t\t\tconst current = this[type].get(id)\n\n\t\t\t// Upgrade entity to Model\n\t\t\tif (current.$key)\n\t\t\t{\n\t\t\t\tconst arr = this.map[current.$key]\n\n\t\t\t\tif (arr.includes(current))\n\t\t\t\t{\n\t\t\t\t\tarr.splice(arr.indexOf(current), 1)\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tthis[type].set(id, entity)\n\t\t}\n\t\telse if (!this[type].has(id))\n\t\t{\n\t\t\tthis[type].set(id, entity)\n\t\t}\n\n\t\tif (key)\n\t\t{\n\t\t\tthis.map[key] = this.map[key] || []\n\t\t\tthis.map[key].push(entity)\n\t\t}\n\t}\n\n\t/**\n\t * Remove one or more entities from the graph\n\t *\n\t * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]|Node|Node[]|Relationship|Relationship[]} obj One or more objects\n\t *\n\t * @memberOf Graph\n\t */\n\tremove(obj)\n\t{\n\t\tif (Array.isArray(obj))\n\t\t{\n\t\t\tfor (const item of obj)\n\t\t\t{\n\t\t\t\tthis.remove(item)\n\t\t\t}\n\t\t\treturn\n\t\t}\n\n\t\tconst entity = obj.$entity || obj\n\t\tconst id = entity.identity.toNumber()\n\t\tconst type = this.getEntityType(entity)\n\n\t\tthis[type].delete(id)\n\n\t\tif (entity.$key)\n\t\t{\n\t\t\tconst map = this.map[entity.$key]\n\t\t\tconst i = map.indexOf(entity)\n\n\t\t\tif (i >= 0)\n\t\t\t{\n\t\t\t\tmap.splice(i, 1)\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * Get the type of the entity\n\t *\n\t * @param {any} entity Entity object\n\t * @returns {string} 'nodes' or 'relationships'\n\t *\n\t * @memberOf Graph\n\t */\n\tgetEntityType(entity)\n\t{\n\t\tif (entity instanceof neo4j.types.Node)\n\t\t{\n\t\t\treturn 'nodes'\n\t\t}\n\n\t\tif (entity instanceof neo4j.types.Relationship)\n\t\t{\n\t\t\treturn 'relationships'\n\t\t}\n\n\t\tthrow 'Type not implemented.'\n\t}\n\n\t/**\n\t * Get Relationship from the graph\n\t *\n\t * @param {Node} start Start node\n\t * @param {Node} end End node\n\t * @param {Function} $Relationship Relationship class\n\t * @returns {Relationship} Relationship or null if no match was found\n\t *\n\t * @memberOf Graph\n\t */\n\tgetRelationship(start, end, $Relationship)\n\t{\n\t\tlet relationship = null\n\n\t\tfor (const [, item] of this.relationships)\n\t\t{\n\t\t\tconst entity = item.$entity || item\n\n\t\t\tif (entity.type !== $Relationship.type)\n\t\t\t{\n\t\t\t\tcontinue\n\t\t\t}\n\n\t\t\tif (entity.start.equals(start.$id) && !entity.end.equals(end.$id) && $Relationship.direction === Relationship.OUT)\n\t\t\t{\n\t\t\t\trelationship = item\n\t\t\t\tbreak\n\t\t\t}\n\n\t\t\tif (entity.start.equals(end.$id) && !entity.end.equals(start.$id) && $Relationship.direction === Relationship.IN)\n\t\t\t{\n\t\t\t\trelationship = item\n\t\t\t\tbreak\n\t\t\t}\n\t\t}\n\n\t\tif (!relationship)\n\t\t{\n\t\t\treturn null\n\t\t}\n\n\t\tif (!(relationship instanceof $Relationship))\n\t\t{\n\t\t\trelationship = new $Relationship(relationship, this)\n\t\t\tthis.relationships.set(relationship.$id, relationship)\n\t\t}\n\n\t\treturn relationship\n\t}\n\n\t/**\n\t * Get related nodes\n\t *\n\t * @param {Node} node Start node\n\t * @param {Function} $Relationship Relationship class\n\t * @returns {Node[]} Related nodes\n\t *\n\t * @memberOf Graph\n\t */\n\tgetRelated(node, $Relationship)\n\t{\n\t\tconst entity = node.$entity\n\t\tconst results = []\n\n\t\tfor (const rel of this.relationships.values())\n\t\t{\n\t\t\tlet other = null\n\n\t\t\tif (rel.type !== $Relationship.type)\n\t\t\t{\n\t\t\t\tcontinue\n\t\t\t}\n\n\t\t\tif ($Relationship.direction === Relationship.OUT && rel.start.equals(entity.identity))\n\t\t\t{\n\t\t\t\tother = this.nodes.get(rel.end.toNumber())\n\t\t\t}\n\t\t\telse if ($Relationship.direction === Relationship.IN && rel.end.equals(entity.identity))\n\t\t\t{\n\t\t\t\tother = this.nodes.get(rel.start.toNumber())\n\t\t\t}\n\t\t\telse\n\t\t\t{\n\t\t\t\tcontinue\n\t\t\t}\n\n\t\t\tif (!(other instanceof $Relationship.Model))\n\t\t\t{\n\t\t\t\tother = new $Relationship.Model(other, this)\n\t\t\t\tthis.nodes.set(other.$id, other)\n\t\t\t}\n\n\t\t\tif ($Relationship.singular)\n\t\t\t{\n\t\t\t\treturn other\n\t\t\t}\n\n\t\t\tresults.push(other)\n\t\t}\n\n\t\treturn results\n\t}\n}\n\nmodule.exports = Graph\n",
+    "static": true,
+    "longname": "lib/Graph.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 4,
+    "kind": "variable",
+    "name": "Relationship",
+    "memberof": "lib/Graph.js",
+    "static": true,
+    "longname": "lib/Graph.js~Relationship",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Graph.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 5,
+    "kind": "variable",
+    "name": "neo4j",
+    "memberof": "lib/Graph.js",
+    "static": true,
+    "longname": "lib/Graph.js~neo4j",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Graph.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "variable",
+    "name": "_db",
+    "memberof": "lib/Graph.js",
+    "static": true,
+    "longname": "lib/Graph.js~_db",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Graph.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 7,
+    "kind": "class",
+    "name": "Graph",
+    "memberof": "lib/Graph.js",
+    "static": true,
+    "longname": "lib/Graph.js~Graph",
+    "access": null,
+    "export": true,
+    "importPath": "neo-maggoo/lib/Graph.js",
+    "importStyle": "Graph",
+    "description": "Object-Graph Map",
+    "lineNumber": 13,
+    "unknown": [
+      {
+        "tagName": "@class",
+        "tagValue": "Graph"
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 8,
+    "kind": "get",
+    "name": "db",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Graph.js~Graph.db",
+    "access": null,
+    "description": "Get a database instance.",
+    "lineNumber": 23,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 9,
+    "kind": "member",
+    "name": "[_db]",
+    "memberof": "lib/Graph.js~Graph",
+    "static": true,
+    "longname": "lib/Graph.js~Graph.[_db]",
+    "access": null,
+    "description": null,
+    "lineNumber": 25,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "method",
+    "name": "build",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Graph.js~Graph.build",
+    "access": null,
+    "description": "Build a graph from query results.\nMap variables returned from the query to Nodes",
+    "lineNumber": 42,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Graph} The resulting graph."
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query",
+        "description": "The search query."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parameters",
+        "description": "The parameters used in the search query."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "models",
+        "description": "variables and Node models as key-value pairs."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Graph"
+      ],
+      "spread": false,
+      "description": "The resulting graph."
+    }
+  },
+  {
+    "__docId__": 11,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#constructor",
+    "access": null,
+    "description": "Creates an instance of Graph.",
+    "lineNumber": 59,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "neo4j.Result"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "result",
+        "description": "Result of a query."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "models",
+        "description": "variables and Node models as key-value pairs."
+      }
+    ]
+  },
+  {
+    "__docId__": 12,
+    "kind": "member",
+    "name": "nodes",
+    "memberof": "lib/Graph.js~Graph",
+    "static": false,
+    "longname": "lib/Graph.js~Graph#nodes",
+    "access": null,
+    "description": null,
+    "lineNumber": 61,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 13,
+    "kind": "member",
+    "name": "relationships",
+    "memberof": "lib/Graph.js~Graph",
+    "static": false,
+    "longname": "lib/Graph.js~Graph#relationships",
+    "access": null,
+    "description": null,
+    "lineNumber": 62,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 14,
+    "kind": "member",
+    "name": "map",
+    "memberof": "lib/Graph.js~Graph",
+    "static": false,
+    "longname": "lib/Graph.js~Graph#map",
+    "access": null,
+    "description": null,
+    "lineNumber": 63,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "member",
+    "name": "models",
+    "memberof": "lib/Graph.js~Graph",
+    "static": false,
+    "longname": "lib/Graph.js~Graph#models",
+    "access": null,
+    "description": null,
+    "lineNumber": 64,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 16,
+    "kind": "method",
+    "name": "add",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#add",
+    "access": null,
+    "description": "Add one or more entities to the graph",
+    "lineNumber": 80,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "neo4j.types.Node",
+          "neo4j.types.Node[]",
+          "neo4j.types.Relationship",
+          "neo4j.types.Relationship[]"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "One or more entities"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "key",
+        "description": "The key associated with this"
+      }
+    ]
+  },
+  {
+    "__docId__": 17,
+    "kind": "method",
+    "name": "remove",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#remove",
+    "access": null,
+    "description": "Remove one or more entities from the graph",
+    "lineNumber": 137,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "neo4j.types.Node",
+          "neo4j.types.Node[]",
+          "neo4j.types.Relationship",
+          "neo4j.types.Relationship[]",
+          "Node",
+          "Node[]",
+          "Relationship",
+          "Relationship[]"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "obj",
+        "description": "One or more objects"
+      }
+    ]
+  },
+  {
+    "__docId__": 18,
+    "kind": "method",
+    "name": "getEntityType",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#getEntityType",
+    "access": null,
+    "description": "Get the type of the entity",
+    "lineNumber": 174,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} 'nodes' or 'relationships'"
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "entity",
+        "description": "Entity object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "'nodes' or 'relationships'"
+    }
+  },
+  {
+    "__docId__": 19,
+    "kind": "method",
+    "name": "getRelationship",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#getRelationship",
+    "access": null,
+    "description": "Get Relationship from the graph",
+    "lineNumber": 199,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Relationship} Relationship or null if no match was found"
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Node"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "start",
+        "description": "Start node"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Node"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "end",
+        "description": "End node"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "$Relationship",
+        "description": "Relationship class"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Relationship"
+      ],
+      "spread": false,
+      "description": "Relationship or null if no match was found"
+    }
+  },
+  {
+    "__docId__": 20,
+    "kind": "method",
+    "name": "getRelated",
+    "memberof": "lib/Graph.js~Graph",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Graph.js~Graph#getRelated",
+    "access": null,
+    "description": "Get related nodes",
+    "lineNumber": 248,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Node[]} Related nodes"
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Graph"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Node"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "node",
+        "description": "Start node"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "$Relationship",
+        "description": "Relationship class"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Node[]"
+      ],
+      "spread": false,
+      "description": "Related nodes"
+    }
+  },
+  {
+    "__docId__": 21,
+    "kind": "file",
+    "name": "lib/Node.js",
+    "content": "'use strict'\n\nconst neo4j = require('neo4j-driver/lib/v1')\nconst { Model } = require('maggoo')\nconst NodeCollection = require('./NodeCollection')\nconst RelatedNode = require('./RelatedNode')\nconst RelatedNodeCollection = require('./RelatedNodeCollection')\nconst Relationship = require('./Relationship')\nconst Graph = require('./Graph')\nconst DB = require('./DB')\nconst shortid = require('shortid')\nconst merge = require('deepmerge')\n\n\n/**\n * Query options object\n * @typedef {Object} QueryOptions\n * @property {Object.<String, *>} parameters - Parameters used in the query.\n * @property {String} variable - The variable used to identify the Node in the query, 'n' by default.\n * @property {Array} variables - All variables used in the query that should be added to the results.\n * @property {String|Array} where - The where clause, arrays are joined by the 'AND' operator.\n * @property {String} with - The name of relationship to include, use the dot-notation to include mutliple levels\n * @property {Array} with - An array of names of relationships to include\n * @property {Object.<String, Boolean|Object>} with - Relationships to include (true) or exclude (false) or filter(object)\n */\n\n/**\n * Relationship definition object\n * @typedef {object} RelationshipDefinition\n * @property {Node|function} Model - {@link Relationship.Model}\n * @property {string} type - {@link Relationship.type}\n * @property {string} direction - {@link Relationship.direction}\n * @property {boolean} singular - {@link Relationship.singular}\n */\n\n\n\n// Private\nconst _related = Symbol()\nconst _labels = Symbol()\n\n/**\n * @class Node\n * @extends {Model}\n */\nclass Node extends Model {\n\n\t/**\n\t * Creates an instance of Node.\n\t *\n\t * @param {Node|neo4j.types.Node} node Node data object or neo4j Node\n\t * @param {Graph} [graph] The current graph\n\t */\n\tconstructor(node, graph)\n\t{\n\t\tif (node instanceof neo4j.types.Node)\n\t\t{\n\t\t\tsuper(node.properties)\n\n\t\t\tthis.$labels = node.labels\n\n\t\t\t/**\n\t\t\t * @type {neo4.Node} The original node data from the graph\n\t\t\t */\n\t\t\tthis.$entity = node\n\t\t}\n\t\telse\n\t\t{\n\t\t\tsuper(node)\n\t\t}\n\n\t\t/**\n\t\t * @private\n\t\t */\n\t\tthis[_related] = {}\n\n\t\t/**\n\t\t * @type {Graph} The graph this node is part of\n\t\t */\n\t\tthis.$graph = graph\n\t}\n\n\t/**\n\t * The node ID.\n\t * This will be automatically genreated when the node is saved\n\t *\n\t * @type {string}\n\t */\n\tget id()\n\t{\n\t\treturn this.$data.id\n\t}\n\n\tset id(value)\n\t{\n\t\tthis.$data.id = value\n\t}\n\n\t/**\n\t * ID generator, uses ShortId by default\n\t * @returns {string} ID\n\t */\n\tstatic uuid()\n\t{\n\t\treturn shortid.generate()\n\t}\n\n\t/**\n\t * The neo4j entity ID.\n\t * Note that this could change over time, use id instead.\n\t *\n\t * @readonly\n\t * @type {number}\n\t */\n\tget $id()\n\t{\n\t\treturn this.$entity ? this.$entity.identity.toNumber() : null\n\t}\n\n\t/**\n\t * Whether or not the node is already stored in the graph database.\n\t *\n\t * @type {boolean}\n\t */\n\tget $new()\n\t{\n\t\treturn !this.$entity\n\t}\n\n\t/**\n\t * Whether or not the Node has changed properties.\n\t *\n\t * @type {boolean}\n\t */\n\tget $dirty()\n\t{\n\t\treturn this.$new || super.$dirty\n\t}\n\n\t/**\n\t * Get a relationship by name.\n\t *\n\t * @param {string} name The name of the relationship\n\t * @returns {Relationship} The relastionship\n\t */\n\tgetRelationship(name)\n\t{\n\t\tif (!(name in this.constructor.Relationships))\n\t\t{\n\t\t\treturn null\n\t\t}\n\n\t\treturn this.constructor.Relationships[name]\n\t}\n\n\t/**\n\t * Get a Node property or related node(s).\n\t *\n\t * @param {string} key The name of the property or relationship\n\t * @returns {any|RelatedNodeCollection} The value or related node(s)\n\t */\n\tget(key)\n\t{\n\t\tif (key in this.constructor.Relationships)\n\t\t{\n\t\t\treturn this.getRelated(key)\n\t\t}\n\n\t\treturn super.get(key)\n\t}\n\n\t/**\n\t * Set a Node property or related node(s).\n\t *\n\t * @param {string} key The name of the property or relationship\n\t * @param {any} value The value or related node(s)\n\t * @returns {boolean} Whether or not the property was successfully set\n\t */\n\tset(key, value)\n\t{\n\t\tif (key in this.constructor.relationships)\n\t\t{\n\t\t\treturn this.setRelated(key, value)\n\t\t}\n\n\t\treturn super.set(key, value)\n\t}\n\n\t/**\n\t * Get related node(s).\n\t *\n\t * @param {string} name The name of the relationship\n\t * @returns {RelatedNodeCollection} The related node(s)\n\t */\n\tgetRelated(name)\n\t{\n\t\tconst $Relationship = this.getRelationship(name)\n\n\t\tif (!this[_related][name])\n\t\t{\n\t\t\tconst nodes = this.$graph ? this.$graph.getRelated(this, $Relationship) : []\n\t\t\tconst related = new RelatedNodeCollection($Relationship, nodes, this)\n\n\t\t\tthis[_related][name] = related\n\t\t}\n\n\t\tconst result = this[_related][name]\n\n\t\tif (!result.length && $Relationship.singular)\n\t\t{\n\t\t\treturn null\n\t\t}\n\n\t\treturn $Relationship.singular ? result[0] : result\n\t}\n\n\t/**\n\t * Add related node(s).\n\t * Existing nodes will not be overwritten unless the relationship is singular.\n\t *\n\t * @param {string} name The name of the relationship\n\t * @param {Node|NodeCollection|Node[]} node Node(s)\n\t * @param {Object} [properties={}] Properties to set on the relationship(s)\n\t */\n\taddRelated(name, node, properties = {})\n\t{\n\t\tthis.setRelated(name, node, properties, false)\n\t}\n\n\t/**\n\t * Set related node(s).\n\t *\n\t * @param {string} name The name of the relastionship\n\t * @param {Node|NodeCollection|Node[]} node Node(s)\n\t * @param {any} [properties={}] Properties to set on the relationship(s)\n\t * @param {boolean} [overwrite=true] If set to false existing nodes will not be overwritten unless the relationship is singular\n\t */\n\tsetRelated(name, node, properties = {}, overwrite = true)\n\t{\n\t\tconst $Relationship = this.getRelationship(name)\n\n\t\tlet result = null\n\n\t\tif ($Relationship.singular)\n\t\t{\n\t\t\tresult = new RelatedNodeCollection($Relationship, [node], this)\n\t\t\tresult[0].$rel.setProperties(properties)\n\t\t}\n\t\telse\n\t\t{\n\t\t\tconst nodes = node instanceof Array ? node : [node]\n\t\t\tconst items = []\n\n\t\t\tfor (node of nodes)\n\t\t\t{\n\t\t\t\tconst item = new RelatedNode($Relationship, this, node, properties, this.$graph)\n\n\t\t\t\titems.push(item)\n\t\t\t}\n\n\t\t\tif (overwrite)\n\t\t\t{\n\t\t\t\tresult = new RelatedNodeCollection($Relationship, items, this)\n\t\t\t}\n\t\t\telse\n\t\t\t{\n\t\t\t\tresult = this.getRelated(name)\n\t\t\t\tresult.push(...items)\n\t\t\t}\n\t\t}\n\n\t\tthis.setChanged(name, result)\n\n\t\tthis[_related][name] = result\n\t}\n\n\t/**\n\t * Node labels. Will be added the node in the graph database.\n\t * By default it uses the label as defined by $type.\n\t *\n\t * @type {Array}\n\t */\n\tget $labels()\n\t{\n\t\treturn this[_labels] ? this[_labels] : [this.$type]\n\t}\n\n\t/**\n\t * Node labels. Will be added the node in the graph database.\n\t * By default it uses the label as defined by $type.\n\t *\n\t * @type {Array}\n\t * @param {Array} labels Labels\n\t */\n\tset $labels(labels)\n\t{\n\t\t// Mark as private to exclude from esdoc\n\t\t/**\n\t\t * @private\n\t\t */\n\t\tthis[_labels] = labels\n\t}\n\n\t/**\n\t * Save the Node to the graph database.\n\t *\n\t * @param {boolean} [deep=false] If true save all related nodes\n\t * @param {any} [tx=null] The current database transaction\n\t */\n\tasync save(deep = false, tx = null)\n\t{\n\t\t// Prevent infinite loops in circular graphs\n\t\tif (tx && tx.$nodes.includes(this.id))\n\t\t{\n\t\t\treturn\n\t\t}\n\n\t\tlet session = null\n\n\t\tif (!tx)\n\t\t{\n\t\t\ttx = DB.beginTransaction()\n\t\t\tsession = tx.session\n\t\t}\n\n\t\tthis.id = this.id || Node.uuid()\n\n\t\ttx.$nodes.push(this.id)\n\n\t\tif (this.$dirty)\n\t\t{\n\t\t\tconst properties = Object.assign({}, this.$data)\n\t\t\tconst parameters = { properties }\n\n\t\t\tlet query = ''\n\n\t\t\tparameters.id = this.id\n\n\t\t\tquery += 'MERGE (n {id: {id}})'\n\t\t\tquery += '\\n'\n\n\t\t\t// TODO: remove properties that were explicitly deleted\n\n\t\t\tquery += `\n\t\t\t\tSET n:${ this.$labels.join(':') }\n\t\t\t\tSET n += {properties}\n\t\t\t\tRETURN n\n\t\t\t`\n\n\t\t\tconst result = await tx.run(query, parameters).then(r => r)\n\n\t\t\tthis.$entity = result.records[0].get('n')\n\t\t\tthis.reset()\n\t\t}\n\n\t\tif (deep)\n\t\t{\n\t\t\tawait this.saveRelated(tx)\n\t\t}\n\n\t\tif (session)\n\t\t{\n\t\t\tawait tx.commit().then(r => r)\n\n\t\t\tsession.close()\n\t\t}\n\t}\n\n\t/**\n\t * Save related nodes and their relationships\n\t *\n\t * @param {Transaction} [tx] The current databse transaction\n\t */\n\tasync saveRelated(tx = null)\n\t{\n\t\tfor (const key of Object.keys(this.constructor.Relationships))\n\t\t{\n\t\t\tlet nodes = this.getRelated(key)\n\n\t\t\tif (nodes && !(nodes instanceof Array))\n\t\t\t{\n\t\t\t\tnodes = [nodes]\n\t\t\t}\n\n\t\t\tif (!nodes || !nodes.length)\n\t\t\t{\n\t\t\t\tcontinue\n\t\t\t}\n\n\t\t\tfor (const node of nodes)\n\t\t\t{\n\t\t\t\tawait node.save(true, tx)\n\n\t\t\t\tif (node.$rel.$dirty)\n\t\t\t\t{\n\t\t\t\t\tawait node.$rel.save(tx)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * Delete node from the graph database\n\t *\n\t * @param {boolean} [deep=false] Delete related nodes\n\t * @param {Transaction} [tx=null] The current databse transaction\n\t */\n\tasync delete(deep = false, tx = null)\n\t{\n\t\tif (!this.id)\n\t\t{\n\t\t\tthrow 'Can not delete a node without ID'\n\t\t}\n\n\t\t// Prevent infinite loops in circular graphs\n\t\tif (tx && tx.$nodes.includes(this.id))\n\t\t{\n\t\t\treturn\n\t\t}\n\n\t\tlet session = null\n\n\t\tif (!tx)\n\t\t{\n\t\t\tsession = DB.driver.session()\n\t\t\ttx = session.beginTransaction()\n\t\t\ttx.$nodes = []\n\t\t}\n\n\t\ttx.$nodes.push(this.id)\n\n\t\tconst query = `\n\t\t\tMATCH (n)\n\t\t\tWHERE n.id = {id}\n\t\t\tDETACH DELETE n\n\t\t`\n\n\t\tconst parameters = { id: this.id }\n\n\t\tawait DB.query(query, parameters)\n\n\t\tif (this.$graph)\n\t\t{\n\t\t\tthis.$graph.remove(this.$entity)\n\t\t}\n\n\t\tif (deep)\n\t\t{\n\t\t\tawait this.deleteRelated(tx)\n\t\t}\n\n\t\tthis.$entity = null\n\t\tthis.$data.id = null\n\n\t\tif (session)\n\t\t{\n\t\t\tawait tx.commit().then(r => r)\n\n\t\t\tsession.close()\n\t\t}\n\t}\n\n\t/**\n\t * Delete related nodes and their relationships\n\t *\n\t * @param {Transaction} [tx] The current databse transaction\n\t */\n\tasync deleteRelated(tx = null)\n\t{\n\t\tfor (const [name] of Object.entries(this.constructor.Relationships))\n\t\t{\n\t\t\tconst $Relationship = this.getRelationship(name)\n\t\t\tlet nodes = this.getRelated(name)\n\n\t\t\tif ($Relationship.singular)\n\t\t\t{\n\t\t\t\tnodes = nodes ? [nodes] : []\n\t\t\t}\n\n\t\t\tfor (const node of nodes)\n\t\t\t{\n\t\t\t\tawait node.delete(true, tx)\n\t\t\t}\n\t\t}\n\t}\n\n\t// *** STATIC METHODS ***\n\n\t/**\n\t * Fetch a single Node\n\t *\n\t * @param {string|object} filters Filter object or Node id\n\t * @param {QueryOptions} [o={}] Query options\n\t * @returns {Node} Result\n\t *\n\t * @example\n\t * const node = await Node.get('foo')\n\t *\n\t * @example\n\t * const node = await Node.get({ id: 'foo' })\n\t */\n\tstatic async get(filters, o = {})\n\t{\n\t\to.singular = true\n\n\t\treturn this.find(filters, o)\n\t}\n\n\t// @param {QueryOptions} [o={}] Query options\n\n\n\t/**\n\t * Fetch Nodes\n\t *\n\t * @param {QueryOptions} o Query options\n \t * @async\n\t * @return {Promise.<Array>} Results\n\t *\n\t * @example\n\t * const nodes = await Node.all({ limit: 10 })\n\t */\n\tstatic async all(o)\n\t{\n\t\tconst results = await this.find(null, o)\n\n\t\treturn results\n\t}\n\n\t/**\n\t * Use a query statement to search for Nodes\n\t * By default returns results for 'n' as Node collection\n\t *\n\t * @param {string} query A search query\n\t * @param {object} [parameters={}] Parameters used in query\n\t * @param {QueryOptions} [o={}] Query options\n\t * @returns {NodeCollection} Results\n\t *\n\t * @example\n\t * const nodes = await Node.query(`\n\t *     MATCH (n:Node)\n\t *     WHERE n.foo > {foo}\n\t * `, { foo: 1 })\n\t */\n\tstatic async query(query, parameters = {}, o = {})\n\t{\n\t\to = merge(o, { query, parameters })\n\n\t\treturn this.find(null, o)\n\t}\n\n\t/**\n\t * Use a query statement to search for Nodes\n\t * By default returns results for 'n' as Node collection\n\t *\n\t * @param {string} where A where clause\n\t * @param {object} [parameters={}] Parameters used in query\n\t * @param {QueryOptions} [o={}] Query options\n\t * @returns {NodeCollection} Results\n\t *\n\t * @example\n\t * const nodes = await Node.where('n.foo > {foo}', { foo: 1 })\n\t */\n\tstatic async where(where, parameters = {}, o = {})\n\t{\n\t\to = merge(o, { where, parameters })\n\n\t\treturn this.find(null, o)\n\t}\n\n\t/**\n\t * Default values for query options\n\t *\n\t */\n\tstatic get defaults()\n\t{\n\t\treturn {\n\t\t\tparameters: {},\n\t\t\tvariable: 'n',\n\t\t\tvariables: []\n\t\t}\n\t}\n\n\t/**\n\t * Find Nodes based on filter or Node ID\n\t *\n\t * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)\n\t * @param {QueryOptions} [o={}] Query options\n\t * @returns {NodeCollection} Results\n\t *\n\t * @example\n\t * // Find by ID\n\t * const nodes = Node.find('foo')\n\t *\n\t * @example\n\t * // Find by filter\n\t * const nodes = Node.find({ foo: 1 })\n\t *\n\t * @example\n\t * // Find by filter, with related Nodes\n\t * const nodes = Node.find({ foo: 1 }, { with: 'relatives' })\n\t * nodes[0].relatives\n\t */\n\tstatic async find(filters, o = {})\n\t{\n\t\to = merge(merge({}, this.defaults), o)\n\n\t\tif (!o.variables.includes(o.variable))\n\t\t{\n\t\t\to.variables.push(o.variable)\n\t\t}\n\n\t\tif (filters)\n\t\t{\n\t\t\to = merge(o, this.parseFilters(filters, o.variable))\n\t\t}\n\n\t\tif (o.with)\n\t\t{\n\t\t\to = merge(o, this.getRelationshipsQuery(o.with, o.variables, o.variable))\n\t\t}\n\n\t\tconst query = this.buildQuery(o)\n\n\t\tconsole.log('query', query, o.parameters)\n\t\tconsole.time('query time')\n\n\t\tconst graph = await Graph.build(query, o.parameters, { [o.variable]: this })\n\n\t\tconsole.timeEnd('query time')\n\n\t\tif (o.singular)\n\t\t{\n\t\t\treturn graph.map[o.variable] ? graph.map[o.variable][0] : null\n\t\t}\n\n\t\tconst nodes = graph.map[o.variable] || []\n\n\t\treturn new NodeCollection(this, nodes)\n\t}\n\n\t/**\n\t * Build a search query\n\t *\n\t * @param {object} o Query options\n\t * @returns {string} Query string\n\t */\n\tstatic buildQuery(o)\n\t{\n\t\to = merge(this.defaults, o)\n\n\t\t// Build Query\n\t\tlet query = o.query || `MATCH (${ o.variable }:${ this.name })\\n`\n\n\t\t// Define filters\n\t\tif (Array.isArray(o.where) && o.where.length)\n\t\t{\n\t\t\tquery += 'WHERE '\n\t\t\tquery += o.where.join('\\nAND ')\n\t\t\tquery += '\\n'\n\t\t}\n\t\telse if (typeof o.where == 'string')\n\t\t{\n\t\t\tquery += 'WHERE '\n\t\t\tquery += o.where\n\t\t\tquery += '\\n'\n\t\t}\n\n\t\tif (o.matches)\n\t\t{\n\t\t\tquery += o.matches.join('\\n')\n\t\t\tquery += '\\n'\n\t\t}\n\n\t\tquery += 'RETURN '\n\n\t\t// Define return values\n\t\tif (o.return)\n\t\t{\n\t\t\tquery += o.return\n\t\t}\n\t\telse\n\t\t{\n\t\t\tquery += o.variables.join(', ')\n\t\t}\n\n\t\tquery += '\\n'\n\n\t\tif (o.limit)\n\t\t{\n\t\t\tquery += `LIMIT ${ o.limit }\\n`\n\t\t}\n\n\t\treturn query\n\t}\n\n\t/**\n\t * Parse search filters\n\t *\n\t * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)\n\t * @param {string} [variable] Variable for the current node\n\t * @returns {QueryOptions} Filters options object\n\t */\n\tstatic parseFilters(filters, variable = 'n')\n\t{\n\t\tif (typeof filters == 'number')\n\t\t{\n\t\t\tfilters = { $id: filters }\n\t\t}\n\t\telse if (typeof filters == 'string')\n\t\t{\n\t\t\tfilters = { id: filters }\n\t\t}\n\t\telse if (!filters || filters !== Object(filters))\n\t\t{\n\t\t\treturn {}\n\t\t}\n\n\t\tconst o = {\n\t\t\tparameters: {},\n\t\t\twhere: []\n\t\t}\n\n\t\tfor (const [key, value] of Object.entries(filters))\n\t\t{\n\t\t\tconst valueVariable = `${ variable }_${ key }`\n\t\t\tlet condition = ''\n\n\t\t\tif (key === '$id')\n\t\t\t{\n\t\t\t\tcondition += `id(${ variable }) `\n\t\t\t}\n\t\t\telse\n\t\t\t{\n\t\t\t\tcondition += `${ variable }.${ key } `\n\t\t\t}\n\n\t\t\tif (value instanceof RegExp)\n\t\t\t{\n\t\t\t\tcondition += `=~ {${ valueVariable }}`\n\n\t\t\t\tconst flags = `(?${ value.flags.replace('g', '') })`\n\n\t\t\t\to.parameters[valueVariable] = flags + value.source\n\t\t\t}\n\t\t\telse if (Array.isArray(value))\n\t\t\t{\n\t\t\t\tconst names = []\n\n\t\t\t\tvalue.forEach((v, i) =>\n\t\t\t\t{\n\t\t\t\t\tconst name = valueVariable + i\n\n\t\t\t\t\to.parameters[name] = v\n\t\t\t\t\tnames.push(`{${ name }}`)\n\t\t\t\t})\n\n\t\t\t\tcondition += `IN [${ names.join(', ') }]`\n\t\t\t}\n\t\t\telse\n\t\t\t{\n\t\t\t\tcondition += `= {${ valueVariable }}`\n\t\t\t\to.parameters[valueVariable] = value\n\t\t\t}\n\n\t\t\to.where.push(condition)\n\t\t}\n\n\t\treturn o\n\t}\n\n\t/**\n\t * Count nodes in graph database\n\t *\n\t * @param {object|string} filters Search filters (object) or where clause (string)\n\t * @param {any} [parameters={}] Parameters used in where clause\n\t * @param {QueryOptions} [o={}] Query options\n\t * @returns {number} Number of nodes\n\t */\n\tstatic async count(filters, parameters = {}, o = {})\n\t{\n\t\to = merge(this.defaults, o)\n\t\to = merge(o, { parameters })\n\n\t\tif (typeof filters == 'string')\n\t\t{\n\t\t\to.where = filters\n\t\t}\n\t\telse if (!!filters && filters.constructor === Object)\n\t\t{\n\t\t\to = merge(o, this.parseFilters(filters, o.variable))\n\t\t}\n\n\t\to.return = `count(distinct(${ o.variable })) as total`\n\n\t\tconst query = this.buildQuery(o)\n\n\t\tconst results = await DB.query(query, o.parameters)\n\n\t\treturn results.records[0].get('total').toInt()\n\t}\n\n\t/**\n\t * Definitions of the relationships for this Node\n\t *\n\t * @member\n\t * @readonly\n\t * @type {object.<string, RelationshipDefinition>}\n\t */\n\tstatic get relationships()\n\t{\n\t\treturn {}\n\t}\n\n\t/**\n\t * Auto-genreated {@link Relationship} sub-classes based on definitions\n\t *\n\t * @type {object.<string, Function>}\n\t */\n\tstatic get Relationships()\n\t{\n\t\tconst Relationships = {}\n\n\t\tconst names = Object.keys(this.relationships)\n\n\t\tfor (const name of names)\n\t\t{\n\t\t\t// TODO: cache classes\n\n\t\t\tclass NewRelationship extends Relationship {}\n\n\t\t\tRelationships[name] = Object.assign(NewRelationship, this.relationships[name])\n\t\t}\n\n\t\treturn Relationships\n\t}\n\n\t/**\n\t * Build query options for related nodes\n\t * Mostly intended for internal usage.\n\t *\n\t * @param {string} levels Filter for related nodes in dot-format (eg. father.children will fetch the related 'father' and its 'children')\n\t * @param {object} variables The variables currently used for building the query\n\t * @param {string} [reference='n'] Reference variable for the current node\n\t * @returns {options} Query options object\n\t * @property {array} matches Optional matches for each relationship\n\t * @property {object} variables The variables currently used for building the query\n\t */\n\tstatic getRelationshipsQuery(levels, variables, reference = 'n')\n\t{\n\t\tlet o = {\n\t\t\tmatches: [],\n\t\t\tvariables\n\t\t}\n\n\t\tconst relationships = this.Relationships\n\t\tconst names = Object.keys(relationships)\n\n\t\tif (typeof levels === 'string')\n\t\t{\n\t\t\tlevels = { [levels]: true }\n\t\t}\n\t\telse if (Array.isArray(levels))\n\t\t{\n\t\t\tlevels = levels.reduce((obj, key) =>\n\t\t\t{\n\t\t\t\tobj[key] = {}\n\t\t\t\treturn obj\n\t\t\t}, {})\n\t\t}\n\n\t\tfor (const name of names)\n\t\t{\n\t\t\tlet next = null\n\t\t\tlet current = null\n\t\t\tlet filters = null\n\n\t\t\tfor (let level of Object.keys(levels))\n\t\t\t{\n\t\t\t\tfilters = levels[level]\n\n\t\t\t\tif (level.includes('.'))\n\t\t\t\t{\n\t\t\t\t\tnext = level.substr(level.indexOf('.') + 1)\n\t\t\t\t\tnext = { [next]: filters }\n\n\t\t\t\t\tlevel = level.substr(0, level.indexOf('.'))\n\t\t\t\t}\n\t\t\t\telse\n\t\t\t\t{\n\t\t\t\t\tnext = null\n\t\t\t\t}\n\n\t\t\t\tif (name === level)\n\t\t\t\t{\n\t\t\t\t\tcurrent = level\n\t\t\t\t\tbreak\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (!current)\n\t\t\t{\n\t\t\t\tcontinue\n\t\t\t}\n\n\t\t\tconst relationship = relationships[name]\n\t\t\tconst nodeVar = `${ reference }_${ name }`\n\t\t\tconst relationshipVar = `${ reference }_r_${ name }`\n\t\t\tconst collectionVar = '_col'\n\n\t\t\tlet query = `OPTIONAL MATCH (${ reference })`\n\n\t\t\tif (relationship.direction === Relationship.IN || relationship.direction === Relationship.BOTH)\n\t\t\t{\n\t\t\t\tquery += '<'\n\t\t\t}\n\n\t\t\tquery += `-[${ reference }_r_${ name }:${ relationship.type }]-`\n\n\t\t\tif (relationship.direction === Relationship.OUT || relationship.direction === Relationship.BOTH)\n\t\t\t{\n\t\t\t\tquery += '>'\n\t\t\t}\n\n\t\t\tquery += `(${ nodeVar }:${ relationship.Model.name })`\n\n\t\t\tif (!next)\n\t\t\t{\n\t\t\t\to = merge(o, this.parseFilters(filters, nodeVar))\n\n\t\t\t\tif (o.where && o.where.length)\n\t\t\t\t{\n\t\t\t\t\tquery += '\\n'\n\t\t\t\t\tquery += 'WHERE '\n\t\t\t\t\tquery += o.where.join('\\nAND ')\n\n\t\t\t\t\tdelete o.where\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tquery += '\\n'\n\t\t\tquery += `WITH ${ o.variables.join(', ') }, `\n\t\t\tquery += `COLLECT(${ nodeVar }) as ${ nodeVar + collectionVar }, `\n\t\t\tquery += `COLLECT(${ relationshipVar }) as ${ relationshipVar + collectionVar }`\n\n\t\t\to.matches.push(query)\n\n\t\t\to.variables.push(nodeVar + collectionVar)\n\t\t\to.variables.push(relationshipVar + collectionVar)\n\n\t\t\tif (next)\n\t\t\t{\n\t\t\t\tconst nextO = relationship.Model.getRelationshipsQuery(next, o.variables, nodeVar)\n\n\t\t\t\to = merge(o, nextO)\n\t\t\t}\n\t\t}\n\n\t\treturn o\n\t}\n}\n\nmodule.exports = Node\n",
+    "static": true,
+    "longname": "lib/Node.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 22,
+    "kind": "variable",
+    "name": "neo4j",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~neo4j",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 23,
+    "kind": "variable",
+    "name": "Model",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~Model",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 24,
+    "kind": "variable",
+    "name": "NodeCollection",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~NodeCollection",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 25,
+    "kind": "variable",
+    "name": "RelatedNode",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~RelatedNode",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 26,
+    "kind": "variable",
+    "name": "RelatedNodeCollection",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~RelatedNodeCollection",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 27,
+    "kind": "variable",
+    "name": "Relationship",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~Relationship",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 28,
+    "kind": "variable",
+    "name": "Graph",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~Graph",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 29,
+    "kind": "variable",
+    "name": "DB",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~DB",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 30,
+    "kind": "variable",
+    "name": "shortid",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~shortid",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 31,
+    "kind": "variable",
+    "name": "merge",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~merge",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 12,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "typedef",
+    "name": "QueryOptions",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~QueryOptions",
+    "access": null,
+    "description": "Query options object",
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Object.<String, *>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parameters",
+        "description": "Parameters used in the query."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "variable",
+        "description": "The variable used to identify the Node in the query, 'n' by default."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "variables",
+        "description": "All variables used in the query that should be added to the results."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "where",
+        "description": "The where clause, arrays are joined by the 'AND' operator."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "with",
+        "description": "The name of relationship to include, use the dot-notation to include mutliple levels"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "with",
+        "description": "An array of names of relationships to include"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object.<String, Boolean|Object>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "with",
+        "description": "Relationships to include (true) or exclude (false) or filter(object)"
+      }
+    ],
+    "type": {
+      "types": [
+        "Object"
+      ],
+      "optional": false,
+      "name": "QueryOptions"
+    }
+  },
+  {
+    "__docId__": 33,
+    "kind": "typedef",
+    "name": "RelationshipDefinition",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~RelationshipDefinition",
+    "access": null,
+    "description": "Relationship definition object",
+    "lineNumber": 39,
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Node",
+          "function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "Model",
+        "description": "{@link Relationship.Model}"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "type",
+        "description": "{@link Relationship.type}"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "direction",
+        "description": "{@link Relationship.direction}"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "singular",
+        "description": "{@link Relationship.singular}"
+      }
+    ],
+    "type": {
+      "types": [
+        "object"
+      ],
+      "optional": false,
+      "name": "RelationshipDefinition"
+    }
+  },
+  {
+    "__docId__": 34,
+    "kind": "variable",
+    "name": "_labels",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~_labels",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 40,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 35,
+    "kind": "class",
+    "name": "Node",
+    "memberof": "lib/Node.js",
+    "static": true,
+    "longname": "lib/Node.js~Node",
+    "access": null,
+    "export": true,
+    "importPath": "neo-maggoo/lib/Node.js",
+    "importStyle": "Node",
+    "description": "",
+    "lineNumber": 46,
+    "unknown": [
+      {
+        "tagName": "@class",
+        "tagValue": "Node"
+      }
+    ],
+    "interface": false,
+    "extends": [
+      "Model"
+    ]
+  },
+  {
+    "__docId__": 36,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#constructor",
+    "access": null,
+    "description": "Creates an instance of Node.",
+    "lineNumber": 54,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Node",
+          "neo4j.types.Node"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "node",
+        "description": "Node data object or neo4j Node"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Graph"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "graph",
+        "description": "The current graph"
+      }
+    ]
+  },
+  {
+    "__docId__": 37,
+    "kind": "member",
+    "name": "$labels",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#$labels",
+    "access": null,
+    "description": null,
+    "lineNumber": 60,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 38,
+    "kind": "member",
+    "name": "$entity",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#$entity",
+    "access": null,
+    "description": "",
+    "lineNumber": 65,
+    "type": {
+      "nullable": null,
+      "types": [
+        "neo4.Node"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 39,
+    "kind": "member",
+    "name": "[_related]",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#[_related]",
+    "access": "private",
+    "description": "",
+    "lineNumber": 75,
+    "type": {
+      "types": [
+        "{}"
+      ]
+    }
+  },
+  {
+    "__docId__": 40,
+    "kind": "member",
+    "name": "$graph",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#$graph",
+    "access": null,
+    "description": "",
+    "lineNumber": 80,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Graph"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 41,
+    "kind": "get",
+    "name": "id",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#id",
+    "access": null,
+    "description": "The node ID.\nThis will be automatically genreated when the node is saved",
+    "lineNumber": 89,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 42,
+    "kind": "set",
+    "name": "id",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#id",
+    "access": null,
+    "description": null,
+    "lineNumber": 94,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 43,
+    "kind": "method",
+    "name": "uuid",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.uuid",
+    "access": null,
+    "description": "ID generator, uses ShortId by default",
+    "lineNumber": 103,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} ID"
+      }
+    ],
+    "params": [],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "ID"
+    }
+  },
+  {
+    "__docId__": 44,
+    "kind": "get",
+    "name": "$id",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#$id",
+    "access": null,
+    "description": "The neo4j entity ID.\nNote that this could change over time, use id instead.",
+    "lineNumber": 115,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "number"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 45,
+    "kind": "get",
+    "name": "$new",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#$new",
+    "access": null,
+    "description": "Whether or not the node is already stored in the graph database.",
+    "lineNumber": 125,
+    "type": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 46,
+    "kind": "get",
+    "name": "$dirty",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#$dirty",
+    "access": null,
+    "description": "Whether or not the Node has changed properties.",
+    "lineNumber": 135,
+    "type": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 47,
+    "kind": "method",
+    "name": "getRelationship",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#getRelationship",
+    "access": null,
+    "description": "Get a relationship by name.",
+    "lineNumber": 146,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Relationship} The relastionship"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "The name of the relationship"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Relationship"
+      ],
+      "spread": false,
+      "description": "The relastionship"
+    }
+  },
+  {
+    "__docId__": 48,
+    "kind": "method",
+    "name": "get",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#get",
+    "access": null,
+    "description": "Get a Node property or related node(s).",
+    "lineNumber": 162,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{any|RelatedNodeCollection} The value or related node(s)"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "key",
+        "description": "The name of the property or relationship"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "any",
+        "RelatedNodeCollection"
+      ],
+      "spread": false,
+      "description": "The value or related node(s)"
+    }
+  },
+  {
+    "__docId__": 49,
+    "kind": "method",
+    "name": "set",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#set",
+    "access": null,
+    "description": "Set a Node property or related node(s).",
+    "lineNumber": 179,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{boolean} Whether or not the property was successfully set"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "key",
+        "description": "The name of the property or relationship"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "value",
+        "description": "The value or related node(s)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": "Whether or not the property was successfully set"
+    }
+  },
+  {
+    "__docId__": 50,
+    "kind": "method",
+    "name": "getRelated",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#getRelated",
+    "access": null,
+    "description": "Get related node(s).",
+    "lineNumber": 195,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{RelatedNodeCollection} The related node(s)"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "The name of the relationship"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "RelatedNodeCollection"
+      ],
+      "spread": false,
+      "description": "The related node(s)"
+    }
+  },
+  {
+    "__docId__": 51,
+    "kind": "method",
+    "name": "addRelated",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#addRelated",
+    "access": null,
+    "description": "Add related node(s).\nExisting nodes will not be overwritten unless the relationship is singular.",
+    "lineNumber": 225,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "The name of the relationship"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Node",
+          "NodeCollection",
+          "Node[]"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "node",
+        "description": "Node(s)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "properties",
+        "description": "Properties to set on the relationship(s)"
+      }
+    ]
+  },
+  {
+    "__docId__": 52,
+    "kind": "method",
+    "name": "setRelated",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#setRelated",
+    "access": null,
+    "description": "Set related node(s).",
+    "lineNumber": 238,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "The name of the relastionship"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Node",
+          "NodeCollection",
+          "Node[]"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "node",
+        "description": "Node(s)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "properties",
+        "description": "Properties to set on the relationship(s)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "true",
+        "defaultRaw": true,
+        "name": "overwrite",
+        "description": "If set to false existing nodes will not be overwritten unless the relationship is singular"
+      }
+    ]
+  },
+  {
+    "__docId__": 53,
+    "kind": "get",
+    "name": "$labels",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#$labels",
+    "access": null,
+    "description": "Node labels. Will be added the node in the graph database.\nBy default it uses the label as defined by $type.",
+    "lineNumber": 283,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 54,
+    "kind": "set",
+    "name": "$labels",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Node.js~Node#$labels",
+    "access": null,
+    "description": "Node labels. Will be added the node in the graph database.\nBy default it uses the label as defined by $type.",
+    "lineNumber": 295,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "labels",
+        "description": "Labels"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 55,
+    "kind": "member",
+    "name": "[_labels]",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#[_labels]",
+    "access": "private",
+    "description": "",
+    "lineNumber": 301,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "method",
+    "name": "save",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/Node.js~Node#save",
+    "access": null,
+    "description": "Save the Node to the graph database.",
+    "lineNumber": 310,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "false",
+        "defaultRaw": false,
+        "name": "deep",
+        "description": "If true save all related nodes"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "tx",
+        "description": "The current database transaction"
+      }
+    ]
+  },
+  {
+    "__docId__": 57,
+    "kind": "member",
+    "name": "id",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#id",
+    "access": null,
+    "description": null,
+    "lineNumber": 326,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "member",
+    "name": "$entity",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#$entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 352,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 59,
+    "kind": "method",
+    "name": "saveRelated",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/Node.js~Node#saveRelated",
+    "access": null,
+    "description": "Save related nodes and their relationships",
+    "lineNumber": 374,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Transaction"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "tx",
+        "description": "The current databse transaction"
+      }
+    ]
+  },
+  {
+    "__docId__": 60,
+    "kind": "method",
+    "name": "delete",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/Node.js~Node#delete",
+    "access": null,
+    "description": "Delete node from the graph database",
+    "lineNumber": 408,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "boolean"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "false",
+        "defaultRaw": false,
+        "name": "deep",
+        "description": "Delete related nodes"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Transaction"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "null",
+        "defaultRaw": null,
+        "name": "tx",
+        "description": "The current databse transaction"
+      }
+    ]
+  },
+  {
+    "__docId__": 61,
+    "kind": "member",
+    "name": "$entity",
+    "memberof": "lib/Node.js~Node",
+    "static": false,
+    "longname": "lib/Node.js~Node#$entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 452,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 62,
+    "kind": "method",
+    "name": "deleteRelated",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/Node.js~Node#deleteRelated",
+    "access": null,
+    "description": "Delete related nodes and their relationships",
+    "lineNumber": 468,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Transaction"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "tx",
+        "description": "The current databse transaction"
+      }
+    ]
+  },
+  {
+    "__docId__": 63,
+    "kind": "method",
+    "name": "get",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.get",
+    "access": null,
+    "description": "Fetch a single Node",
+    "examples": [
+      "const node = await Node.get('foo')",
+      "const node = await Node.get({ id: 'foo' })"
+    ],
+    "lineNumber": 502,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Node} Result"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "filters",
+        "description": "Filter object or Node id"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Node"
+      ],
+      "spread": false,
+      "description": "Result"
+    }
+  },
+  {
+    "__docId__": 64,
+    "kind": "method",
+    "name": "all",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.all",
+    "access": null,
+    "description": "Fetch Nodes",
+    "examples": [
+      "const nodes = await Node.all({ limit: 10 })"
+    ],
+    "lineNumber": 522,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise.<Array>"
+      ],
+      "spread": false,
+      "description": "Results"
+    }
+  },
+  {
+    "__docId__": 65,
+    "kind": "method",
+    "name": "query",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.query",
+    "access": null,
+    "description": "Use a query statement to search for Nodes\nBy default returns results for 'n' as Node collection",
+    "examples": [
+      "const nodes = await Node.query(`\n    MATCH (n:Node)\n    WHERE n.foo > {foo}\n`, { foo: 1 })"
+    ],
+    "lineNumber": 544,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{NodeCollection} Results"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "query",
+        "description": "A search query"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "parameters",
+        "description": "Parameters used in query"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "NodeCollection"
+      ],
+      "spread": false,
+      "description": "Results"
+    }
+  },
+  {
+    "__docId__": 66,
+    "kind": "method",
+    "name": "where",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.where",
+    "access": null,
+    "description": "Use a query statement to search for Nodes\nBy default returns results for 'n' as Node collection",
+    "examples": [
+      "const nodes = await Node.where('n.foo > {foo}', { foo: 1 })"
+    ],
+    "lineNumber": 563,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{NodeCollection} Results"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "where",
+        "description": "A where clause"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "parameters",
+        "description": "Parameters used in query"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "NodeCollection"
+      ],
+      "spread": false,
+      "description": "Results"
+    }
+  },
+  {
+    "__docId__": 67,
+    "kind": "get",
+    "name": "defaults",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.defaults",
+    "access": null,
+    "description": "Default values for query options",
+    "lineNumber": 574,
+    "type": {
+      "types": [
+        "{\"parameters\": *, \"variable\": string, \"variables\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 68,
+    "kind": "method",
+    "name": "find",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.find",
+    "access": null,
+    "description": "Find Nodes based on filter or Node ID",
+    "examples": [
+      "// Find by ID\nconst nodes = Node.find('foo')",
+      "// Find by filter\nconst nodes = Node.find({ foo: 1 })",
+      "// Find by filter, with related Nodes\nconst nodes = Node.find({ foo: 1 }, { with: 'relatives' })\nnodes[0].relatives"
+    ],
+    "lineNumber": 603,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{NodeCollection} Results"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object",
+          "string",
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "filters",
+        "description": "Search filters, Node ID (string), or neo4j node identifier (number)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "NodeCollection"
+      ],
+      "spread": false,
+      "description": "Results"
+    }
+  },
+  {
+    "__docId__": 69,
+    "kind": "method",
+    "name": "buildQuery",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.buildQuery",
+    "access": null,
+    "description": "Build a search query",
+    "lineNumber": 647,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} Query string"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "Query string"
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "method",
+    "name": "parseFilters",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.parseFilters",
+    "access": null,
+    "description": "Parse search filters",
+    "lineNumber": 703,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{QueryOptions} Filters options object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object",
+          "string",
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "filters",
+        "description": "Search filters, Node ID (string), or neo4j node identifier (number)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "variable",
+        "description": "Variable for the current node"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "QueryOptions"
+      ],
+      "spread": false,
+      "description": "Filters options object"
+    }
+  },
+  {
+    "__docId__": 71,
+    "kind": "method",
+    "name": "count",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "lib/Node.js~Node.count",
+    "access": null,
+    "description": "Count nodes in graph database",
+    "lineNumber": 779,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{number} Number of nodes"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object",
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "filters",
+        "description": "Search filters (object) or where clause (string)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "parameters",
+        "description": "Parameters used in where clause"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "QueryOptions"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "o",
+        "description": "Query options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "number"
+      ],
+      "spread": false,
+      "description": "Number of nodes"
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "get",
+    "name": "relationships",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.relationships",
+    "access": null,
+    "description": "Definitions of the relationships for this Node",
+    "lineNumber": 809,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "object.<string, RelationshipDefinition>"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 73,
+    "kind": "get",
+    "name": "Relationships",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.Relationships",
+    "access": null,
+    "description": "Auto-genreated {@link Relationship} sub-classes based on definitions",
+    "lineNumber": 819,
+    "type": {
+      "nullable": null,
+      "types": [
+        "object.<string, Function>"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 74,
+    "kind": "method",
+    "name": "getRelationshipsQuery",
+    "memberof": "lib/Node.js~Node",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Node.js~Node.getRelationshipsQuery",
+    "access": null,
+    "description": "Build query options for related nodes\nMostly intended for internal usage.",
+    "lineNumber": 848,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{options} Query options object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "levels",
+        "description": "Filter for related nodes in dot-format (eg. father.children will fetch the related 'father' and its 'children')"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "variables",
+        "description": "The variables currently used for building the query"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "'n'",
+        "defaultRaw": "'n'",
+        "name": "reference",
+        "description": "Reference variable for the current node"
+      }
+    ],
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "matches",
+        "description": "Optional matches for each relationship"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "variables",
+        "description": "The variables currently used for building the query"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "options"
+      ],
+      "spread": false,
+      "description": "Query options object"
+    }
+  },
+  {
+    "__docId__": 75,
+    "kind": "file",
+    "name": "lib/NodeCollection.js",
+    "content": "'use strict'\n\nconst { Collection } = require('maggoo')\nconst DB = require('./DB')\n\nclass NodeCollection extends Collection {\n\n\tconstructor(Model, items)\n\t{\n\t\tif (items && items instanceof Model)\n\t\t{\n\t\t\titems = [items]\n\t\t}\n\n\t\tsuper(Model, items)\n\t}\n\n\tasync save(deep)\n\t{\n\t\tconst tx = DB.beginTransaction()\n\t\tconst session = tx.session\n\n\t\tconst run = this.wrap('save')\n\n\t\tawait run(deep, tx)\n\n\t\tif (session)\n\t\t{\n\t\t\tawait tx.commit().then(r => r)\n\n\t\t\tsession.close()\n\t\t}\n\t}\n\n\tasync delete(deep)\n\t{\n\t\tconst tx = DB.beginTransaction()\n\t\tconst session = tx.session\n\n\t\tconst run = this.wrap('delete')\n\n\t\tawait run(deep, tx)\n\n\t\tif (session)\n\t\t{\n\t\t\tawait tx.commit().then(r => r)\n\n\t\t\tsession.close()\n\t\t}\n\t}\n\n}\n\nmodule.exports = NodeCollection\n",
+    "static": true,
+    "longname": "lib/NodeCollection.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 76,
+    "kind": "variable",
+    "name": "Collection",
+    "memberof": "lib/NodeCollection.js",
+    "static": true,
+    "longname": "lib/NodeCollection.js~Collection",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/NodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 77,
+    "kind": "variable",
+    "name": "DB",
+    "memberof": "lib/NodeCollection.js",
+    "static": true,
+    "longname": "lib/NodeCollection.js~DB",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/NodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 78,
+    "kind": "class",
+    "name": "NodeCollection",
+    "memberof": "lib/NodeCollection.js",
+    "static": true,
+    "longname": "lib/NodeCollection.js~NodeCollection",
+    "access": null,
+    "export": true,
+    "importPath": "neo-maggoo/lib/NodeCollection.js",
+    "importStyle": "NodeCollection",
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false,
+    "extends": [
+      "Collection"
+    ]
+  },
+  {
+    "__docId__": 79,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/NodeCollection.js~NodeCollection",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/NodeCollection.js~NodeCollection#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "Model",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "items",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 80,
+    "kind": "method",
+    "name": "save",
+    "memberof": "lib/NodeCollection.js~NodeCollection",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/NodeCollection.js~NodeCollection#save",
+    "access": null,
+    "description": null,
+    "lineNumber": 18,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "deep",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 81,
+    "kind": "method",
+    "name": "delete",
+    "memberof": "lib/NodeCollection.js~NodeCollection",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/NodeCollection.js~NodeCollection#delete",
+    "access": null,
+    "description": null,
+    "lineNumber": 35,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "deep",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 82,
+    "kind": "file",
+    "name": "lib/RelatedNode.js",
+    "content": "'use strict'\n\nclass RelatedNode {}\n\nconst proxy = new Proxy(RelatedNode, {\n\tconstruct(obj, [$Relationship, start, end, properties = {}, graph = null])\n\t{\n\t\tlet rel = null\n\n\t\tif (graph)\n\t\t{\n\t\t\trel = graph.getRelationship(start, end, $Relationship)\n\t\t}\n\n\t\tif (!rel)\n\t\t{\n\t\t\trel = new $Relationship(properties, graph)\n\n\t\t\trel.start = start\n\t\t\trel.end = end\n\t\t}\n\n\t\treturn new Proxy(end, {\n\t\t\tgetPrototypeOf: () =>\n\t\t\t{\n\t\t\t\treturn $Relationship.Model.prototype\n\t\t\t},\n\t\t\thas(target, name)\n\t\t\t{\n\t\t\t\tif (name === '$rel')\n\t\t\t\t{\n\t\t\t\t\treturn true\n\t\t\t\t}\n\n\t\t\t\treturn Reflect.has(...arguments)\n\t\t\t},\n\t\t\tget(target, name)\n\t\t\t{\n\t\t\t\tif (name === '$rel')\n\t\t\t\t{\n\t\t\t\t\treturn rel\n\t\t\t\t}\n\n\t\t\t\treturn target[name]\n\t\t\t}\n\t\t})\n\t}\n})\n\nmodule.exports = proxy\n",
+    "static": true,
+    "longname": "lib/RelatedNode.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 83,
+    "kind": "class",
+    "name": "RelatedNode",
+    "memberof": "lib/RelatedNode.js",
+    "static": true,
+    "longname": "lib/RelatedNode.js~RelatedNode",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/RelatedNode.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false
+  },
+  {
+    "__docId__": 84,
+    "kind": "file",
+    "name": "lib/RelatedNodeCollection.js",
+    "content": "'use strict'\n\nconst NodeCollection = require('./NodeCollection')\nconst RelatedNode = require('./RelatedNode')\n\nclass RelatedNodeCollection extends NodeCollection {\n\n\tconstructor(Relationship, items, start)\n\t{\n\t\tsuper(Relationship.Model, items)\n\n\t\tthis.$Relationship = Relationship\n\t\tthis.$start = start\n\t}\n\n\tcreateRelatedNode(node)\n\t{\n\t\treturn new RelatedNode(this.$Relationship, this.$start, node, {}, this.$start.$graph)\n\t}\n\n}\n\nconst proxify = {\n\n\tconstruct()\n\t{\n\t\tconst instance = Reflect.construct(...arguments)\n\n\t\tconst proxied = new Proxy(instance, {\n\n\t\t\tget(target, key)\n\t\t\t{\n\t\t\t\tlet value = Reflect.get(...arguments)\n\n\t\t\t\t// Wrap all nodes in a Related object\n\t\t\t\tif (value instanceof target.$Model && !('$rel' in value))\n\t\t\t\t{\n\t\t\t\t\tvalue = target[key] = target.createRelatedNode(value)\n\t\t\t\t}\n\n\t\t\t\treturn value\n\t\t\t}\n\n\t\t})\n\n\t\treturn proxied\n\t}\n\n}\n\nmodule.exports = new Proxy(RelatedNodeCollection, proxify)\n",
+    "static": true,
+    "longname": "lib/RelatedNodeCollection.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 85,
+    "kind": "variable",
+    "name": "NodeCollection",
+    "memberof": "lib/RelatedNodeCollection.js",
+    "static": true,
+    "longname": "lib/RelatedNodeCollection.js~NodeCollection",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/RelatedNodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 86,
+    "kind": "variable",
+    "name": "RelatedNode",
+    "memberof": "lib/RelatedNodeCollection.js",
+    "static": true,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNode",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/RelatedNodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "class",
+    "name": "RelatedNodeCollection",
+    "memberof": "lib/RelatedNodeCollection.js",
+    "static": true,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNodeCollection",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/RelatedNodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "interface": false,
+    "extends": [
+      "NodeCollection"
+    ]
+  },
+  {
+    "__docId__": 88,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/RelatedNodeCollection.js~RelatedNodeCollection",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNodeCollection#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "Relationship",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "items",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "start",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 89,
+    "kind": "member",
+    "name": "$Relationship",
+    "memberof": "lib/RelatedNodeCollection.js~RelatedNodeCollection",
+    "static": false,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNodeCollection#$Relationship",
+    "access": null,
+    "description": null,
+    "lineNumber": 12,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 90,
+    "kind": "member",
+    "name": "$start",
+    "memberof": "lib/RelatedNodeCollection.js~RelatedNodeCollection",
+    "static": false,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNodeCollection#$start",
+    "access": null,
+    "description": null,
+    "lineNumber": 13,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 91,
+    "kind": "method",
+    "name": "createRelatedNode",
+    "memberof": "lib/RelatedNodeCollection.js~RelatedNodeCollection",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/RelatedNodeCollection.js~RelatedNodeCollection#createRelatedNode",
+    "access": null,
+    "description": null,
+    "lineNumber": 16,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "node",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "variable",
+    "name": "proxify",
+    "memberof": "lib/RelatedNodeCollection.js",
+    "static": true,
+    "longname": "lib/RelatedNodeCollection.js~proxify",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/RelatedNodeCollection.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 23,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "{\"construct\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 93,
+    "kind": "file",
+    "name": "lib/Relationship.js",
+    "content": "'use strict'\n\nconst neo4j = require('neo4j-driver/lib/v1')\nconst DB = require('./DB')\nconst { Model } = require('maggoo')\n\nconst _model = Symbol()\nconst _type = Symbol()\nconst _singular = Symbol()\nconst _start = Symbol()\nconst _end = Symbol()\nconst _direction = Symbol()\n\n/**\n * Class representing a relationship between two nodes\n * @extends Model\n */\nclass Relationship extends Model {\n\n\t// *** CONSTANTS\n\n\t/**\n\t * @constant\n\t * @member {string}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get OUT()\n\t{\n\t\treturn 'relationship.direction.out'\n\t}\n\n\t/**\n\t * @constant\n\t * @member {string}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get IN()\n\t{\n\t\treturn 'relationship.direction.in'\n\t}\n\n\t/**\n\t * @constant\n\t * @type {string}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get BOTH()\n\t{\n\t\treturn 'relationship.direction.both'\n\t}\n\n\n\t// *** PUBLIC METHODS\n\n\tconstructor(relation, graph)\n\t{\n\t\tif (relation instanceof neo4j.types.Relationship)\n\t\t{\n\t\t\tsuper(relation.properties)\n\n\t\t\tthis.$entity = relation\n\t\t}\n\t\telse\n\t\t{\n\t\t\tsuper(relation)\n\t\t}\n\n\t\tthis.$graph = graph\n\n\t\tthis.start = null\n\t\tthis.end = null\n\t}\n\n\tget $direction()\n\t{\n\t\treturn this.constructor.direction\n\t}\n\n\tget $type()\n\t{\n\t\treturn this.constructor.type\n\t}\n\n\t/**\n\t * Whether or not the node is already stored in the graph database.\n\t *\n\t * @readonly\n\t * @type {boolean}\n\t *\n\t * @memberOf Node\n\t */\n\tget $new()\n\t{\n\t\treturn !this.$entity\n\t}\n\n\t/**\n\t * Whether or not the Node has changed properties.\n\t *\n\t * @readonly\n\t * @type {boolean}\n\t *\n\t * @memberOf Node\n\t */\n\tget $dirty()\n\t{\n\t\treturn this.$new || super.$dirty\n\t}\n\n\tget start()\n\t{\n\t\treturn this[_start]\n\t}\n\n\tset start(start)\n\t{\n\t\tthis[_start] = start\n\t}\n\n\tget end()\n\t{\n\t\treturn this[_end]\n\t}\n\n\tset end(end)\n\t{\n\t\tthis[_end] = end\n\t}\n\n\tasync save(tx)\n\t{\n\t\tlet session = null\n\n\t\tif (!tx)\n\t\t{\n\t\t\ttx = DB.beginTransaction()\n\t\t\tsession = tx.session\n\t\t}\n\n\t\tconst left = (this.$direction === Relationship.IN || this.$direction === Relationship.BOTH) ? '<' : ''\n\t\tconst right = (this.$direction === Relationship.OUT || this.$direction === Relationship.BOTH) ? '>' : ''\n\n\t\tconst query = `\n\t\t\tMATCH (start { id: {start} })\n\t\t\tMATCH (end { id: {end} })\n\t\t\tMERGE (start)${ left }-[r:${ this.$type }]-${ right }(end)\n\t\t\tSET r += {properties}\n\t\t\tRETURN r\n\t\t`\n\n\t\tconst parameters = {\n\t\t\tstart: this.start.id,\n\t\t\tend: this.end.id,\n\t\t\tproperties: this.$data\n\t\t}\n\n\t\t// console.log('save relationship', query, parameters)\n\t\t// console.time('save relationship')\n\n\t\tconst result = await tx.run(query, parameters).then(r => r)\n\n\t\tthis.$entity = result.records[0].get('r')\n\n\t\t// console.timeEnd('save relationship')\n\n\t\tif (session)\n\t\t{\n\t\t\tawait tx.commit().then(r => r)\n\n\t\t\tsession.close()\n\t\t}\n\t}\n\n\n\t// *** PRIVATE METHODS\n\n\n\t// *** STATIC METHODS\n\n\t/**\n\t * The type of the relationhip, will be used as the name of the relationship created in the graph\n\t *\n\t * @static\n\t * @member {string}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get type()\n\t{\n\t\treturn this[_type] || 'is_related_to'\n\t}\n\n\tstatic set type(value)\n\t{\n\t\tthis[_type] = value\n\t}\n\n\t/**\n\t * If true a relationship will always have only a single related Node\n\t *\n\t * @static\n\t * @member {boolean}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get singular()\n\t{\n\t\treturn this[_singular] === true\n\t}\n\n\tstatic set singular(value)\n\t{\n\t\tthis[_singular] = !!value\n\t}\n\n\t/**\n\t * The direction of the relationship, can be {@link Relationship.IN} or {@link Relationship.OUT}\n\t *\n\t * @static\n\t * @member {string}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get direction()\n\t{\n\t\treturn this[_direction] || null\n\t}\n\n\tstatic set direction(value)\n\t{\n\t\tthis[_direction] = value\n\t}\n\n\t/**\n\t * The related Node class or a function that returns a Node class\n\t *\n\t * @static\n\t * @member {Node|function}\n\t *\n\t * @memberOf Relationship\n\t */\n\tstatic get Model()\n\t{\n\t\tif (typeof this[_model] === 'function' && !(this[_model].prototype instanceof Model))\n\t\t{\n\t\t\treturn this[_model]()\n\t\t}\n\n\t\treturn this[_model] || require('./Node')\n\t}\n\n\tstatic set Model(Class)\n\t{\n\t\tthis[_model] = Class\n\t}\n\n}\n\nmodule.exports = Relationship\n",
+    "static": true,
+    "longname": "lib/Relationship.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 94,
+    "kind": "variable",
+    "name": "neo4j",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~neo4j",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "variable",
+    "name": "DB",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~DB",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "variable",
+    "name": "Model",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~Model",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 97,
+    "kind": "variable",
+    "name": "_model",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_model",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 98,
+    "kind": "variable",
+    "name": "_type",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_type",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 99,
+    "kind": "variable",
+    "name": "_singular",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_singular",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 100,
+    "kind": "variable",
+    "name": "_start",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_start",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 101,
+    "kind": "variable",
+    "name": "_end",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_end",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 102,
+    "kind": "variable",
+    "name": "_direction",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~_direction",
+    "access": null,
+    "export": false,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 12,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "class",
+    "name": "Relationship",
+    "memberof": "lib/Relationship.js",
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship",
+    "access": null,
+    "export": true,
+    "importPath": "neo-maggoo/lib/Relationship.js",
+    "importStyle": "Relationship",
+    "description": "Class representing a relationship between two nodes",
+    "lineNumber": 18,
+    "interface": false,
+    "extends": [
+      "*"
+    ]
+  },
+  {
+    "__docId__": 104,
+    "kind": "get",
+    "name": "OUT",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.OUT",
+    "access": null,
+    "description": "",
+    "lineNumber": 28,
+    "unknown": [
+      {
+        "tagName": "@constant",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 105,
+    "kind": "get",
+    "name": "IN",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.IN",
+    "access": null,
+    "description": "",
+    "lineNumber": 39,
+    "unknown": [
+      {
+        "tagName": "@constant",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 106,
+    "kind": "get",
+    "name": "BOTH",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.BOTH",
+    "access": null,
+    "description": "",
+    "lineNumber": 50,
+    "unknown": [
+      {
+        "tagName": "@constant",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 107,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 58,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "relation",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "graph",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 108,
+    "kind": "member",
+    "name": "$entity",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 64,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 109,
+    "kind": "member",
+    "name": "$graph",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$graph",
+    "access": null,
+    "description": null,
+    "lineNumber": 71,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 110,
+    "kind": "member",
+    "name": "start",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#start",
+    "access": null,
+    "description": null,
+    "lineNumber": 73,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 111,
+    "kind": "member",
+    "name": "end",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#end",
+    "access": null,
+    "description": null,
+    "lineNumber": 74,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 112,
+    "kind": "get",
+    "name": "$direction",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$direction",
+    "access": null,
+    "description": null,
+    "lineNumber": 77,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 113,
+    "kind": "get",
+    "name": "$type",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$type",
+    "access": null,
+    "description": null,
+    "lineNumber": 82,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 114,
+    "kind": "get",
+    "name": "$new",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$new",
+    "access": null,
+    "description": "Whether or not the node is already stored in the graph database.",
+    "lineNumber": 95,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Node"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 115,
+    "kind": "get",
+    "name": "$dirty",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$dirty",
+    "access": null,
+    "description": "Whether or not the Node has changed properties.",
+    "lineNumber": 108,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Node"
+      }
+    ],
+    "type": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 116,
+    "kind": "get",
+    "name": "start",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#start",
+    "access": null,
+    "description": null,
+    "lineNumber": 113,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 117,
+    "kind": "set",
+    "name": "start",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#start",
+    "access": null,
+    "description": null,
+    "lineNumber": 118,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 118,
+    "kind": "member",
+    "name": "[_start]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#[_start]",
+    "access": null,
+    "description": null,
+    "lineNumber": 120,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 119,
+    "kind": "get",
+    "name": "end",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#end",
+    "access": null,
+    "description": null,
+    "lineNumber": 123,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 120,
+    "kind": "set",
+    "name": "end",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#end",
+    "access": null,
+    "description": null,
+    "lineNumber": 128,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 121,
+    "kind": "member",
+    "name": "[_end]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#[_end]",
+    "access": null,
+    "description": null,
+    "lineNumber": 130,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 122,
+    "kind": "method",
+    "name": "save",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#save",
+    "access": null,
+    "description": null,
+    "lineNumber": 133,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "tx",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 123,
+    "kind": "member",
+    "name": "$entity",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": false,
+    "longname": "lib/Relationship.js~Relationship#$entity",
+    "access": null,
+    "description": null,
+    "lineNumber": 165,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 124,
+    "kind": "get",
+    "name": "type",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.type",
+    "access": null,
+    "description": "The type of the relationhip, will be used as the name of the relationship created in the graph",
+    "lineNumber": 191,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 125,
+    "kind": "set",
+    "name": "type",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.type",
+    "access": null,
+    "description": null,
+    "lineNumber": 196,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 126,
+    "kind": "member",
+    "name": "[_type]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.[_type]",
+    "access": null,
+    "description": null,
+    "lineNumber": 198,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 127,
+    "kind": "get",
+    "name": "singular",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.singular",
+    "access": null,
+    "description": "If true a relationship will always have only a single related Node",
+    "lineNumber": 209,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 128,
+    "kind": "set",
+    "name": "singular",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.singular",
+    "access": null,
+    "description": null,
+    "lineNumber": 214,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 129,
+    "kind": "member",
+    "name": "[_singular]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.[_singular]",
+    "access": null,
+    "description": null,
+    "lineNumber": 216,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 130,
+    "kind": "get",
+    "name": "direction",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.direction",
+    "access": null,
+    "description": "The direction of the relationship, can be {@link Relationship.IN} or {@link Relationship.OUT}",
+    "lineNumber": 227,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 131,
+    "kind": "set",
+    "name": "direction",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.direction",
+    "access": null,
+    "description": null,
+    "lineNumber": 232,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 132,
+    "kind": "member",
+    "name": "[_direction]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.[_direction]",
+    "access": null,
+    "description": null,
+    "lineNumber": 234,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 133,
+    "kind": "get",
+    "name": "Model",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.Model",
+    "access": null,
+    "description": "The related Node class or a function that returns a Node class",
+    "lineNumber": 245,
+    "unknown": [
+      {
+        "tagName": "@memberOf",
+        "tagValue": "Relationship"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 134,
+    "kind": "set",
+    "name": "Model",
+    "memberof": "lib/Relationship.js~Relationship",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.Model",
+    "access": null,
+    "description": null,
+    "lineNumber": 255,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 135,
+    "kind": "member",
+    "name": "[_model]",
+    "memberof": "lib/Relationship.js~Relationship",
+    "static": true,
+    "longname": "lib/Relationship.js~Relationship.[_model]",
+    "access": null,
+    "description": null,
+    "lineNumber": 257,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 137,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 138,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 139,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 140,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 141,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 142,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 143,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 144,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 145,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 146,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 147,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 148,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 149,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 150,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 151,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 152,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 153,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 154,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 155,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 156,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 157,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 158,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 159,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 160,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 161,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 162,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 163,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 164,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 165,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 166,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 167,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 168,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 169,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 170,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 171,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 172,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 173,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 174,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 175,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 176,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 177,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 178,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 179,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 180,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 181,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 182,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 183,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": "",
+    "lineNumber": 193,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 185,
+    "kind": "external",
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 186,
+    "kind": "external",
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 187,
+    "kind": "external",
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 188,
+    "kind": "external",
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 189,
+    "kind": "external",
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 190,
+    "kind": "external",
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 191,
+    "kind": "external",
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 192,
+    "kind": "external",
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": "",
+    "lineNumber": 34,
+    "builtinExternal": true
+  }
+]

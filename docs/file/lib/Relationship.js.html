@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">lib/Relationship.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html">Graph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">lib/Relationship.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;
+
+const neo4j = require(&apos;neo4j-driver/lib/v1&apos;)
+const DB = require(&apos;./DB&apos;)
+const { Model } = require(&apos;maggoo&apos;)
+
+const _model = Symbol()
+const _type = Symbol()
+const _singular = Symbol()
+const _start = Symbol()
+const _end = Symbol()
+const _direction = Symbol()
+
+/**
+ * Class representing a relationship between two nodes
+ * @extends Model
+ */
+class Relationship extends Model {
+
+	// *** CONSTANTS
+
+	/**
+	 * @constant
+	 * @member {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get OUT()
+	{
+		return &apos;relationship.direction.out&apos;
+	}
+
+	/**
+	 * @constant
+	 * @member {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get IN()
+	{
+		return &apos;relationship.direction.in&apos;
+	}
+
+	/**
+	 * @constant
+	 * @type {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get BOTH()
+	{
+		return &apos;relationship.direction.both&apos;
+	}
+
+
+	// *** PUBLIC METHODS
+
+	constructor(relation, graph)
+	{
+		if (relation instanceof neo4j.types.Relationship)
+		{
+			super(relation.properties)
+
+			this.$entity = relation
+		}
+		else
+		{
+			super(relation)
+		}
+
+		this.$graph = graph
+
+		this.start = null
+		this.end = null
+	}
+
+	get $direction()
+	{
+		return this.constructor.direction
+	}
+
+	get $type()
+	{
+		return this.constructor.type
+	}
+
+	/**
+	 * Whether or not the node is already stored in the graph database.
+	 *
+	 * @readonly
+	 * @type {boolean}
+	 *
+	 * @memberOf Node
+	 */
+	get $new()
+	{
+		return !this.$entity
+	}
+
+	/**
+	 * Whether or not the Node has changed properties.
+	 *
+	 * @readonly
+	 * @type {boolean}
+	 *
+	 * @memberOf Node
+	 */
+	get $dirty()
+	{
+		return this.$new || super.$dirty
+	}
+
+	get start()
+	{
+		return this[_start]
+	}
+
+	set start(start)
+	{
+		this[_start] = start
+	}
+
+	get end()
+	{
+		return this[_end]
+	}
+
+	set end(end)
+	{
+		this[_end] = end
+	}
+
+	async save(tx)
+	{
+		let session = null
+
+		if (!tx)
+		{
+			tx = DB.beginTransaction()
+			session = tx.session
+		}
+
+		const left = (this.$direction === Relationship.IN || this.$direction === Relationship.BOTH) ? &apos;&lt;&apos; : &apos;&apos;
+		const right = (this.$direction === Relationship.OUT || this.$direction === Relationship.BOTH) ? &apos;&gt;&apos; : &apos;&apos;
+
+		const query = `
+			MATCH (start { id: {start} })
+			MATCH (end { id: {end} })
+			MERGE (start)${ left }-[r:${ this.$type }]-${ right }(end)
+			SET r += {properties}
+			RETURN r
+		`
+
+		const parameters = {
+			start: this.start.id,
+			end: this.end.id,
+			properties: this.$data
+		}
+
+		// console.log(&apos;save relationship&apos;, query, parameters)
+		// console.time(&apos;save relationship&apos;)
+
+		const result = await tx.run(query, parameters).then(r =&gt; r)
+
+		this.$entity = result.records[0].get(&apos;r&apos;)
+
+		// console.timeEnd(&apos;save relationship&apos;)
+
+		if (session)
+		{
+			await tx.commit().then(r =&gt; r)
+
+			session.close()
+		}
+	}
+
+
+	// *** PRIVATE METHODS
+
+
+	// *** STATIC METHODS
+
+	/**
+	 * The type of the relationhip, will be used as the name of the relationship created in the graph
+	 *
+	 * @static
+	 * @member {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get type()
+	{
+		return this[_type] || &apos;is_related_to&apos;
+	}
+
+	static set type(value)
+	{
+		this[_type] = value
+	}
+
+	/**
+	 * If true a relationship will always have only a single related Node
+	 *
+	 * @static
+	 * @member {boolean}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get singular()
+	{
+		return this[_singular] === true
+	}
+
+	static set singular(value)
+	{
+		this[_singular] = !!value
+	}
+
+	/**
+	 * The direction of the relationship, can be {@link Relationship.IN} or {@link Relationship.OUT}
+	 *
+	 * @static
+	 * @member {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get direction()
+	{
+		return this[_direction] || null
+	}
+
+	static set direction(value)
+	{
+		this[_direction] = value
+	}
+
+	/**
+	 * The related Node class or a function that returns a Node class
+	 *
+	 * @static
+	 * @member {Node|function}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get Model()
+	{
+		if (typeof this[_model] === &apos;function&apos; &amp;&amp; !(this[_model].prototype instanceof Model))
+		{
+			return this[_model]()
+		}
+
+		return this[_model] || require(&apos;./Node&apos;)
+	}
+
+	static set Model(Class)
+	{
+		this[_model] = Class
+	}
+
+}
+
+module.exports = Relationship
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
