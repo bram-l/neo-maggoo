@@ -2,6 +2,7 @@
 
 Neo4j OGM for Node.js using proxified ES6 classes
 
+**WARNING: This package is still in an experimental state, currently in active development and could change at any time.**
 
 ## Installation
 
