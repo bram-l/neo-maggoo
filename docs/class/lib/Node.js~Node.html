@@ -36,9 +36,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -46,13 +44,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Node from &apos;<span><a href="file/lib/Node.js.html#lineNumber46">neo-maggoo/lib/Node.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Node from &apos;<span><a href="file/lib/Node.js.html#lineNumber49">neo-maggoo/lib/Node.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/lib/Node.js.html#lineNumber46">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/lib/Node.js.html#lineNumber49">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -101,14 +99,13 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-get-Relationships">Relationships</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>&gt;</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-get-Collection">Collection</a></span></span><span data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>Auto-genreated <span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span> sub-classes based on definitions</p>
-</div>
+        
       </div>
     </td>
     <td>
@@ -129,7 +126,34 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-get-defaults">defaults</a></span></span><span data-ice="signature">: {&quot;parameters&quot;: <span>*</span>, &quot;variable&quot;: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, &quot;variables&quot;: <span>*</span>}</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-get-labels">labels</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-get-queryDefaults">queryDefaults</a></span></span><span data-ice="signature">: {&quot;parameters&quot;: <span>*</span>, &quot;variable&quot;: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, &quot;variables&quot;: <span>*</span>, &quot;links&quot;: <span>*</span>}</span>
         </p>
       </div>
       <div>
@@ -190,9 +214,63 @@
     <td>
       <div>
         <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-addIndex">addIndex</a></span></span><span data-ice="signature">(property: <span>*</span>, now: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-addUnique">addUnique</a></span></span><span data-ice="signature">(property: <span>*</span>, now: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-all">all</a></span></span><span data-ice="signature">(o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&gt;</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-all">all</a></span></span><span data-ice="signature">(o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
         </p>
       </div>
       <div>
@@ -276,7 +354,61 @@
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-find">find</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-dropIndex">dropIndex</a></span></span><span data-ice="signature">(property: <span>*</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="async">async</span>
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-dropUnique">dropUnique</a></span></span><span data-ice="signature">(property: <span>*</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          <span data-ice="async">async</span>
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-find">find</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
         </p>
       </div>
       <div>
@@ -304,7 +436,7 @@
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-get">get</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Node.js~Node.html">Node</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-get">get</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
         </p>
       </div>
       <div>
@@ -332,7 +464,35 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-getRelationshipsQuery">getRelationshipsQuery</a></span></span><span data-ice="signature">(levels: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, variables: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>options</span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-getRelationship">getRelationship</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Get a Relationship class by name.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-getRelationshipQueryOptions">getRelationshipQueryOptions</a></span></span><span data-ice="signature">(levels: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, variables: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>options</span></span>
         </p>
       </div>
       <div>
@@ -359,9 +519,64 @@ Mostly intended for internal usage.</p>
     <td>
       <div>
         <p>
+          <span data-ice="async">async</span>
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-merge">merge</a></span></span><span data-ice="signature">(criteria: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Get a node or a create a new one based on the given properties</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-parseFilters">parseFilters</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, variable: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-normalizeRelationshipLevels">normalizeRelationshipLevels</a></span></span><span data-ice="signature">(levels: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-parseQueryFilters">parseQueryFilters</a></span></span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, variable: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span>
         </p>
       </div>
       <div>
@@ -389,7 +604,7 @@ Mostly intended for internal usage.</p>
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-query">query</a></span></span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-query">query</a></span></span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
         </p>
       </div>
       <div>
@@ -446,7 +661,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-where">where</a></span></span><span data-ice="signature">(where: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#static-method-where">where</a></span></span><span data-ice="signature">(where: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
         </p>
       </div>
       <div>
@@ -482,7 +697,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span>neo4j.types.Node</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
         </p>
       </div>
       <div>
@@ -702,6 +917,33 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <td>
       <span class="access" data-ice="access">public</span>
       
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-member-[_labels]">[_labels]</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
       <span class="kind" data-ice="kind">get</span>
       
       <span class="override" data-ice="override"></span>
@@ -773,7 +1015,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-addRelated">addRelated</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-addRelated">addRelated</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
@@ -781,6 +1023,33 @@ By default returns results for &apos;n&apos; as Node collection</p>
         
         <div data-ice="description"><p>Add related node(s).</p>
 </div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-clearCachedRelationships">clearCachedRelationships</a></span></span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
       </div>
     </td>
     <td>
@@ -855,6 +1124,34 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <td>
       <div>
         <p>
+          <span data-ice="async">async</span>
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-fetchRelated">fetchRelated</a></span></span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>array</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Fetch related Nodes connected to the current node.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
           
           
           <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-get">get</a></span></span><span data-ice="signature">(key: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>any</span> | <span>RelatedNodeCollection</span></span>
@@ -864,6 +1161,34 @@ By default returns results for &apos;n&apos; as Node collection</p>
         
         
         <div data-ice="description"><p>Get a Node property or related node(s).</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-getLinked">getLinked</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Get linked results.</p>
 </div>
       </div>
     </td>
@@ -913,14 +1238,41 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-getRelationship">getRelationship</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-getRelationship">getRelationship</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>Get a relationship by name.</p>
+        <div data-ice="description"><p>Get a Relationship class by name.</p>
 </div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-has">has</a></span></span><span data-ice="signature">(key: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
       </div>
     </td>
     <td>
@@ -969,7 +1321,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-saveRelated">saveRelated</a></span></span><span data-ice="signature">(tx: <span>Transaction</span>)</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-saveRelated">saveRelated</a></span></span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>, tx: <span>Transaction</span>)</span>
         </p>
       </div>
       <div>
@@ -1025,7 +1377,35 @@ By default returns results for &apos;n&apos; as Node collection</p>
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-setRelated">setRelated</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span>, properties: <span>any</span>, overwrite: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>)</span>
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-setProperty">setProperty</a></span></span><span data-ice="signature">(key: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, value: <span>any</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Set property value</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-setRelated">setRelated</a></span></span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span>, properties: <span>any</span>, overwrite: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>)</span>
         </p>
       </div>
       <div>
@@ -1049,26 +1429,25 @@ By default returns results for &apos;n&apos; as Node collection</p>
 <div data-ice="staticMemberDetails"><h2 data-ice="title">Static Public Members</h2>
 
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-get-Relationships">
+  <h3 data-ice="anchor" id="static-get-Collection">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
     <span class="kind" data-ice="kind">get</span>
     
     
     
-    <span data-ice="name">Relationships</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>&gt;</span>
+    <span data-ice="name">Collection</span><span data-ice="signature">: <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber819">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber120">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>Auto-genreated <span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span> sub-classes based on definitions</p>
-</div>
+  
 
   
 
@@ -1093,18 +1472,61 @@ By default returns results for &apos;n&apos; as Node collection</p>
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-get-defaults">
+  <h3 data-ice="anchor" id="static-get-labels">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
     <span class="kind" data-ice="kind">get</span>
     
     
     
-    <span data-ice="name">defaults</span><span data-ice="signature">: {&quot;parameters&quot;: <span>*</span>, &quot;variable&quot;: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, &quot;variables&quot;: <span>*</span>}</span>
+    <span data-ice="name">labels</span><span data-ice="signature">: <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber574">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber428">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-get-queryDefaults">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    <span class="kind" data-ice="kind">get</span>
+    
+    
+    
+    <span data-ice="name">queryDefaults</span><span data-ice="signature">: {&quot;parameters&quot;: <span>*</span>, &quot;variable&quot;: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, &quot;variables&quot;: <span>*</span>, &quot;links&quot;: <span>*</span>}</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber691">source</a></span></span>
     </span>
   </h3>
 
@@ -1148,7 +1570,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber809">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber252">source</a></span></span>
     </span>
   </h3>
 
@@ -1184,6 +1606,162 @@ By default returns results for &apos;n&apos; as Node collection</p>
 <div data-ice="staticMethodDetails"><h2 data-ice="title">Static Public Methods</h2>
 
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-addIndex">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    
+    
+    <span data-ice="name">addIndex</span><span data-ice="signature">(property: <span>*</span>, now: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber100">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">property</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">now</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: false</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-addUnique">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    
+    
+    <span data-ice="name">addUnique</span><span data-ice="signature">(property: <span>*</span>, now: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber105">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">property</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">now</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: false</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-method-all">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
@@ -1191,11 +1769,11 @@ By default returns results for &apos;n&apos; as Node collection</p>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">all</span><span data-ice="signature">(o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&gt;</span>
+    <span data-ice="name">all</span><span data-ice="signature">(o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber522">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber730">source</a></span></span>
     </span>
   </h3>
 
@@ -1232,7 +1810,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&gt;</td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>Results</p>
 </td>
         </tr>
@@ -1276,7 +1854,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber647">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber864">source</a></span></span>
     </span>
   </h3>
 
@@ -1350,7 +1928,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber779">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1038">source</a></span></span>
     </span>
   </h3>
 
@@ -1429,6 +2007,124 @@ By default returns results for &apos;n&apos; as Node collection</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-dropIndex">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span data-ice="name">dropIndex</span><span data-ice="signature">(property: <span>*</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber110">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">property</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-dropUnique">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span data-ice="name">dropUnique</span><span data-ice="signature">(property: <span>*</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber115">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">property</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-method-find">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
@@ -1436,11 +2132,11 @@ By default returns results for &apos;n&apos; as Node collection</p>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">find</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+    <span data-ice="name">find</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber603">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber796">source</a></span></span>
     </span>
   </h3>
 
@@ -1485,7 +2181,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>Results</p>
 </td>
         </tr>
@@ -1537,11 +2233,11 @@ nodes[0].relatives</code></pre>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">get</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Node.js~Node.html">Node</a></span></span>
+    <span data-ice="name">get</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber502">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber714">source</a></span></span>
     </span>
   </h3>
 
@@ -1586,7 +2282,7 @@ nodes[0].relatives</code></pre>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Node.js~Node.html">Node</a></span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>Result</p>
 </td>
         </tr>
@@ -1623,18 +2319,92 @@ nodes[0].relatives</code></pre>
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-method-getRelationshipsQuery">
+  <h3 data-ice="anchor" id="static-method-getRelationship">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
     
     
     
     
-    <span data-ice="name">getRelationshipsQuery</span><span data-ice="signature">(levels: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, variables: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>options</span></span>
+    <span data-ice="name">getRelationship</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber848">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber263">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>Get a Relationship class by name.</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">name</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>The name of the relationship</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The Relastionship class</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-getRelationshipQueryOptions">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    
+    
+    <span data-ice="name">getRelationshipQueryOptions</span><span data-ice="signature">(levels: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, variables: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>options</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1072">source</a></span></span>
     </span>
   </h3>
 
@@ -1737,18 +2507,178 @@ Mostly intended for internal usage.</p>
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-method-parseFilters">
+  <h3 data-ice="anchor" id="static-method-merge">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span data-ice="name">merge</span><span data-ice="signature">(criteria: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1185">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>Get a node or a create a new one based on the given properties</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">criteria</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Specific properties to match</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">properties</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Properties to be set on the existing or created node</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">o</td>
+      <td data-ice="type"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: {}</li></ul></td>
+      <td data-ice="description"><p>Query options</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>Resulting Node</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-normalizeRelationshipLevels">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
     
     
     
     
-    <span data-ice="name">parseFilters</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, variable: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span>
+    <span data-ice="name">normalizeRelationshipLevels</span><span data-ice="signature">(levels: <span>*</span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber703">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1152">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">levels</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-method-parseQueryFilters">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    
+    
+    
+    
+    <span data-ice="name">parseQueryFilters</span><span data-ice="signature">(filters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, variable: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber962">source</a></span></span>
     </span>
   </h3>
 
@@ -1778,7 +2708,7 @@ Mostly intended for internal usage.</p>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">variable</td>
       <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
-      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="appendix"></td>
       <td data-ice="description"><p>Variable for the current node</p>
 </td>
     </tr>
@@ -1825,11 +2755,11 @@ Mostly intended for internal usage.</p>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">query</span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+    <span data-ice="name">query</span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber544">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber750">source</a></span></span>
     </span>
   </h3>
 
@@ -1883,7 +2813,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>Results</p>
 </td>
         </tr>
@@ -1930,7 +2860,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber103">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber95">source</a></span></span>
     </span>
   </h3>
 
@@ -1983,11 +2913,11 @@ By default returns results for &apos;n&apos; as Node collection</p>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">where</span><span data-ice="signature">(where: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span>
+    <span data-ice="name">where</span><span data-ice="signature">(where: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, o: <span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber563">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber769">source</a></span></span>
     </span>
   </h3>
 
@@ -2041,7 +2971,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>Results</p>
 </td>
         </tr>
@@ -2084,11 +3014,11 @@ By default returns results for &apos;n&apos; as Node collection</p>
     
     
     
-    <span data-ice="name">constructor</span><span data-ice="signature">(node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span>neo4j.types.Node</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
+    <span data-ice="name">constructor</span><span data-ice="signature">(node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber54">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber57">source</a></span></span>
     </span>
   </h3>
 
@@ -2110,7 +3040,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">node</td>
-      <td data-ice="type"><span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span>neo4j.types.Node</span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Node data object or neo4j Node</p>
 </td>
@@ -2159,7 +3089,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber135">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber177">source</a></span></span>
     </span>
   </h3>
 
@@ -2203,7 +3133,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber65">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber68">source</a></span></span>
     </span>
   </h3>
 
@@ -2246,7 +3176,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber80">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber88">source</a></span></span>
     </span>
   </h3>
 
@@ -2289,7 +3219,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber115">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber157">source</a></span></span>
     </span>
   </h3>
 
@@ -2334,7 +3264,7 @@ Note that this could change over time, use id instead.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber283">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber456">source</a></span></span>
     </span>
   </h3>
 
@@ -2379,7 +3309,7 @@ By default it uses the label as defined by $type.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber295">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber477">source</a></span></span>
     </span>
   </h3>
 
@@ -2424,7 +3354,7 @@ By default it uses the label as defined by $type.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber125">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber167">source</a></span></span>
     </span>
   </h3>
 
@@ -2433,6 +3363,49 @@ By default it uses the label as defined by $type.</p>
   
   <div data-ice="description"><p>Whether or not the node is already stored in the graph database.</p>
 </div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-[_labels]">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span data-ice="name">[_labels]</span><span data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber465">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
 
   
 
@@ -2468,7 +3441,7 @@ By default it uses the label as defined by $type.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber89">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber140">source</a></span></span>
     </span>
   </h3>
 
@@ -2513,7 +3486,7 @@ This will be automatically genreated when the node is saved</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber94">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber145">source</a></span></span>
     </span>
   </h3>
 
@@ -2555,11 +3528,11 @@ This will be automatically genreated when the node is saved</p>
     
     
     
-    <span data-ice="name">addRelated</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
+    <span data-ice="name">addRelated</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber225">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber354">source</a></span></span>
     </span>
   </h3>
 
@@ -2589,7 +3562,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">node</td>
-      <td data-ice="type"><span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Node(s)</p>
 </td>
@@ -2625,6 +3598,66 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-clearCachedRelationships">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span data-ice="name">clearCachedRelationships</span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber406">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">relationships</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-delete">
     <span class="access" data-ice="access">public</span>
     
@@ -2636,7 +3669,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber408">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber603">source</a></span></span>
     </span>
   </h3>
 
@@ -2706,7 +3739,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber468">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber663">source</a></span></span>
     </span>
   </h3>
 
@@ -2756,6 +3789,67 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-fetchRelated">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span data-ice="name">fetchRelated</span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>array</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1239">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>Fetch related Nodes connected to the current node.</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">relationships</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>array</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Similar to &apos;with&apos; option in #Node.find</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-get">
     <span class="access" data-ice="access">public</span>
     
@@ -2767,7 +3861,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber162">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber204">source</a></span></span>
     </span>
   </h3>
 
@@ -2830,6 +3924,80 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-getLinked">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span data-ice="name">getLinked</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber324">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>Get linked results.</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">name</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>The name of the link</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The related node(s) / value(s) or null if none is found</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-getRelated">
     <span class="access" data-ice="access">public</span>
     
@@ -2841,7 +4009,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber195">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber296">source</a></span></span>
     </span>
   </h3>
 
@@ -2911,18 +4079,18 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     
     
     
-    <span data-ice="name">getRelationship</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span>
+    <span data-ice="name">getRelationship</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber146">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber285">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>Get a relationship by name.</p>
+  <div data-ice="description"><p>Get a Relationship class by name.</p>
 </div>
 
   
@@ -2952,9 +4120,80 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></td>
-          <td class="return-desc" data-ice="returnDescription"><p>The relastionship</p>
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-Relationship">Relationship</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The Relastionship class</p>
 </td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-has">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span data-ice="name">has</span><span data-ice="signature">(key: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber238">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">key</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          
         </tr>
       </tbody>
     </table>
@@ -2989,7 +4228,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber310">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber497">source</a></span></span>
     </span>
   </h3>
 
@@ -3055,11 +4294,11 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">saveRelated</span><span data-ice="signature">(tx: <span>Transaction</span>)</span>
+    <span data-ice="name">saveRelated</span><span data-ice="signature">(relationships: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>, tx: <span>Transaction</span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber374">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber562">source</a></span></span>
     </span>
   </h3>
 
@@ -3080,6 +4319,13 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <tbody>
     
     <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">relationships</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="description"><p>The relationships to be saved (all by default)</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">tx</td>
       <td data-ice="type"><span>Transaction</span></td>
       <td data-ice="appendix"><ul><li>optional</li></ul></td>
@@ -3120,7 +4366,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber179">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber228">source</a></span></span>
     </span>
   </h3>
 
@@ -3190,6 +4436,74 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-setProperty">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span data-ice="name">setProperty</span><span data-ice="signature">(key: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, value: <span>any</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber188">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>Set property value</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">key</td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Property name</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">value</td>
+      <td data-ice="type"><span>any</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Property value</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-setRelated">
     <span class="access" data-ice="access">public</span>
     
@@ -3197,11 +4511,11 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     
     
     
-    <span data-ice="name">setRelated</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span>, properties: <span>any</span>, overwrite: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>)</span>
+    <span data-ice="name">setRelated</span><span data-ice="signature">(name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span>, properties: <span>any</span>, overwrite: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber238">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber367">source</a></span></span>
     </span>
   </h3>
 
@@ -3230,7 +4544,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">node</td>
-      <td data-ice="type"><span><a href="class/lib/Node.js~Node.html">Node</a></span> | <span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span> | <span><span><a href="class/lib/Node.js~Node.html">Node</a></span><span>[]</span></span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span><a href="class/lib/Graph.js~Graph.html#static-get-NodeCollection">NodeCollection</a></span> | <span><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span><span>[]</span></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Node(s)</p>
 </td>

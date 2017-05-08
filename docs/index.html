@@ -36,16 +36,131 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
 </div>
 </nav>
 
-<div class="content" data-ice="content">Please create README.md</div>
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="neo-maggoo">Neo Maggoo</h1>
+<p>Neo4j OGM for Node.js using proxified ES6 classes</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="lang-sh"><code class="source-code prettyprint">npm install neo-maggoo --save</code>
+</code></pre>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Node.js &gt;= 6.0.0</li>
+<li>Neo4j &gt;= 3.0.0</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre><code class="lang-js"><code class="source-code prettyprint">const { Node, Relationship, DB } = require(&apos;neo-maggoo&apos;)
+
+// Node definition
+class Person extends Node {
+    static get relationships()
+    {
+        return {
+            relatives: {
+                Model: Person,
+                type: &apos;is_related_to&apos;,
+                direction: Relationship.OUT
+            },
+            father: {
+                Model: Person,
+                type: &apos;is_father_of&apos;,
+                direction: Relationship.IN,
+                singular: true // Returns a single node instead of an array
+            },
+            mother: {
+                Model: Person,
+                type: &apos;is_mother_of&apos;,
+                direction: Relationship.IN,
+                singular: true // Returns a single node instead of an array
+            }
+        }
+    }
+}
+
+// Initialize database connection
+DB.init(NEO4J_BOLT_URL, NEO4J_USER, NEO4J_PASSWORD)</code>
+</code></pre>
+<h3 id="read">READ</h3>
+<p>Get all nodes</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const people = await Person.all()
+assert(people.length)</code>
+</code></pre>
+<p>Get a single node</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">// Find by UUID
+const person = await Person.get(&apos;foo&apos;)
+assert(person.id === &apos;foo&apos;)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">// Find by Neo4j ID (NOTE: this may change over time)
+const person = await Person.get(1)
+assert(person.$id === 1)</code>
+</code></pre>
+<p>Find nodes using filter</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const people = await Person.find({ name: &apos;foo&apos; })
+assert(people[0].name === &apos;foo&apos;)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const people = await Person.find({ name: &apos;foo&apos; }, { with: &apos;relatives&apos; })
+assert(people[0].name === &apos;foo&apos;)
+assert(people[0].relatives.length)</code>
+</code></pre>
+<p>Find with related nodes</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: &apos;relatives&apos; })
+assert(foo.relatives.length)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: &apos;father.father&apos; })
+assert(foo.father.id)
+assert(foo.father.father.id)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: [&apos;father.father&apos;, &apos;mother&apos;] })
+assert(foo.father.id)
+assert(foo.father.father.id)
+assert(foo.mother.id)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: { relatives: { name: &apos;bar&apos; }, &apos;relatives.father&apos;: true } })
+assert(foo.relatives[0].name === &apos;bar&apos;)
+assert(foo.relatives[0].father.id)</code>
+</code></pre>
+<p>Find nodes using query</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const people = await Person.query(&apos;MATCH (n) WHERE n.id = {id}&apos;, { id: foo }, { with: &apos;relatives&apos; })
+assert(people[0].id === &apos;foo&apos;)
+assert(people[0].relatives.length)</code>
+</code></pre>
+<p>Count nodes</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const total = await Person.count()
+assert(total &gt; 0)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const total = await Person.count({ name: foo })
+assert(total &gt; 0)</code>
+</code></pre>
+<pre><code class="lang-js"><code class="source-code prettyprint">const total = await Person.count(&apos;WHERE n.name = {name}&apos;, { name: foo })
+assert(total &gt; 0)</code>
+</code></pre>
+<h3 id="write">WRITE</h3>
+<p>Save an entire graph</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: &apos;father&apos; })
+foo.father.name = &apos;baz&apos;
+await foo.save(true) // Will save foo.father</code>
+</code></pre>
+<p>Save nested nodes</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = new Person()
+const bar = new Person()
+foo.relatives.push(bar)
+await foo.save(true) // Saves foo &amp; bar, and creates a &apos;is_related_to&apos; relationship</code>
+</code></pre>
+<p>Delete collection</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const people = await Person.all()
+await people.delete()</code>
+</code></pre>
+<p>Delete an entire graph</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const foo = await Person.get(&apos;foo&apos;, { with: &apos;relatives&apos; })
+await foo.delete(true) // Deletes foo and its related nodes</code>
+</code></pre>
+</div>
+</div>
 
 <footer class="footer">
   Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>

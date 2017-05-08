@@ -36,9 +36,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -100,9 +98,37 @@ class Relationship extends Model {
 		return &apos;relationship.direction.both&apos;
 	}
 
+	/**
+	 * @constant
+	 * @type {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get ANY()
+	{
+		return &apos;relationship.direction.any&apos;
+	}
+
+	/**
+	 * @constant
+	 * @type {string}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get DEFAULT_TYPE()
+	{
+		return &apos;is_related_to&apos;
+	}
+
 
 	// *** PUBLIC METHODS
 
+	/**
+	 * Creates an instance of Relationship
+	 *
+	 * @param {object|neo4j.types.Relationship} relation Relationship data object or neo4j Relationship
+	 * @param {Graph} graph Current graph
+	 */
 	constructor(relation, graph)
 	{
 		if (relation instanceof neo4j.types.Relationship)
@@ -117,9 +143,6 @@ class Relationship extends Model {
 		}
 
 		this.$graph = graph
-
-		this.start = null
-		this.end = null
 	}
 
 	get $direction()
@@ -130,6 +153,18 @@ class Relationship extends Model {
 	get $type()
 	{
 		return this.constructor.type
+	}
+
+	/**
+	 * The neo4j entity ID.
+	 * Note that this could change over time, use id instead.
+	 *
+	 * @readonly
+	 * @type {number}
+	 */
+	get $id()
+	{
+		return this.$entity ? this.$entity.identity.toNumber() : null
 	}
 
 	/**
@@ -166,6 +201,7 @@ class Relationship extends Model {
 	set start(start)
 	{
 		this[_start] = start
+		this._start = start
 	}
 
 	get end()
@@ -176,6 +212,7 @@ class Relationship extends Model {
 	set end(end)
 	{
 		this[_end] = end
+		this._end = end
 	}
 
 	async save(tx)
@@ -188,14 +225,25 @@ class Relationship extends Model {
 			session = tx.session
 		}
 
-		const left = (this.$direction === Relationship.IN || this.$direction === Relationship.BOTH) ? &apos;&lt;&apos; : &apos;&apos;
-		const right = (this.$direction === Relationship.OUT || this.$direction === Relationship.BOTH) ? &apos;&gt;&apos; : &apos;&apos;
+		const left = [Relationship.IN].includes(this.$direction) ? &apos;&lt;&apos; : &apos;&apos;
+		const right = [Relationship.OUT, Relationship.ANY, Relationship.BOTH].includes(this.$direction) ? &apos;&gt;&apos; : &apos;&apos;
+
+		let create = `MERGE (start)${ left }-[r:${ this.$type }]-${ right }(end)`
+		let set = &apos;SET r += {properties}&apos;
+
+		if (this.$direction === Relationship.BOTH)
+		{
+			create += `
+			MERGE (end)-[r_2:${ this.$type }]-&gt;(start)`
+
+			set += `
+			SET r_2 += {properties}`
+		}
 
 		const query = `
-			MATCH (start { id: {start} })
-			MATCH (end { id: {end} })
-			MERGE (start)${ left }-[r:${ this.$type }]-${ right }(end)
-			SET r += {properties}
+			MATCH (start { id: {start} }), (end { id: {end} })
+			${ create }
+			${ set }
 			RETURN r
 		`
 
@@ -211,6 +259,7 @@ class Relationship extends Model {
 		const result = await tx.run(query, parameters).then(r =&gt; r)
 
 		this.$entity = result.records[0].get(&apos;r&apos;)
+		this.reset()
 
 		// console.timeEnd(&apos;save relationship&apos;)
 
@@ -221,10 +270,6 @@ class Relationship extends Model {
 			session.close()
 		}
 	}
-
-
-	// *** PRIVATE METHODS
-
 
 	// *** STATIC METHODS
 
@@ -238,7 +283,7 @@ class Relationship extends Model {
 	 */
 	static get type()
 	{
-		return this[_type] || &apos;is_related_to&apos;
+		return this[_type] || this.DEFAULT_TYPE
 	}
 
 	static set type(value)
@@ -274,7 +319,7 @@ class Relationship extends Model {
 	 */
 	static get direction()
 	{
-		return this[_direction] || null
+		return this[_direction] || this.OUT
 	}
 
 	static set direction(value)

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">lib/Node.read.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html">Graph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">_</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/_/Node.read.js~Read.html">Read</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extendClass">extendClass</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">lib/Node.read.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;
+
+const merge = require(&apos;deepmerge&apos;)
+
+const DB = require(&apos;./DB&apos;)
+const Node = require(&apos;./Node&apos;)
+const NodeCollection = require(&apos;./NodeCollection&apos;)
+const Graph = require(&apos;./Graph&apos;)
+const Relationship = require(&apos;./Relationship&apos;)
+
+const REGEX_LEVEL_SPLIT = /\.(.*)/
+
+/**
+ * Query options object
+ * @typedef {Object} QueryOptions
+ * @property {Object.&lt;String, *&gt;} parameters - Parameters used in the query.
+ * @property {String} variable - The variable used to identify the Node in the query, &apos;n&apos; by default.
+ * @property {Array} variables - All variables used in the query that should be added to the results.
+ * @property {String|Array} where - The where clause, arrays are joined by the &apos;AND&apos; operator.
+ * @property {Number} limit - The maximum number of results to be returned
+ * @property {String} with - The name of relationship to include, use the dot-notation to include mutliple levels
+ * @property {Array} with - An array of names of relationships to include
+ * @property {Object.&lt;String, Boolean|Object&gt;} with - Relationships to include (true) or exclude (false) or filter(object)
+ * @memberof Node
+ */
+
+/**
+ * Relationship definition object
+ * @typedef {object} RelationshipDefinition
+ * @property {Node|function} Model - {@link Relationship.Model}
+ * @property {string} type - {@link Relationship.type}
+ * @property {string} direction - {@link Relationship.direction}
+ * @property {boolean} singular - {@link Relationship.singular}
+ * @memberof Node
+ */
+
+/**
+ * Node read methods
+ */
+
+/**
+ * Default values for query options
+ *
+ * @memberof Node
+ */
+Node.queryDefaults = {
+	parameters: {},
+	variable: &apos;n&apos;,
+	variables: [],
+	distinct: false,
+	links: null
+}
+
+/**
+ * Fetch a single Node
+ *
+ * @param {string|object} filters Filter object or Node id
+ * @param {QueryOptions} [o={}] Query options
+ * @returns {Node} Result
+ * @memberof Node
+ *
+ * @example
+ * const node = await Node.get(&apos;foo&apos;)
+ *
+ * @example
+ * const node = await Node.get({ id: &apos;foo&apos; })
+ */
+Node.get = async (filters, o = {}) =&gt;
+{
+	o.singular = true
+
+	return this.find(filters, o)
+}
+
+/**
+ * Fetch Nodes
+ *
+ * @param {QueryOptions} o Query options
+ * @return {NodeCollection} Results
+ * @memberof Node
+ *
+ * @example
+ * const nodes = await Node.all({ limit: 10 })
+ */
+Node.all = async (o) =&gt;
+{
+	return this.find(null, o)
+}
+
+/**
+ * Use a query statement to search for Nodes
+ * By default returns results for &apos;n&apos; as Node collection
+ *
+ * @param {string} query A search query
+ * @param {object} [parameters={}] Parameters used in query
+ * @param {QueryOptions} [o={}] Query options
+ * @returns {NodeCollection} Results
+ *
+ * @example
+ * const nodes = await Node.query(`
+ *     MATCH (n:Node)
+ *     WHERE n.foo &gt; {foo}
+ * `, { foo: 1 })
+ */
+Node.query = async (query, parameters = {}, o = {}) =&gt;
+{
+	o = merge(o, { query, parameters })
+
+	return this.find(null, o)
+}
+
+/**
+ * Use a query statement to search for Nodes
+ * By default returns results for &apos;n&apos; as Node collection
+ *
+ * @param {string} where A where clause
+ * @param {object} [parameters={}] Parameters used in query
+ * @param {QueryOptions} [o={}] Query options
+ * @returns {NodeCollection} Results
+ *
+ * @example
+ * const nodes = await Node.where(&apos;n.foo &gt; {foo}&apos;, { foo: 1 })
+ */
+Node.where = async (where, parameters = {}, o = {}) =&gt;
+{
+	o = merge(o, { where, parameters })
+
+	return this.find(null, o)
+}
+
+/**
+ * Find Nodes based on filter or Node ID
+ *
+ * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)
+ * @param {QueryOptions} [o={}] Query options
+ * @returns {NodeCollection} Results
+ *
+ * @example
+ * // Find by ID
+ * const nodes = Node.find(&apos;foo&apos;)
+ *
+ * @example
+ * // Find by filter
+ * const nodes = Node.find({ foo: 1 })
+ *
+ * @example
+ * // Find by filter, with related Nodes
+ * const nodes = Node.find({ foo: 1 }, { with: &apos;relatives&apos; })
+ * nodes[0].relatives
+ */
+Node.find = async (filters, o = {}) =&gt;
+{
+	o = merge(merge({}, this.queryDefaults), o)
+
+	if (!o.variables.includes(o.variable))
+	{
+		o.variables.push(o.variable)
+	}
+
+	if (o.models)
+	{
+		Object.keys(o.models).map(variable =&gt;
+		{
+			if (!o.variables.includes(variable))
+			{
+				o.variables.push(variable)
+			}
+		})
+	}
+
+	if (filters)
+	{
+		o = merge(o, this.parseQueryFilters(filters, o.variable))
+	}
+
+	if (o.with)
+	{
+		o = merge(o, this.getRelationshipQueryOptions(o.with, o.variables, o.variable))
+	}
+
+	const query = this.buildQuery(o)
+
+	// console.log(&apos;query&apos;, query, o.parameters)
+	// console.time(&apos;query time&apos;)
+
+	const models = o.models || {}
+
+	if (!models[o.variable])
+	{
+		models[o.variable] = this
+	}
+
+	const graph = await Graph.build(query, o.parameters, models, o.links)
+
+	// console.timeEnd(&apos;query time&apos;)
+
+	if (o.singular)
+	{
+		return graph.map[o.variable] ? graph.map[o.variable][0] : null
+	}
+
+	const nodes = graph.map[o.variable] || []
+
+	return new NodeCollection(this, nodes)
+}
+
+/**
+ * Build a search query
+ *
+ * @param {object} o Query options
+ * @returns {string} Query string
+ */
+Node.buildQuery = (o) =&gt;
+{
+	o = merge(this.queryDefaults, o)
+
+	// Build Query
+	let query = o.query || `MATCH (${ o.variable }:${ this.name })\n`
+
+	// Define filters
+	if (Array.isArray(o.where) &amp;&amp; o.where.length)
+	{
+		query += &apos;WHERE &apos;
+		query += o.where.join(&apos;\nAND &apos;)
+		query += &apos;\n&apos;
+	}
+	else if (typeof o.where == &apos;string&apos;)
+	{
+		query += &apos;WHERE &apos;
+		query += o.where
+		query += &apos;\n&apos;
+	}
+
+	if (o.matches)
+	{
+		query += o.matches.join(&apos;\n&apos;)
+		query += &apos;\n&apos;
+	}
+
+	query += &apos;RETURN &apos;
+
+	if (o.distinct)
+	{
+		query += &apos;DISTINCT &apos;
+	}
+
+	// Define return values
+	if (o.return)
+	{
+		query += o.return
+	}
+	else
+	{
+		query += o.variables.join(&apos;, &apos;)
+	}
+
+	query += &apos;\n&apos;
+
+	if (o.orderBy)
+	{
+		query += `ORDER BY ${ o.orderBy }\n`
+	}
+
+	if (o.skip)
+	{
+		query += `SKIP ${ parseInt(o.skip, 10) }\n`
+	}
+
+	if (o.limit)
+	{
+		query += `LIMIT ${ parseInt(o.limit, 10) }\n`
+	}
+
+	return query
+}
+
+/**
+ * Parse search filters
+ *
+ * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)
+ * @param {string} [variable] Variable for the current node
+ * @returns {QueryOptions} Filters options object
+ */
+Node.parseQueryFilters = (filters, variable = &apos;n&apos;) =&gt;
+{
+	if (typeof filters == &apos;number&apos;)
+	{
+		filters = { $id: filters }
+	}
+	else if (typeof filters == &apos;string&apos;)
+	{
+		filters = { id: filters }
+	}
+	else if (!filters || filters !== Object(filters))
+	{
+		return {}
+	}
+
+	const o = {
+		parameters: {},
+		where: []
+	}
+
+	for (const [key, value] of Object.entries(filters))
+	{
+		const valueVariable = `${ variable }_${ key }`
+		let condition = &apos;&apos;
+
+		if (key === &apos;$id&apos;)
+		{
+			condition += `id(${ variable }) `
+		}
+		else
+		{
+			condition += `${ variable }.${ key } `
+		}
+
+		if (value instanceof RegExp)
+		{
+			condition += `=~ {${ valueVariable }}`
+
+			const flags = `(?${ value.flags.replace(&apos;g&apos;, &apos;&apos;) })`
+
+			o.parameters[valueVariable] = flags + value.source
+		}
+		else if (Array.isArray(value))
+		{
+			const names = []
+
+			value.forEach((v, i) =&gt;
+			{
+				const name = valueVariable + i
+
+				o.parameters[name] = v
+				names.push(`{${ name }}`)
+			})
+
+			condition += `IN [${ names.join(&apos;, &apos;) }]`
+		}
+		else
+		{
+			condition += `= {${ valueVariable }}`
+			o.parameters[valueVariable] = value
+		}
+
+		o.where.push(condition)
+	}
+
+	return o
+}
+
+/**
+ * Count nodes in graph database
+ *
+ * @param {object|string} filters Search filters (object) or where clause (string)
+ * @param {any} [parameters={}] Parameters used in where clause
+ * @param {QueryOptions} [o={}] Query options
+ * @returns {number} Number of nodes
+ */
+Node.count = async (filters, parameters = {}, o = {}) =&gt;
+{
+	o = merge(this.queryDefaults, o)
+	o = merge(o, { parameters })
+
+	if (typeof filters == &apos;string&apos;)
+	{
+		o.where = filters
+	}
+	else if (!!filters &amp;&amp; filters.constructor === Object)
+	{
+		o = merge(o, this.parseQueryFilters(filters, o.variable))
+	}
+
+	o.return = `count(distinct(${ o.variable })) as total`
+
+	const query = this.buildQuery(o)
+
+	const results = await DB.query(query, o.parameters)
+
+	return results.records[0].get(&apos;total&apos;).toInt()
+}
+
+/**
+ * Build query options for related nodes
+ * Mostly intended for internal usage.
+ *
+ * @param {string} levels Filter for related nodes in dot-format (eg. father.children will fetch the related &apos;father&apos; and its &apos;children&apos;)
+ * @param {object} variables The variables currently used for building the query
+ * @param {string} [reference=&apos;n&apos;] Reference variable for the current node
+ * @returns {options} Query options object
+ * @property {array} matches Optional matches for each relationship
+ * @property {object} variables The variables currently used for building the query
+ */
+Node.getRelationshipQueryOptions = (levels, variables, reference = &apos;n&apos;) =&gt;
+{
+	let o = {
+		matches: [],
+		variables
+	}
+
+	// const relationships = this.Relationships
+
+	levels = this.normalizeRelationshipLevels(levels)
+
+	for (const name of Object.keys(levels))
+	{
+		let next = null
+		const filters = levels[name]
+
+		if (filters.with)
+		{
+			next = filters.with
+			delete filters.with
+		}
+		else
+		{
+			next = null
+		}
+
+		const $Relationship = this.getRelationship(name)
+		const nodeVar = `${ reference }_${ name }`
+		const relationshipVar = `${ reference }_r_${ name }`
+		const collectionVar = &apos;_col&apos;
+
+		let query = `OPTIONAL MATCH (${ reference })`
+
+		if ($Relationship.direction === Relationship.IN || $Relationship.direction === Relationship.BOTH)
+		{
+			query += &apos;&lt;&apos;
+		}
+
+		query += `-[${ reference }_r_${ name }:${ $Relationship.type }]-`
+
+		if ($Relationship.direction === Relationship.OUT || $Relationship.direction === Relationship.BOTH)
+		{
+			query += &apos;&gt;&apos;
+		}
+
+		query += `(${ nodeVar }:${ $Relationship.Model.name })`
+
+		if (!next)
+		{
+			o = merge(o, this.parseQueryFilters(filters, nodeVar))
+
+			if (o.where &amp;&amp; o.where.length)
+			{
+				query += &apos;\n&apos;
+				query += &apos;WHERE &apos;
+				query += o.where.join(&apos;\nAND &apos;)
+
+				delete o.where
+			}
+		}
+
+		query += &apos;\n&apos;
+		query += `WITH ${ o.variables.join(&apos;, &apos;) }, `
+		query += `COLLECT(${ nodeVar }) as ${ nodeVar + collectionVar }, `
+		query += `COLLECT(${ relationshipVar }) as ${ relationshipVar + collectionVar }`
+
+		o.matches.push(query)
+
+		o.variables.push(nodeVar + collectionVar)
+		o.variables.push(relationshipVar + collectionVar)
+
+		if (next)
+		{
+			const nextO = $Relationship.Model.getRelationshipQueryOptions(next, o.variables, nodeVar)
+
+			o = merge(o, nextO)
+		}
+	}
+
+	return o
+}
+
+Node.normalizeRelationshipLevels = (levels) =&gt;
+{
+	if (typeof levels === &apos;string&apos;)
+	{
+		const [current, rest] = levels.split(REGEX_LEVEL_SPLIT)
+
+		levels = { [current]: {} }
+
+		if (rest)
+		{
+			levels[current].with = this.normalizeRelationshipLevels(rest)
+		}
+	}
+	else if (Array.isArray(levels))
+	{
+		levels = levels.reduce((obj, current) =&gt;
+		{
+			Object.assign(obj, this.normalizeRelationshipLevels(current))
+			return obj
+		}, {})
+	}
+
+	return levels
+}
+
+/**
+ * Get a node or a create a new one based on the given properties
+ *
+ * @param {any} properties Specific properties
+ * @returns {Node} Resulting node
+ */
+Node.getOrCreate = async (properties) =&gt;
+{
+	let node = await this.get(properties)
+
+	if (!node)
+	{
+		node = new this(properties)
+	}
+
+	return node
+}
+
+/**
+ * Fetch related Nodes connected to the current node.
+ *
+ * @param {object|array|string} relationships Similar to &apos;with&apos; option in #Node.find
+ */
+Node.prototype.fetchRelated = async (relationships) =&gt;
+{
+	const $static = this.constructor
+
+	let o = merge({}, $static.queryDefaults)
+
+	o = merge(o, $static.parseQueryFilters({ id: this.id }, o.variable))
+	o = merge(o, $static.getRelationshipQueryOptions(relationships, [o.variable]))
+
+	const query = $static.buildQuery(o)
+
+	await this.$graph.run(query, o.parameters)
+
+	this.clearCachedRelationships(relationships)
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -36,9 +36,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -48,10 +46,12 @@
 <div class="content" data-ice="content"><h1 data-ice="title">lib/Graph.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;
 
-const Relationship = require(&apos;./Relationship&apos;)
 const neo4j = require(&apos;neo4j-driver/lib/v1&apos;)
 
-const _db = Symbol()
+const _db = Symbol(&apos;db&apos;)
+const _Node = Symbol(&apos;Node&apos;)
+const _Relationship = Symbol(&apos;Relationship&apos;)
+const _NodeCollection = Symbol(&apos;NodeCollection&apos;)
 
 /**
  * Object-Graph Map
@@ -59,6 +59,26 @@ const _db = Symbol()
  * @class Graph
  */
 class Graph {
+
+	static get TYPE_NODE()
+	{
+		return &apos;node&apos;
+	}
+
+	static get TYPE_RELATIONSHIP()
+	{
+		return &apos;relationship&apos;
+	}
+
+	static get TYPE_INTEGER()
+	{
+		return &apos;integer&apos;
+	}
+
+	static get TYPE_ARRAY()
+	{
+		return &apos;array&apos;
+	}
 
 	/**
 	 * Get a database instance.
@@ -75,6 +95,36 @@ class Graph {
 		return this[_db]
 	}
 
+	static get Node()
+	{
+		if (!this[_Node])
+		{
+			this[_Node] = require(&apos;./Node&apos;)
+		}
+
+		return this[_Node]
+	}
+
+	static get Relationship()
+	{
+		if (!this[_Relationship])
+		{
+			this[_Relationship] = require(&apos;./Relationship&apos;)
+		}
+
+		return this[_Relationship]
+	}
+
+	static get NodeCollection()
+	{
+		if (!this[_NodeCollection])
+		{
+			this[_NodeCollection] = require(&apos;./NodeCollection&apos;)
+		}
+
+		return this[_NodeCollection]
+	}
+
 	/**
 	 * Build a graph from query results.
 	 * Map variables returned from the query to Nodes
@@ -83,16 +133,17 @@ class Graph {
 	 * @param {string} query The search query.
 	 * @param {object} parameters The parameters used in the search query.
 	 * @param {object} models variables and Node models as key-value pairs.
+	 * @param {object} [links=null] virtual relationships between records
 	 * @returns {Graph} The resulting graph.
 	 *
 	 * @memberOf Graph
 	 */
-	static build(query, parameters, models)
+	static build(query, parameters, models = {}, links = null)
 	{
 		return this.db.query(query, parameters)
 			.then(result =&gt;
 			{
-				return new this(result, models)
+				return new this(result, models, links)
 			})
 	}
 
@@ -101,19 +152,98 @@ class Graph {
 	 *
 	 * @param {neo4j.Result} result Result of a query.
 	 * @param {object} models variables and Node models as key-value pairs.
+	 * @param {object} [links=null] virtual relationships between records
 	 *
 	 * @memberOf Graph
 	 */
-	constructor(result, models)
+	constructor(result, models = {}, links = null)
 	{
 		this.nodes         = new Map()
 		this.relationships = new Map()
-		this.map           = new Map()
+		this.references    = {}
 		this.models        = models
+		this.links         = links
 
-		for (const record of result.records)
+		if (result &amp;&amp; result.records)
+		{
+			this.addRecords(result.records)
+		}
+	}
+
+	run(query, parameters, models = {}, links = null)
+	{
+		Object.assign(this.models, models)
+
+		if (links)
+		{
+			this.links = this.links || {}
+			Object.assign(this.links, links)
+		}
+
+		return this.constructor.db.query(query, parameters)
+			.then(result =&gt;
+			{
+				this.addRecords(result.records)
+			})
+	}
+
+	/**
+	 * Add records to the graph
+	 *
+	 * @param {neo4j.Record[]} records Neo4j Records
+	 */
+	addRecords(records)
+	{
+		for (const record of records)
 		{
 			record.forEach(this.add.bind(this))
+
+			if (this.links)
+			{
+				this.addLinks(record)
+			}
+		}
+	}
+
+	/**
+	 * Link record items
+	 *
+	 * @param {neo4j.Record} record Neo4j Record
+	 */
+	addLinks(record)
+	{
+		const names = Object.keys(this.links)
+
+		for (const name of names)
+		{
+			const link = this.links[name]
+
+			link.items = link.items || []
+
+			const startKey = link.start || Object.keys(this.models)[0]
+			const endKey = link.end || name
+
+			if (record.has(startKey) &amp;&amp; record.has(endKey))
+			{
+				const start = record.get(startKey).identity.toNumber()
+
+				const entity = record.get(endKey)
+				const type = Graph.typeOf(entity)
+				const value = entity.identity ? entity.identity.toNumber() : entity
+
+				const item = {
+					start,
+					value,
+					type
+				}
+
+				if (endKey in this.models)
+				{
+					link.model = this.models[endKey]
+				}
+
+				link.items.push(item)
+			}
 		}
 	}
 
@@ -127,7 +257,9 @@ class Graph {
 	 */
 	add(entity, key)
 	{
-		if (Array.isArray(entity))
+		const type = Graph.typeOf(entity)
+
+		if (type === Graph.TYPE_ARRAY)
 		{
 			for (const item of entity)
 			{
@@ -136,43 +268,41 @@ class Graph {
 			return
 		}
 
-		const type = this.getEntityType(entity)
-		const id = entity.identity.toNumber()
+		const id = Graph.getId(entity)
+
+		this.references[key] = this.references[key] || []
+		this.references[key].push(id ? id : entity)
+
+		if (type !== Graph.TYPE_NODE &amp;&amp; type !== Graph.TYPE_RELATIONSHIP)
+		{
+			return
+		}
 
 		entity.$key = key
 
+		const map = this.getMap(entity)
+		let current
+
+		if (map.has(id))
+		{
+			current = map.get(id)
+		}
+		else
+		{
+			current = {
+				entity
+			}
+		}
+
 		if (key in this.models)
 		{
-			entity = new this.models[key](entity, this)
+			const $Model = this.models[key]
+
+			current.models = current.models || {}
+			current.models[$Model.name] = new $Model(entity, this)
 		}
 
-		if (this[type].has(id) &amp;&amp; key in this.models)
-		{
-			const current = this[type].get(id)
-
-			// Upgrade entity to Model
-			if (current.$key)
-			{
-				const arr = this.map[current.$key]
-
-				if (arr.includes(current))
-				{
-					arr.splice(arr.indexOf(current), 1)
-				}
-			}
-
-			this[type].set(id, entity)
-		}
-		else if (!this[type].has(id))
-		{
-			this[type].set(id, entity)
-		}
-
-		if (key)
-		{
-			this.map[key] = this.map[key] || []
-			this.map[key].push(entity)
-		}
+		map.set(id, current)
 	}
 
 	/**
@@ -193,45 +323,116 @@ class Graph {
 			return
 		}
 
-		const entity = obj.$entity || obj
-		const id = entity.identity.toNumber()
-		const type = this.getEntityType(entity)
+		const entity = Graph.getEntity(obj)
+		const id = Graph.getId(entity)
 
-		this[type].delete(id)
+		this.getMap(entity).delete(id)
 
-		if (entity.$key)
+		const map = this.references[entity.$key]
+		const i = map.indexOf(id)
+
+		if (i &gt;= 0)
 		{
-			const map = this.map[entity.$key]
-			const i = map.indexOf(entity)
-
-			if (i &gt;= 0)
-			{
-				map.splice(i, 1)
-			}
+			map.splice(i, 1)
 		}
+	}
+
+	static getEntity(subject)
+	{
+		if (subject instanceof Graph.Node || subject instanceof Graph.Relationship)
+		{
+			return subject.$entity
+		}
+
+		if (subject instanceof neo4j.types.Node || subject instanceof neo4j.types.Relationship)
+		{
+			return subject
+		}
+
+		if (subject.entity)
+		{
+			return subject.entity
+		}
+
+		return null
 	}
 
 	/**
 	 * Get the type of the entity
 	 *
 	 * @param {any} entity Entity object
-	 * @returns {string} &apos;nodes&apos; or &apos;relationships&apos;
+	 * @returns {string} Graph.TYPE_NODE, Graph.TYPE_RELATIONSHIP, Graph.TYPE_INTEGER or native JS type
 	 *
 	 * @memberOf Graph
 	 */
-	getEntityType(entity)
+	static typeOf(entity)
 	{
 		if (entity instanceof neo4j.types.Node)
 		{
-			return &apos;nodes&apos;
+			return Graph.TYPE_NODE
 		}
 
 		if (entity instanceof neo4j.types.Relationship)
 		{
-			return &apos;relationships&apos;
+			return Graph.TYPE_RELATIONSHIP
 		}
 
-		throw &apos;Type not implemented.&apos;
+		if (neo4j.isInt(entity))
+		{
+			return Graph.TYPE_INTEGER
+		}
+
+		if (Array.isArray(entity))
+		{
+			return Graph.TYPE_ARRAY
+		}
+
+		return typeof entity
+	}
+
+	static getId(subject)
+	{
+		if (!isNaN(subject))
+		{
+			return parseInt(subject)
+		}
+
+		if (subject instanceof Graph.Node || subject instanceof Graph.Relationship)
+		{
+			return subject.$id
+		}
+
+		if (subject instanceof neo4j.types.Node || subject instanceof neo4j.types.Relationship)
+		{
+			return subject.identity.toNumber()
+		}
+
+		return null
+	}
+
+	/**
+	 * Get the map used for the entity
+	 *
+	 * @param {any} entity Entity object
+	 * @returns {Map} The entity map
+	 *
+	 * @memberOf Graph
+	 */
+	getMap(entity)
+	{
+		const type = Graph.typeOf(entity)
+
+		if (type === Graph.TYPE_NODE || entity instanceof Graph.Node)
+		{
+			return this.nodes
+		}
+
+		if (type === Graph.TYPE_RELATIONSHIP || (entity.prototype &amp;&amp; entity.prototype instanceof Graph.Relationship))
+		{
+			return this.relationships
+		}
+
+		throw `No map defined for this entity: ${ entity }`
 	}
 
 	/**
@@ -250,20 +451,20 @@ class Graph {
 
 		for (const [, item] of this.relationships)
 		{
-			const entity = item.$entity || item
+			const entity = item.entity
 
 			if (entity.type !== $Relationship.type)
 			{
 				continue
 			}
 
-			if (entity.start.equals(start.$id) &amp;&amp; !entity.end.equals(end.$id) &amp;&amp; $Relationship.direction === Relationship.OUT)
+			if (entity.start.equals(start.$id) &amp;&amp; entity.end.equals(end.$id) &amp;&amp; $Relationship.direction === Graph.Relationship.OUT)
 			{
 				relationship = item
 				break
 			}
 
-			if (entity.start.equals(end.$id) &amp;&amp; !entity.end.equals(start.$id) &amp;&amp; $Relationship.direction === Relationship.IN)
+			if (entity.start.equals(end.$id) &amp;&amp; entity.end.equals(start.$id) &amp;&amp; $Relationship.direction === Graph.Relationship.IN)
 			{
 				relationship = item
 				break
@@ -275,13 +476,12 @@ class Graph {
 			return null
 		}
 
-		if (!(relationship instanceof $Relationship))
+		if (!relationship.model)
 		{
-			relationship = new $Relationship(relationship, this)
-			this.relationships.set(relationship.$id, relationship)
+			relationship.model = new $Relationship(relationship.entity, this)
 		}
 
-		return relationship
+		return relationship.model
 	}
 
 	/**
@@ -298,32 +498,29 @@ class Graph {
 		const entity = node.$entity
 		const results = []
 
-		for (const rel of this.relationships.values())
+		for (const [, item] of this.relationships)
 		{
+			const relationship = item.entity
 			let other = null
 
-			if (rel.type !== $Relationship.type)
+			if (relationship.type !== $Relationship.type)
 			{
 				continue
 			}
 
-			if ($Relationship.direction === Relationship.OUT &amp;&amp; rel.start.equals(entity.identity))
+			// TODO: check relationships with direction &apos;both&apos;
+
+			if ([Graph.Relationship.OUT, Graph.Relationship.ANY].includes($Relationship.direction) &amp;&amp; relationship.start.equals(entity.identity))
 			{
-				other = this.nodes.get(rel.end.toNumber())
+				other = this.getNodeModel(relationship.end, $Relationship.Model)
 			}
-			else if ($Relationship.direction === Relationship.IN &amp;&amp; rel.end.equals(entity.identity))
+			else if ([Graph.Relationship.IN, Graph.Relationship.ANY, Graph.Relationship.BOTH].includes($Relationship.direction) &amp;&amp; relationship.end.equals(entity.identity))
 			{
-				other = this.nodes.get(rel.start.toNumber())
+				other = this.getNodeModel(relationship.start, $Relationship.Model)
 			}
 			else
 			{
 				continue
-			}
-
-			if (!(other instanceof $Relationship.Model))
-			{
-				other = new $Relationship.Model(other, this)
-				this.nodes.set(other.$id, other)
 			}
 
 			if ($Relationship.singular)
@@ -332,6 +529,103 @@ class Graph {
 			}
 
 			results.push(other)
+		}
+
+		return results
+	}
+
+	getNodeModel(id, $Node)
+	{
+		if (neo4j.isInt(id))
+		{
+			id = id.toNumber()
+		}
+
+		const node = this.nodes.get(id)
+
+		if (!node)
+		{
+			throw &apos;Node not found&apos;
+		}
+
+		if (!$Node)
+		{
+			$Node = Graph.Node
+		}
+
+		node.models = node.models || {}
+
+		if (!node.models[$Node.name])
+		{
+			node.models[$Node.name] = new $Node(node.entity, this)
+		}
+
+		return node.models[$Node.name]
+	}
+
+	getNodes(reference)
+	{
+		const ids = this.references[reference]
+		const nodes = []
+		const Model = this.models[reference]
+
+		if (!ids)
+		{
+			return nodes
+		}
+
+		for (const id of ids)
+		{
+			nodes.push(this.getNodeModel(id, Model))
+		}
+
+		return nodes
+	}
+
+	getLinked(node, name)
+	{
+		if (!this.links || !this.links[name] || !this.links[name].items)
+		{
+			return null
+		}
+
+		const entity = Graph.getEntity(node)
+		const id = Graph.getId(entity)
+		const link = this.links[name]
+		const results = []
+
+		for (const item of link.items)
+		{
+			if (item.start !== id)
+			{
+				continue
+			}
+
+			let value = item.value
+
+			if (item.type === Graph.TYPE_NODE)
+			{
+				value = this.getNodeModel(value, link.model)
+			}
+
+			if (item.type === Graph.TYPE_INTEGER)
+			{
+				value = value.toNumber()
+			}
+
+			if (item.type === Graph.TYPE_ARRAY &amp;&amp; link.model &amp;&amp; link.model.prototype instanceof Graph.NodeCollection)
+			{
+				const Collection = link.model
+
+				value = new Collection(value)
+			}
+
+			if (link.singular)
+			{
+				return value
+			}
+
+			results.push(value)
 		}
 
 		return results

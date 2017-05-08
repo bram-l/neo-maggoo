@@ -36,9 +36,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -102,7 +100,61 @@
         <p>
           
           
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#static-get-ANY">ANY</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
           <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#static-get-BOTH">BOTH</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#static-get-DEFAULT_TYPE">DEFAULT_TYPE</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
         </p>
       </div>
       <div>
@@ -392,6 +444,33 @@
     <td>
       <span class="access" data-ice="access">public</span>
       <span data-ice="static">static</span>
+      <span class="kind" data-ice="kind">set</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#static-set-singular">singular</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
       <span class="kind" data-ice="kind">get</span>
       
       <span class="override" data-ice="override"></span>
@@ -409,33 +488,6 @@
         
         <div data-ice="description"><p>If true a relationship will always have only a single related Node</p>
 </div>
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      <span data-ice="static">static</span>
-      <span class="kind" data-ice="kind">set</span>
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#static-set-singular">singular</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
       </div>
     </td>
     <td>
@@ -519,13 +571,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(relation: <span>*</span>, graph: <span>*</span>)</span>
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(relation: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>neo4j.types.Relationship</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Creates an instance of Relationship</p>
+</div>
       </div>
     </td>
     <td>
@@ -642,6 +695,34 @@
         
         
         
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-get-$id">$id</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>The neo4j entity ID.</p>
+</div>
       </div>
     </td>
     <td>
@@ -816,7 +897,7 @@
     <td>
       <span class="access" data-ice="access">public</span>
       
-      <span class="kind" data-ice="kind">set</span>
+      <span class="kind" data-ice="kind">get</span>
       
       <span class="override" data-ice="override"></span>
     </td>
@@ -825,7 +906,7 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-set-start">start</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-get-start">start</a></span></span><span data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
@@ -843,7 +924,7 @@
     <td>
       <span class="access" data-ice="access">public</span>
       
-      <span class="kind" data-ice="kind">get</span>
+      <span class="kind" data-ice="kind">set</span>
       
       <span class="override" data-ice="override"></span>
     </td>
@@ -852,7 +933,7 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-get-start">start</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html#instance-set-start">start</a></span></span><span data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
@@ -909,6 +990,49 @@
 <div data-ice="staticMemberDetails"><h2 data-ice="title">Static Public Members</h2>
 
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-get-ANY">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    <span class="kind" data-ice="kind">get</span>
+    
+    
+    
+    <span data-ice="name">ANY</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber61">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-get-BOTH">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
@@ -921,6 +1045,49 @@
       
       
       <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber50">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-get-DEFAULT_TYPE">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    <span class="kind" data-ice="kind">get</span>
+    
+    
+    
+    <span data-ice="name">DEFAULT_TYPE</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber72">source</a></span></span>
     </span>
   </h3>
 
@@ -1006,7 +1173,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber255">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber302">source</a></span></span>
     </span>
   </h3>
 
@@ -1049,7 +1216,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber245">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber292">source</a></span></span>
     </span>
   </h3>
 
@@ -1136,7 +1303,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber234">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber281">source</a></span></span>
     </span>
   </h3>
 
@@ -1179,7 +1346,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber257">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber304">source</a></span></span>
     </span>
   </h3>
 
@@ -1222,7 +1389,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber216">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber263">source</a></span></span>
     </span>
   </h3>
 
@@ -1265,7 +1432,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber198">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber245">source</a></span></span>
     </span>
   </h3>
 
@@ -1308,7 +1475,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber227">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber274">source</a></span></span>
     </span>
   </h3>
 
@@ -1352,7 +1519,50 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber232">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber279">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-set-singular">
+    <span class="access" data-ice="access">public</span>
+    <span data-ice="static">static</span>
+    <span class="kind" data-ice="kind">set</span>
+    
+    
+    
+    <span data-ice="name">singular</span><span data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber261">source</a></span></span>
     </span>
   </h3>
 
@@ -1395,7 +1605,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber209">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber256">source</a></span></span>
     </span>
   </h3>
 
@@ -1404,49 +1614,6 @@
   
   <div data-ice="description"><p>If true a relationship will always have only a single related Node</p>
 </div>
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-set-singular">
-    <span class="access" data-ice="access">public</span>
-    <span data-ice="static">static</span>
-    <span class="kind" data-ice="kind">set</span>
-    
-    
-    
-    <span data-ice="name">singular</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber214">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
 
   
 
@@ -1482,7 +1649,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber196">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber243">source</a></span></span>
     </span>
   </h3>
 
@@ -1525,7 +1692,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber191">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber238">source</a></span></span>
     </span>
   </h3>
 
@@ -1569,18 +1736,19 @@
     
     
     
-    <span data-ice="name">constructor</span><span data-ice="signature">(relation: <span>*</span>, graph: <span>*</span>)</span>
+    <span data-ice="name">constructor</span><span data-ice="signature">(relation: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>neo4j.types.Relationship</span>, graph: <span><a href="class/lib/Graph.js~Graph.html">Graph</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber58">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber86">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Creates an instance of Relationship</p>
+</div>
 
   
 
@@ -1594,15 +1762,17 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">relation</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span> | <span>neo4j.types.Relationship</span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>Relationship data object or neo4j Relationship</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">graph</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html">Graph</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>Current graph</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -1641,7 +1811,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber77">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber102">source</a></span></span>
     </span>
   </h3>
 
@@ -1684,7 +1854,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber108">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber145">source</a></span></span>
     </span>
   </h3>
 
@@ -1728,7 +1898,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber64">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber92">source</a></span></span>
     </span>
   </h3>
 
@@ -1771,7 +1941,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber71">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber99">source</a></span></span>
     </span>
   </h3>
 
@@ -1779,6 +1949,51 @@
   
   
   
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-get-$id">
+    <span class="access" data-ice="access">public</span>
+    
+    <span class="kind" data-ice="kind">get</span>
+    
+    
+    
+    <span data-ice="name">$id</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber119">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>The neo4j entity ID.
+Note that this could change over time, use id instead.</p>
+</div>
 
   
 
@@ -1814,7 +2029,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber95">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber132">source</a></span></span>
     </span>
   </h3>
 
@@ -1858,7 +2073,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber82">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber107">source</a></span></span>
     </span>
   </h3>
 
@@ -1901,7 +2116,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber130">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber168">source</a></span></span>
     </span>
   </h3>
 
@@ -1944,7 +2159,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber120">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber157">source</a></span></span>
     </span>
   </h3>
 
@@ -1987,7 +2202,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber123">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber161">source</a></span></span>
     </span>
   </h3>
 
@@ -2030,50 +2245,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber128">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-set-start">
-    <span class="access" data-ice="access">public</span>
-    
-    <span class="kind" data-ice="kind">set</span>
-    
-    
-    
-    <span data-ice="name">start</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber118">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber166">source</a></span></span>
     </span>
   </h3>
 
@@ -2116,7 +2288,50 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber113">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber150">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-set-start">
+    <span class="access" data-ice="access">public</span>
+    
+    <span class="kind" data-ice="kind">set</span>
+    
+    
+    
+    <span data-ice="name">start</span><span data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber155">source</a></span></span>
     </span>
   </h3>
 
@@ -2162,7 +2377,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber133">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Relationship.js.html#lineNumber172">source</a></span></span>
     </span>
   </h3>
 

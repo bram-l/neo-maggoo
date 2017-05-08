@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">lib/_/Node.write.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html">Graph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">_</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/_/Node.read.js~Read.html">Read</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extendClass">extendClass</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">lib/_/Node.write.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;
+
+const DB = require(&apos;./DB&apos;)
+const Node = require(&apos;./Node&apos;)
+const extend = require(&apos;./utils/extendClass&apos;)
+
+class Write {
+
+	/**
+	 * Save the Node to the graph database.
+	 *
+	 * @param {boolean} [deep=false] If true save all related nodes
+	 * @param {any} [tx=null] The current database transaction
+	 */
+	async save(deep = false, tx = null)
+	{
+		// Prevent infinite loops in circular graphs
+		if (tx &amp;&amp; tx.$nodes.includes(this.id))
+		{
+			return
+		}
+
+		let session = null
+
+		if (!tx)
+		{
+			tx = DB.beginTransaction()
+			session = tx.session
+		}
+
+		this.id = this.id || Node.uuid()
+
+		tx.$nodes.push(this.id)
+
+		if (this.$dirty)
+		{
+			const properties = Object.assign({}, this.$data)
+			const parameters = { properties }
+
+			let query = &apos;&apos;
+
+			parameters.id = this.id
+
+			query += &apos;MERGE (n {id: {id}})&apos;
+			query += &apos;\n&apos;
+
+			// TODO: remove properties that were explicitly deleted
+
+			query += `
+				SET n:${ this.$labels.join(&apos;:&apos;) }
+				SET n += {properties}
+				RETURN n
+			`
+
+			const result = await tx.run(query, parameters).then(r =&gt; r)
+
+			this.$entity = result.records[0].get(&apos;n&apos;)
+			this.reset()
+		}
+
+		if (deep)
+		{
+			await this.saveRelated(tx)
+		}
+
+		if (session)
+		{
+			await tx.commit().then(r =&gt; r)
+
+			session.close()
+		}
+	}
+
+	/**
+	 * Save related nodes and their relationships
+	 *
+	 * @param {Transaction} [tx] The current databse transaction
+	 */
+	async saveRelated(tx = null)
+	{
+		for (const key of Object.keys(this.constructor.relationships))
+		{
+			let nodes = this.getRelated(key)
+
+			if (nodes &amp;&amp; !(nodes instanceof Array))
+			{
+				nodes = [nodes]
+			}
+
+			if (!nodes || !nodes.length)
+			{
+				continue
+			}
+
+			for (const node of nodes)
+			{
+				await node.save(true, tx)
+
+				if (node.$rel.$dirty)
+				{
+					await node.$rel.save(tx)
+				}
+			}
+		}
+	}
+
+	/**
+	 * Delete node from the graph database
+	 *
+	 * @param {boolean} [deep=false] Delete related nodes
+	 * @param {Transaction} [tx=null] The current databse transaction
+	 */
+	async delete(deep = false, tx = null)
+	{
+		if (!this.id)
+		{
+			throw &apos;Can not delete a node without ID&apos;
+		}
+
+		// Prevent infinite loops in circular graphs
+		if (tx &amp;&amp; tx.$nodes.includes(this.id))
+		{
+			return
+		}
+
+		let session = null
+
+		if (!tx)
+		{
+			session = DB.driver.session()
+			tx = session.beginTransaction()
+			tx.$nodes = []
+		}
+
+		tx.$nodes.push(this.id)
+
+		const query = `
+			MATCH (n)
+			WHERE n.id = {id}
+			DETACH DELETE n
+		`
+
+		const parameters = { id: this.id }
+
+		await DB.query(query, parameters)
+
+		if (this.$graph)
+		{
+			this.$graph.remove(this.$entity)
+		}
+
+		if (deep)
+		{
+			await this.deleteRelated(tx)
+		}
+
+		this.$entity = null
+		this.$data.id = null
+
+		if (session)
+		{
+			await tx.commit().then(r =&gt; r)
+
+			session.close()
+		}
+	}
+
+	/**
+	 * Delete related nodes and their relationships
+	 *
+	 * @param {Transaction} [tx] The current databse transaction
+	 */
+	async deleteRelated(tx = null)
+	{
+		for (const key of Object.keys(this.constructor.relationships))
+		{
+			const $Relationship = this.getRelationship(key)
+			let nodes = this.getRelated(key)
+
+			if ($Relationship.singular)
+			{
+				nodes = nodes ? [nodes] : []
+			}
+
+			for (const node of nodes)
+			{
+				await node.delete(true, tx)
+			}
+		}
+	}
+
+}
+
+extend(Node, Write)
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

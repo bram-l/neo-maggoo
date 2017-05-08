@@ -36,9 +36,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Node.js~Node.html">Node</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DB">DB</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Collection">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -67,6 +65,7 @@ const merge = require(&apos;deepmerge&apos;)
  * @property {String} variable - The variable used to identify the Node in the query, &apos;n&apos; by default.
  * @property {Array} variables - All variables used in the query that should be added to the results.
  * @property {String|Array} where - The where clause, arrays are joined by the &apos;AND&apos; operator.
+ * @property {Number} limit - The maximum number of results to be returned
  * @property {String} with - The name of relationship to include, use the dot-notation to include mutliple levels
  * @property {Array} with - An array of names of relationships to include
  * @property {Object.&lt;String, Boolean|Object&gt;} with - Relationships to include (true) or exclude (false) or filter(object)
@@ -81,11 +80,13 @@ const merge = require(&apos;deepmerge&apos;)
  * @property {boolean} singular - {@link Relationship.singular}
  */
 
-
+const REGEX_LEVEL_SPLIT = /\.(.*)/
+const REGEX_INDEX = /([^\(]*)\(?([^\)]*)\)?/i
 
 // Private
-const _related = Symbol()
-const _labels = Symbol()
+const _related = Symbol(&apos;related&apos;)
+const _linked = Symbol(&apos;linked&apos;)
+const _labels = Symbol(&apos;labels&apos;)
 
 /**
  * @class Node
@@ -123,9 +124,57 @@ class Node extends Model {
 		this[_related] = {}
 
 		/**
+		 * @private
+		 */
+		this[_linked] = {}
+
+		/**
 		 * @type {Graph} The graph this node is part of
 		 */
 		this.$graph = graph
+	}
+
+	/**
+	 * ID generator, uses ShortId by default
+	 * @returns {string} ID
+	 */
+	static uuid()
+	{
+		return shortid.generate()
+	}
+
+	static addIndex(property, now = false)
+	{
+		return DB.addIndex(this.prototype.$type, property, now)
+	}
+
+	static addUnique(property, now = false)
+	{
+		return DB.addUnique(this.prototype.$type, property, now)
+	}
+
+	static async dropIndex(property)
+	{
+		await DB.dropIndex(this.prototype.$type, property)
+	}
+
+	static async dropUnique(property)
+	{
+		await DB.dropUnique(this.prototype.$type, property)
+	}
+
+	static get Collection()
+	{
+		const self = this
+
+		return class extends NodeCollection {
+
+			constructor(items)
+			{
+				super(self, items)
+			}
+
+		}
 	}
 
 	/**
@@ -142,15 +191,6 @@ class Node extends Model {
 	set id(value)
 	{
 		this.$data.id = value
-	}
-
-	/**
-	 * ID generator, uses ShortId by default
-	 * @returns {string} ID
-	 */
-	static uuid()
-	{
-		return shortid.generate()
 	}
 
 	/**
@@ -186,19 +226,19 @@ class Node extends Model {
 	}
 
 	/**
-	 * Get a relationship by name.
+	 * Set property value
 	 *
-	 * @param {string} name The name of the relationship
-	 * @returns {Relationship} The relastionship
+	 * @param {string} key Property name
+	 * @param {any} value Property value
 	 */
-	getRelationship(name)
+	setProperty(key, value)
 	{
-		if (!(name in this.constructor.Relationships))
+		if (value &amp;&amp; value.toNumber)
 		{
-			return null
+			value = value.toNumber()
 		}
 
-		return this.constructor.Relationships[name]
+		super.setProperty(key, value)
 	}
 
 	/**
@@ -209,12 +249,19 @@ class Node extends Model {
 	 */
 	get(key)
 	{
-		if (key in this.constructor.Relationships)
+		if (key in this.constructor.relationships)
 		{
 			return this.getRelated(key)
 		}
 
-		return super.get(key)
+		const value = super.get(key)
+
+		if (typeof value === &apos;undefined&apos;)
+		{
+			return this.getLinked(key)
+		}
+
+		return value
 	}
 
 	/**
@@ -232,6 +279,58 @@ class Node extends Model {
 		}
 
 		return super.set(key, value)
+	}
+
+	has(key)
+	{
+		// TODO: check related / linked
+
+		return super.has(key)
+	}
+
+	/**
+	 * Definitions of the relationships for this Node
+	 *
+	 * @member
+	 * @readonly
+	 * @type {object.&lt;string, RelationshipDefinition&gt;}
+	 */
+	static get relationships()
+	{
+		return {}
+	}
+
+	/**
+	 * Get a Relationship class by name.
+	 *
+	 * @param {string} name The name of the relationship
+	 * @returns {Relationship} The Relastionship class
+	 */
+	static getRelationship(name)
+	{
+		const definition = this.relationships[name]
+
+		if (definition.prototype instanceof Relationship)
+		{
+			return definition
+		}
+
+		class $Relationship extends Relationship {}
+
+		Object.assign($Relationship, definition)
+
+		return $Relationship
+	}
+
+	/**
+	 * Get a Relationship class by name.
+	 *
+	 * @param {string} name The name of the relationship
+	 * @returns {Relationship} The Relastionship class
+	 */
+	getRelationship(name)
+	{
+		return this.constructor.getRelationship(name)
 	}
 
 	/**
@@ -260,6 +359,34 @@ class Node extends Model {
 		}
 
 		return $Relationship.singular ? result[0] : result
+	}
+
+	/**
+	 * Get linked results.
+	 *
+	 * @param {string} name The name of the link
+	 * @returns {*} The related node(s) / value(s) or null if none is found
+	 */
+	getLinked(name)
+	{
+		if (!this.$graph)
+		{
+			return null
+		}
+
+		if (!this.$graph.links || !(name in this.$graph.links))
+		{
+			return null
+		}
+
+		if (!this[_linked][name])
+		{
+			const linked = this.$graph ? this.$graph.getLinked(this, name) : []
+
+			this[_linked][name] = linked
+		}
+
+		return this[_linked][name]
 	}
 
 	/**
@@ -322,6 +449,50 @@ class Node extends Model {
 		this[_related][name] = result
 	}
 
+	clearCachedRelationships(relationships = null)
+	{
+		if (relationships === null)
+		{
+			relationships = Object.keys(this.constructor.relationships)
+		}
+
+		relationships = this.constructor.normalizeRelationshipLevels(relationships)
+
+		for (const relationship of Object.keys(relationships))
+		{
+			const filters = relationships[relationship]
+
+			if (this[_related][relationship] &amp;&amp; filters.with)
+			{
+				this[_related][relationship].clearCachedRelationships(filters.with)
+			}
+
+			delete this[_related][relationship]
+		}
+	}
+
+	static get labels()
+	{
+		const labels = [this.name]
+
+		if (this === Node)
+		{
+			return labels
+		}
+
+		let parent = Object.getPrototypeOf(this)
+
+		while (parent !== Node &amp;&amp; Reflect.has(parent, &apos;labels&apos;))
+		{
+			const $labels = Reflect.get(parent, &apos;labels&apos;, parent)
+
+			labels.push(...$labels)
+			parent = Object.getPrototypeOf(parent)
+		}
+
+		return labels
+	}
+
 	/**
 	 * Node labels. Will be added the node in the graph database.
 	 * By default it uses the label as defined by $type.
@@ -330,7 +501,16 @@ class Node extends Model {
 	 */
 	get $labels()
 	{
-		return this[_labels] ? this[_labels] : [this.$type]
+		if (this[_labels])
+		{
+			return this[_labels]
+		}
+
+		const labels = this.constructor.labels
+
+		this[_labels] = labels
+
+		return labels
 	}
 
 	/**
@@ -348,6 +528,11 @@ class Node extends Model {
 		 */
 		this[_labels] = labels
 	}
+
+	/* * * * * * * * * * * * * * * *
+	 *        WRITE METHODS        *
+	 * * * * * * * * * * * * * * * */
+
 
 	/**
 	 * Save the Node to the graph database.
@@ -371,7 +556,7 @@ class Node extends Model {
 			session = tx.session
 		}
 
-		this.id = this.id || Node.uuid()
+		this.id = this.id || this.constructor.uuid()
 
 		tx.$nodes.push(this.id)
 
@@ -403,7 +588,7 @@ class Node extends Model {
 
 		if (deep)
 		{
-			await this.saveRelated(tx)
+			await this.saveRelated(null, tx)
 		}
 
 		if (session)
@@ -417,11 +602,19 @@ class Node extends Model {
 	/**
 	 * Save related nodes and their relationships
 	 *
+	 * @param {Array} [relationships] The relationships to be saved (all by default)
 	 * @param {Transaction} [tx] The current databse transaction
 	 */
-	async saveRelated(tx = null)
+	async saveRelated(relationships = null, tx = null)
 	{
-		for (const key of Object.keys(this.constructor.Relationships))
+		relationships = relationships || Object.keys(this.constructor.relationships)
+
+		if (typeof relationships === &apos;string&apos;)
+		{
+			relationships = [relationships]
+		}
+
+		for (const key of relationships)
 		{
 			let nodes = this.getRelated(key)
 
@@ -470,7 +663,7 @@ class Node extends Model {
 
 		if (!tx)
 		{
-			session = DB.driver.session()
+			session = DB.session()
 			tx = session.beginTransaction()
 			tx.$nodes = []
 		}
@@ -485,7 +678,7 @@ class Node extends Model {
 
 		const parameters = { id: this.id }
 
-		await DB.query(query, parameters)
+		await tx.run(query, parameters).then(r =&gt; r)
 
 		if (this.$graph)
 		{
@@ -515,10 +708,10 @@ class Node extends Model {
 	 */
 	async deleteRelated(tx = null)
 	{
-		for (const [name] of Object.entries(this.constructor.Relationships))
+		for (const key of Object.keys(this.constructor.relationships))
 		{
-			const $Relationship = this.getRelationship(name)
-			let nodes = this.getRelated(name)
+			const $Relationship = this.getRelationship(key)
+			let nodes = this.getRelated(key)
 
 			if ($Relationship.singular)
 			{
@@ -532,7 +725,24 @@ class Node extends Model {
 		}
 	}
 
-	// *** STATIC METHODS ***
+
+	/* * * * * * * * * * * * * * * *
+	 *        READ METHODS         *
+	 * * * * * * * * * * * * * * * */
+
+
+	/**
+	 * Default values for query options
+	 */
+	static get queryDefaults()
+	{
+		return {
+			parameters: {},
+			variable: &apos;n&apos;,
+			variables: [],
+			links: null
+		}
+	}
 
 	/**
 	 * Fetch a single Node
@@ -554,24 +764,18 @@ class Node extends Model {
 		return this.find(filters, o)
 	}
 
-	// @param {QueryOptions} [o={}] Query options
-
-
 	/**
 	 * Fetch Nodes
 	 *
 	 * @param {QueryOptions} o Query options
- 	 * @async
-	 * @return {Promise.&lt;Array&gt;} Results
+	 * @return {NodeCollection} Results
 	 *
 	 * @example
 	 * const nodes = await Node.all({ limit: 10 })
 	 */
 	static async all(o)
 	{
-		const results = await this.find(null, o)
-
-		return results
+		return this.find(null, o)
 	}
 
 	/**
@@ -616,19 +820,6 @@ class Node extends Model {
 	}
 
 	/**
-	 * Default values for query options
-	 *
-	 */
-	static get defaults()
-	{
-		return {
-			parameters: {},
-			variable: &apos;n&apos;,
-			variables: []
-		}
-	}
-
-	/**
 	 * Find Nodes based on filter or Node ID
 	 *
 	 * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)
@@ -650,38 +841,62 @@ class Node extends Model {
 	 */
 	static async find(filters, o = {})
 	{
-		o = merge(merge({}, this.defaults), o)
+		o = merge(merge({}, this.queryDefaults), o)
 
 		if (!o.variables.includes(o.variable))
 		{
 			o.variables.push(o.variable)
 		}
 
+		if (o.models)
+		{
+			Object.keys(o.models).map(variable =&gt;
+			{
+				if (!o.variables.includes(variable))
+				{
+					o.variables.push(variable)
+				}
+			})
+		}
+
+		if (o.links)
+		{
+			Object.keys(o.links).map(variable =&gt;
+			{
+				if (!o.variables.includes(variable))
+				{
+					o.variables.push(variable)
+				}
+			})
+		}
+
 		if (filters)
 		{
-			o = merge(o, this.parseFilters(filters, o.variable))
+			o = merge(o, this.parseQueryFilters(filters, o.variable))
 		}
 
 		if (o.with)
 		{
-			o = merge(o, this.getRelationshipsQuery(o.with, o.variables, o.variable))
+			o = merge(o, this.getRelationshipQueryOptions(o.with, o.variables, o.variable))
 		}
 
 		const query = this.buildQuery(o)
 
-		console.log(&apos;query&apos;, query, o.parameters)
-		console.time(&apos;query time&apos;)
+		const models = o.models || {}
 
-		const graph = await Graph.build(query, o.parameters, { [o.variable]: this })
+		if (!models[o.variable])
+		{
+			models[o.variable] = this
+		}
 
-		console.timeEnd(&apos;query time&apos;)
+		const graph = await Graph.build(query, o.parameters, models, o.links)
+
+		const nodes = graph.getNodes(o.variable)
 
 		if (o.singular)
 		{
-			return graph.map[o.variable] ? graph.map[o.variable][0] : null
+			return nodes &amp;&amp; nodes.length ? nodes[0] : null
 		}
-
-		const nodes = graph.map[o.variable] || []
 
 		return new NodeCollection(this, nodes)
 	}
@@ -694,10 +909,28 @@ class Node extends Model {
 	 */
 	static buildQuery(o)
 	{
-		o = merge(this.defaults, o)
+		o = merge(this.queryDefaults, o)
+
+		if (o.index &amp;&amp; typeof o.index == &apos;string&apos;)
+		{
+			let [, label, property] = o.index.match(REGEX_INDEX)
+
+			if (!property)
+			{
+				property = label
+				label = this.labels[0]
+			}
+
+			o.index = { label, property }
+		}
 
 		// Build Query
-		let query = o.query || `MATCH (${ o.variable }:${ this.name })\n`
+		let query = o.query || `MATCH (${ o.variable }:${ o.index ? o.index.label : this.labels.join(&apos;:&apos;) })\n`
+
+		if (o.index)
+		{
+			query += `USING INDEX ${ o.variable }:${ o.index.label }(${ o.index.property })\n`
+		}
 
 		// Define filters
 		if (Array.isArray(o.where) &amp;&amp; o.where.length)
@@ -719,6 +952,16 @@ class Node extends Model {
 			query += &apos;\n&apos;
 		}
 
+		if (o.set)
+		{
+			const lines = Array.isArray(o.set) ? o.set : [o.set]
+
+			for (const line of lines)
+			{
+				query += `SET ${ line }\n`
+			}
+		}
+
 		query += &apos;RETURN &apos;
 
 		// Define return values
@@ -733,9 +976,23 @@ class Node extends Model {
 
 		query += &apos;\n&apos;
 
+		if (o.orderBy)
+		{
+			query += `ORDER BY ${ o.orderBy }\n`
+		}
+
+		if (o.skip)
+		{
+			query += `SKIP ${ parseInt(o.skip, 10) }\n`
+		}
+
 		if (o.limit)
 		{
-			query += `LIMIT ${ o.limit }\n`
+			query += `LIMIT ${ parseInt(o.limit, 10) }\n`
+		}
+		else if (o.singular)
+		{
+			query += &apos;LIMIT 1\n&apos;
 		}
 
 		return query
@@ -745,10 +1002,10 @@ class Node extends Model {
 	 * Parse search filters
 	 *
 	 * @param {object|string|number} filters Search filters, Node ID (string), or neo4j node identifier (number)
-	 * @param {string} [variable] Variable for the current node
+	 * @param {string} variable Variable for the current node
 	 * @returns {QueryOptions} Filters options object
 	 */
-	static parseFilters(filters, variable = &apos;n&apos;)
+	static parseQueryFilters(filters, variable)
 	{
 		if (typeof filters == &apos;number&apos;)
 		{
@@ -758,9 +1015,9 @@ class Node extends Model {
 		{
 			filters = { id: filters }
 		}
-		else if (!filters || filters !== Object(filters))
+		else if (!filters || filters.constructor !== Object)
 		{
-			return {}
+			throw `Invalid filter object: ${ filters }`
 		}
 
 		const o = {
@@ -826,7 +1083,7 @@ class Node extends Model {
 	 */
 	static async count(filters, parameters = {}, o = {})
 	{
-		o = merge(this.defaults, o)
+		o = merge(this.queryDefaults, o)
 		o = merge(o, { parameters })
 
 		if (typeof filters == &apos;string&apos;)
@@ -835,51 +1092,16 @@ class Node extends Model {
 		}
 		else if (!!filters &amp;&amp; filters.constructor === Object)
 		{
-			o = merge(o, this.parseFilters(filters, o.variable))
+			o = merge(o, this.parseQueryFilters(filters, o.variable))
 		}
 
 		o.return = `count(distinct(${ o.variable })) as total`
 
 		const query = this.buildQuery(o)
 
-		const results = await DB.query(query, o.parameters)
+		const total = await DB.getScalar(query, o.parameters)
 
-		return results.records[0].get(&apos;total&apos;).toInt()
-	}
-
-	/**
-	 * Definitions of the relationships for this Node
-	 *
-	 * @member
-	 * @readonly
-	 * @type {object.&lt;string, RelationshipDefinition&gt;}
-	 */
-	static get relationships()
-	{
-		return {}
-	}
-
-	/**
-	 * Auto-genreated {@link Relationship} sub-classes based on definitions
-	 *
-	 * @type {object.&lt;string, Function&gt;}
-	 */
-	static get Relationships()
-	{
-		const Relationships = {}
-
-		const names = Object.keys(this.relationships)
-
-		for (const name of names)
-		{
-			// TODO: cache classes
-
-			class NewRelationship extends Relationship {}
-
-			Relationships[name] = Object.assign(NewRelationship, this.relationships[name])
-		}
-
-		return Relationships
+		return total.toInt()
 	}
 
 	/**
@@ -893,87 +1115,54 @@ class Node extends Model {
 	 * @property {array} matches Optional matches for each relationship
 	 * @property {object} variables The variables currently used for building the query
 	 */
-	static getRelationshipsQuery(levels, variables, reference = &apos;n&apos;)
+	static getRelationshipQueryOptions(levels, variables, reference = &apos;n&apos;)
 	{
 		let o = {
 			matches: [],
 			variables
 		}
 
-		const relationships = this.Relationships
-		const names = Object.keys(relationships)
+		levels = this.normalizeRelationshipLevels(levels)
 
-		if (typeof levels === &apos;string&apos;)
-		{
-			levels = { [levels]: true }
-		}
-		else if (Array.isArray(levels))
-		{
-			levels = levels.reduce((obj, key) =&gt;
-			{
-				obj[key] = {}
-				return obj
-			}, {})
-		}
-
-		for (const name of names)
+		for (const name of Object.keys(levels))
 		{
 			let next = null
-			let current = null
-			let filters = null
+			const filters = levels[name]
 
-			for (let level of Object.keys(levels))
+			if (filters.with)
 			{
-				filters = levels[level]
-
-				if (level.includes(&apos;.&apos;))
-				{
-					next = level.substr(level.indexOf(&apos;.&apos;) + 1)
-					next = { [next]: filters }
-
-					level = level.substr(0, level.indexOf(&apos;.&apos;))
-				}
-				else
-				{
-					next = null
-				}
-
-				if (name === level)
-				{
-					current = level
-					break
-				}
+				next = filters.with
+				delete filters.with
+			}
+			else
+			{
+				next = null
 			}
 
-			if (!current)
-			{
-				continue
-			}
-
-			const relationship = relationships[name]
+			const $Relationship = this.getRelationship(name)
 			const nodeVar = `${ reference }_${ name }`
 			const relationshipVar = `${ reference }_r_${ name }`
 			const collectionVar = &apos;_col&apos;
 
 			let query = `OPTIONAL MATCH (${ reference })`
 
-			if (relationship.direction === Relationship.IN || relationship.direction === Relationship.BOTH)
+			if ($Relationship.direction === Relationship.IN || $Relationship.direction === Relationship.BOTH)
 			{
 				query += &apos;&lt;&apos;
 			}
 
-			query += `-[${ reference }_r_${ name }:${ relationship.type }]-`
+			query += `-[${ reference }_r_${ name }:${ $Relationship.type }]-`
 
-			if (relationship.direction === Relationship.OUT || relationship.direction === Relationship.BOTH)
+			if ($Relationship.direction === Relationship.OUT || $Relationship.direction === Relationship.BOTH)
 			{
 				query += &apos;&gt;&apos;
 			}
 
-			query += `(${ nodeVar }:${ relationship.Model.name })`
+			query += `(${ nodeVar }:${ $Relationship.Model.name })`
 
 			if (!next)
 			{
-				o = merge(o, this.parseFilters(filters, nodeVar))
+				o = merge(o, this.parseQueryFilters(filters, nodeVar))
 
 				if (o.where &amp;&amp; o.where.length)
 				{
@@ -997,7 +1186,7 @@ class Node extends Model {
 
 			if (next)
 			{
-				const nextO = relationship.Model.getRelationshipsQuery(next, o.variables, nodeVar)
+				const nextO = $Relationship.Model.getRelationshipQueryOptions(next, o.variables, nodeVar)
 
 				o = merge(o, nextO)
 			}
@@ -1005,7 +1194,113 @@ class Node extends Model {
 
 		return o
 	}
+
+	static normalizeRelationshipLevels(levels)
+	{
+		if (typeof levels === &apos;string&apos;)
+		{
+			const [current, rest] = levels.split(REGEX_LEVEL_SPLIT)
+
+			levels = { [current]: {} }
+
+			if (rest)
+			{
+				levels[current].with = this.normalizeRelationshipLevels(rest)
+			}
+		}
+		else if (Array.isArray(levels))
+		{
+			levels = levels.reduce((obj, current) =&gt;
+			{
+				Object.assign(obj, this.normalizeRelationshipLevels(current))
+				return obj
+			}, {})
+		}
+
+		return levels
+	}
+
+	/**
+	 * Get a node or a create a new one based on the given properties
+	 *
+	 * @param {object} criteria Specific properties to match
+	 * @param {object} properties Properties to be set on the existing or created node
+	 * @param {QueryOptions} [o={}] Query options
+	 * @returns {Node} Resulting Node
+	 */
+	static async merge(criteria, properties, o = {})
+	{
+		o = merge(merge({}, this.queryDefaults), o)
+
+		o.singular = true
+
+		let query = `MERGE (${ o.variable }:${ this.labels.join(&apos;:&apos;) }`
+		const keys = Object.keys(criteria)
+
+		if (keys.length)
+		{
+			const paramaters = []
+
+			for (const key of keys)
+			{
+				paramaters.push(`${ key }: {criteria}.${ key }`)
+			}
+
+			query += ` {${ paramaters.join(&apos;, &apos;) }}`
+		}
+
+		query += &apos;)\n&apos;
+
+		query += `ON CREATE SET ${ o.variable }.id={id}\n`
+
+		if (o.onCreate)
+		{
+			query += `ON CREATE ${ o.onCreate }\n`
+		}
+
+		if (o.onMatch)
+		{
+			query += `ON MATCH ${ o.onMatch }\n`
+		}
+
+		o.set = [`${ o.variable } += {criteria}`]
+
+		if (properties)
+		{
+			o.set.push(`${ o.variable } += {properties}`)
+		}
+
+		return await this.query(query, {
+			criteria,
+			properties,
+			id: this.uuid()
+		}, o)
+	}
+
+	/**
+	 * Fetch related Nodes connected to the current node.
+	 *
+	 * @param {object|array|string} relationships Similar to &apos;with&apos; option in #Node.find
+	 */
+	async fetchRelated(relationships)
+	{
+		const $static = this.constructor
+
+		let o = merge({}, $static.queryDefaults)
+
+		o = merge(o, $static.parseQueryFilters({ id: this.id }, o.variable))
+		o = merge(o, $static.getRelationshipQueryOptions(relationships, [o.variable]))
+
+		const query = $static.buildQuery(o)
+
+		await this.$graph.run(query, o.parameters)
+
+		this.clearCachedRelationships(relationships)
+	}
+
 }
+
+Node.addIndex(&apos;id&apos;)
 
 module.exports = Node
 </code></pre>

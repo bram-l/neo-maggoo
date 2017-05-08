@@ -1,69 +1,87 @@
 {
-  "coverage": "61.17%",
-  "expectCount": 85,
-  "actualCount": 52,
+  "coverage": "52.5%",
+  "expectCount": 120,
+  "actualCount": 63,
   "files": {
     "lib/Relationship.js": {
-      "expectCount": 30,
-      "actualCount": 10,
+      "expectCount": 33,
+      "actualCount": 14,
       "undocumentLines": [
-        77,
-        64,
-        71,
-        82,
-        255,
-        234,
-        130,
-        257,
-        216,
-        120,
-        198,
-        58,
-        232,
-        123,
-        128,
-        133,
-        214,
-        113,
-        118,
-        196
+        102,
+        92,
+        99,
+        107,
+        302,
+        281,
+        168,
+        304,
+        263,
+        157,
+        245,
+        279,
+        166,
+        161,
+        172,
+        261,
+        150,
+        155,
+        243
       ]
     },
     "lib/Node.js": {
-      "expectCount": 35,
-      "actualCount": 33,
+      "expectCount": 49,
+      "actualCount": 37,
       "undocumentLines": [
+        120,
         4,
-        94
-      ]
-    },
-    "lib/NodeCollection.js": {
-      "expectCount": 5,
-      "actualCount": 0,
-      "undocumentLines": [
-        3,
-        6,
-        8,
-        35,
-        18
-      ]
-    },
-    "lib/DB.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        5
+        465,
+        100,
+        105,
+        406,
+        110,
+        115,
+        238,
+        145,
+        428,
+        1152
       ]
     },
     "lib/Graph.js": {
-      "expectCount": 14,
-      "actualCount": 9,
+      "expectCount": 34,
+      "actualCount": 12,
       "undocumentLines": [
-        25,
-        63,
-        64,
-        61,
-        62
+        52,
+        72,
+        62,
+        32,
+        27,
+        17,
+        22,
+        76,
+        56,
+        66,
+        47,
+        294,
+        347,
+        539,
+        491,
+        520,
+        119,
+        118,
+        115,
+        117,
+        116,
+        127
+      ]
+    },
+    "lib/NodeCollection.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        9,
+        43,
+        29
       ]
     }
   }
