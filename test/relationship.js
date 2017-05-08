@@ -1,24 +1,39 @@
 'use strict'
 
+require('./util/reporter')
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60 * 5
 
 describe('Relationship', () =>
 {
-	const aa = require('./util/aa')
 	const config = require('./util/config')
 	const Node = require('../lib/Node')
 	const DB = require('../lib/DB')
 	const Relationship = require('../lib/Relationship')
 
+	class Relatives extends Relationship {
+
+		static get Model()
+		{
+			return Person
+		}
+
+		static get type()
+		{
+			return 'is_related_to'
+		}
+
+		static get direction()
+		{
+			return Relationship.OUT
+		}
+
+	}
+
 	class Person extends Node {
 		static get relationships()
 		{
 			return {
-				relatives: {
-					Model: Person,
-					type: 'is_related_to',
-					direction: Relationship.OUT
-				},
+				relatives: Relatives,
 				father: {
 					Model: Person,
 					type: 'is_father_of',
@@ -35,33 +50,47 @@ describe('Relationship', () =>
 		}
 	}
 
-	beforeAll(aa(async () =>
+	beforeAll(async () =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
-	}))
+	})
 
-	beforeEach(aa(async () =>
+	beforeEach(async () =>
 	{
 		await DB.query(`
 			MATCH (n)
 			DETACH DELETE n
 		`)
-	}))
+	})
 
 	afterAll(() =>
 	{
 		DB.exit()
 	})
 
-	it('should be set', () =>
+	it('should be set using extended Class', () =>
 	{
 		expect(Person.relationships.relatives.type).toBe('is_related_to')
-		expect(Person.Relationships.relatives.Model).toBe(Person)
-		expect(Person.Relationships.relatives.direction).toBe(Relationship.OUT)
-		expect(Person.Relationships.relatives.singular).toBe(false)
+
+		const $Relationship = Person.getRelationship('relatives')
+
+		expect($Relationship.Model).toBe(Person)
+		expect($Relationship.direction).toBe(Relationship.OUT)
+		expect($Relationship.singular).toBe(false)
 	})
 
-	it('should be found', aa(async () =>
+	it('should be set by definition', () =>
+	{
+		expect(Person.relationships.father.type).toBe('is_father_of')
+
+		const $Relationship = Person.getRelationship('father')
+
+		expect($Relationship.Model).toBe(Person)
+		expect($Relationship.direction).toBe(Relationship.IN)
+		expect($Relationship.singular).toBe(true)
+	})
+
+	it('should be found', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
@@ -72,9 +101,9 @@ describe('Relationship', () =>
 		const foo = await Person.get('foo', { with: 'relatives' })
 
 		expect(foo.relatives.length).toBe(1)
-	}))
+	})
 
-	it('should be found when nested', aa(async () =>
+	it('should be found when nested', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
@@ -87,9 +116,9 @@ describe('Relationship', () =>
 		expect(foo.father.id).toBe('bar')
 		expect(foo.father.father.id).toBe('baz')
 		expect(foo.$graph.nodes.size).toBe(3)
-	}))
+	})
 
-	it('should be found when circular', aa(async () =>
+	it('should be found when circular', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
@@ -102,9 +131,9 @@ describe('Relationship', () =>
 		expect(foo.relatives.length).toBe(1)
 		expect(foo.relatives[0].relatives.length).toBe(1)
 		expect(foo.$graph.nodes.size).toBe(2)
-	}))
+	})
 
-	it('should be found when multiple', aa(async () =>
+	it('should be found when multiple', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
@@ -123,9 +152,9 @@ describe('Relationship', () =>
 		expect(foo.mother.id).toBe('baz')
 
 		expect(foo.$graph.nodes.size).toBe(3)
-	}))
+	})
 
-	it('should be found with filter', aa(async () =>
+	it('should be found with filter', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
@@ -147,9 +176,9 @@ describe('Relationship', () =>
 		const ids = foo.relatives[0].id + foo.relatives[1].id
 
 		expect(expected.includes(ids)).toBe(true)
-	}))
+	})
 
-	it('should not duplicate nodes with multiple relations', aa(async () =>
+	it('should not duplicate nodes with multiple relations', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
@@ -175,22 +204,23 @@ describe('Relationship', () =>
 		expect(expected.includes(ids)).toBe(true)
 
 		expect(foo.relatives[0].relatives.length + foo.relatives[1].relatives.length).toBe(4)
-	}))
+	})
 
-	it('should be made', aa(async () =>
+	it('should be made', async () =>
 	{
 		const foo = new Person({ name: 'foo' })
 		const bar = new Person({ name: 'bar' })
 
 		foo.relatives.push(bar)
+
 		await foo.save(true)
 
 		const node = await Person.get({ name: 'foo' }, { with: 'relatives' })
 
 		expect(node.relatives[0].name).toBe('bar')
-	}))
+	})
 
-	it('should be made for singular relationships', aa(async () =>
+	it('should be made for singular relationships', async () =>
 	{
 		const foo = new Person({ name: 'foo' })
 		const bar = new Person({ name: 'bar' })
@@ -202,7 +232,25 @@ describe('Relationship', () =>
 		const node = await Person.get({ name: 'foo' }, { with: 'father' })
 
 		expect(node.father.name).toBe('bar')
-	}))
+	})
+
+	it('should be made by saving directly the relationship', async () =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
+		`)
+
+		const foo = await Person.get('foo')
+		const bar = await Person.get('bar')
+
+		foo.father = bar
+
+		await foo.father.$rel.save()
+
+		const node = await Person.get('foo', { with: 'father' })
+
+		expect(node.father.id).toBe('bar')
+	})
 
 	it('should rollback the transaction if any errors are thrown', (done) =>
 	{
@@ -223,7 +271,7 @@ describe('Relationship', () =>
 
 		const promise = foo.save(true)
 
-		promise
+		return promise
 			.then(() =>
 			{
 				// Should throw an error
@@ -238,7 +286,7 @@ describe('Relationship', () =>
 			.then(() => done())
 	})
 
-	it('should be made when circular', aa(async () =>
+	it('should be made when circular', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
@@ -256,9 +304,29 @@ describe('Relationship', () =>
 
 		expect(foo2.relatives.length).toBe(1)
 		expect(foo2.relatives[0].relatives[0].id).toBe('foo')
-	}))
+	})
 
-	it('should delete a related nodes', aa(async () =>
+	it('should be made when Model dependencies are circular', async () =>
+	{
+		await DB.query(`
+			CREATE
+				(foo:Foo { id: 'foo' }),
+				(bar:Bar { id: 'bar' }),
+				(foo)-[:is_related_to]->(bar),
+				(bar)-[:is_related_to]->(foo)
+		`)
+
+		const Foo = require('./fixtures/circular/Foo')
+		const Bar = require('./fixtures/circular/Bar')
+
+		const foo = await Foo.get('foo', { with: 'bar' })
+		const bar = await Bar.get('bar', { with: 'foo' })
+
+		expect(foo.bar.id).toBe(bar.id)
+		expect(bar.foo.id).toBe(foo.id)
+	})
+
+	it('should delete related nodes', async () =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
@@ -279,5 +347,128 @@ describe('Relationship', () =>
 		const total = await Person.count()
 
 		expect(total).toBe(0)
-	}))
+	})
+
+	it('should delete related nodes when circular', async () =>
+	{
+		await DB.query(`
+			CREATE
+				(foo:Node:Foo { id: 'foo' }),
+				(bar:Node:Bar { id: 'bar' }),
+				(foo)-[:is_related_to]->(bar),
+				(bar)-[:is_related_to]->(foo)
+		`)
+
+		const total1 = await Node.count()
+
+		expect(total1).toBe(2)
+
+		const Foo = require('./fixtures/circular/Foo')
+
+		const foo = await Foo.get('foo', { with: 'bar.foo' })
+
+		expect(foo.id).toBe('foo')
+		expect(foo.bar.id).toBe('bar')
+		expect(foo.bar.foo.id).toBe('foo')
+
+		await foo.delete(true)
+
+		const total = await Node.count()
+
+		expect(total).toBe(0)
+	})
+
+	it('should be saved and found for "any" direction', async () =>
+	{
+		class Foo extends Node {
+			static get relationships()
+			{
+				return {
+					bars: {
+						Model: Bar,
+						direction: Relationship.ANY
+					}
+				}
+			}
+		}
+
+		class Bar extends Node {
+			static get relationships()
+			{
+				return {
+					foos: {
+						Model: () =>
+						{
+							return Foo
+						},
+						direction: Relationship.ANY
+					}
+				}
+			}
+		}
+
+		const foo = new Foo()
+		const bar = new Bar()
+
+		foo.bars = [bar]
+
+		await foo.save(true)
+
+		const foos = await Foo.all({ with: 'bars' })
+
+		expect(foos.length).toBe(1)
+		expect(foos[0].bars.length).toBe(1)
+
+		const bars = await Bar.all({ with: 'foos' })
+
+		expect(bars.length).toBe(1)
+		expect(bars[0].foos.length).toBe(1)
+	})
+
+	it('should be saved and found for "both" direction', async () =>
+	{
+		class Foo extends Node {
+			static get relationships()
+			{
+				return {
+					bars: {
+						Model: Bar,
+						direction: Relationship.BOTH
+					}
+				}
+			}
+		}
+
+		class Bar extends Node {
+			static get relationships()
+			{
+				return {
+					foos: {
+						Model: () =>
+						{
+							return Foo
+						},
+						direction: Relationship.BOTH
+					}
+				}
+			}
+		}
+
+		const foo = new Foo()
+		const bar = new Bar()
+
+		foo.bars = [bar]
+
+		await foo.save(true)
+
+		const foos = await Foo.all({ with: 'bars' })
+
+		expect(foos.length).toBe(1)
+		expect(foos[0].bars.length).toBe(1)
+
+		const bars = await Bar.all({ with: 'foos' })
+
+		expect(bars.length).toBe(1)
+		expect(bars[0].foos.length).toBe(1)
+	})
 })

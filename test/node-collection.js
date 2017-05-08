@@ -1,33 +1,34 @@
 'use strict'
 
+require('./util/reporter')
+
 describe('NodeCollection', () =>
 {
-	const aa = require('./util/aa')
 	const config = require('./util/config')
 	const NodeCollection = require('../lib/NodeCollection')
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')
 
-	beforeAll(aa(async () =>
+	beforeAll(async () =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
-	}))
+	})
 
-	beforeEach(aa(async () =>
+	beforeEach(async () =>
 	{
 		await DB.query(`
 			MATCH (n)
 			DETACH DELETE n
 		`)
-	}))
+	})
 
 	afterAll(() =>
 	{
 		DB.exit()
 	})
 
-	it('should call delete on all nodes', aa(async () =>
+	it('should call delete on all nodes', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node { id: 'foo' }), (n2:Node { id: 'bar' }), (n3:Node { id: 'baz' })
@@ -42,9 +43,9 @@ describe('NodeCollection', () =>
 		const total = await Node.count()
 
 		expect(total).toBe(0)
-	}))
+	})
 
-	it('should call save on all nodes', aa(async () =>
+	it('should call save on all nodes', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node { id: 'foo' }), (n2:Node { id: 'bar' }), (n3:Node { id: 'baz' })
@@ -59,9 +60,9 @@ describe('NodeCollection', () =>
 		const foos = await Node.find({ name: 'foo' })
 
 		expect(foos.length).toBe(3)
-	}))
+	})
 
-	it('should call delete on related nodes', aa(async () =>
+	it('should call delete on related nodes', async () =>
 	{
 		class Foo extends Node {
 			static get relationships()
@@ -89,9 +90,9 @@ describe('NodeCollection', () =>
 		const foos = await Foo.all()
 
 		expect(foos.length).toBe(1)
-	}))
+	})
 
-	it('should call delete deep on related nodes', aa(async () =>
+	it('should call delete deep on related nodes', async () =>
 	{
 		class Foo extends Node {
 			static get relationships()
@@ -124,9 +125,9 @@ describe('NodeCollection', () =>
 		const after = await Foo.all()
 
 		expect(after.length).toBe(1)
-	}))
+	})
 
-	it('should call save on related nodes', aa(async () =>
+	it('should call save on related nodes', async () =>
 	{
 		class Foo extends Node {
 			static get relationships()
@@ -156,9 +157,9 @@ describe('NodeCollection', () =>
 		const foos = await Foo.find({ name: 'foo' })
 
 		expect(foos.length).toBe(2)
-	}))
+	})
 
-	it('should set the related Model', aa(async () =>
+	it('should set the related Model', async () =>
 	{
 		class Foo extends Node {
 			static get relationships()
@@ -183,5 +184,5 @@ describe('NodeCollection', () =>
 		expect(foos.$Model).toBe(Foo)
 		expect(foos[0].bars.$Model).toBe(Bar)
 		expect(foos[1].bars.$Model).toBe(Bar)
-	}))
+	})
 })

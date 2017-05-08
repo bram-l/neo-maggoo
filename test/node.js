@@ -1,56 +1,53 @@
 'use strict'
 
+require('./util/reporter')
+
 describe('Node', () =>
 {
-	const aa = require('./util/aa')
 	const config = require('./util/config')
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	beforeAll(aa(async () =>
+	beforeAll(async () =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
-	}))
+	})
 
-	beforeEach(aa(async () =>
+	beforeEach(async () =>
 	{
 		await DB.query(`
 			MATCH (n)
 			DETACH DELETE n
 		`)
-	}))
+	})
 
 	afterAll(() =>
 	{
 		DB.exit()
 	})
 
-	it('should be empty', aa(async () =>
+	it('should return $id null for a new Node', () =>
 	{
-		const result = await DB.query(`
-			MATCH (n)
-			RETURN count(n) as total
-		`)
+		const node = new Node()
 
-		expect(result.records.length).toBeGreaterThan(0)
-		expect(result.records[0].get(0).toNumber()).toBe(0)
-	}))
+		expect(node.$id).toBe(null)
+	})
 
-	it('should return the total number of current Nodes', aa(async () =>
+	it('should return the total number of current Nodes', async () =>
 	{
 		const result = await Node.count()
 
 		expect(result).toBe(0)
-	}))
+	})
 
-	it('should return an empty array when no nodes found', aa(async() =>
+	it('should return an empty array when no nodes found', async() =>
 	{
 		const nodes = await Node.all()
 
 		expect(nodes.length).toBe(0)
-	}))
+	})
 
-	it('should find all nodes by Label', aa(async () =>
+	it('should find all nodes by Label', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node), (n2:Node), (n3:Foo)
@@ -59,16 +56,16 @@ describe('Node', () =>
 		const nodes = await Node.all()
 
 		expect(nodes.length).toBe(2)
-	}))
+	})
 
-	it('should return null when no nodes found by id', aa(async() =>
+	it('should return null when no nodes found by id', async() =>
 	{
 		const node = await Node.get('foo')
 
 		expect(node).toBe(null)
-	}))
+	})
 
-	it('should find a node by id (string)', aa(async () =>
+	it('should find a node by id (string)', async () =>
 	{
 		await DB.query(`
 			CREATE (n:Node {id: 'foo'})
@@ -77,9 +74,9 @@ describe('Node', () =>
 		const foo = await Node.get('foo')
 
 		expect(foo.id).toBe('foo')
-	}))
+	})
 
-	it('should find a node by a node identifier (number)', aa(async () =>
+	it('should find a node by a node identifier (number)', async () =>
 	{
 		await DB.query(`
 			CREATE (n:Node {id: 'foo'})
@@ -90,9 +87,9 @@ describe('Node', () =>
 		const bar = await Node.get(foo.$id)
 
 		expect(foo.id).toBe(bar.id)
-	}))
+	})
 
-	it('should find a node by a filter', aa(async () =>
+	it('should find a node by a filter', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', name: 'foo'}),
@@ -105,9 +102,9 @@ describe('Node', () =>
 		expect(nodes.length).toBe(2)
 		expect(['foo', 'bar'].includes(nodes[0].id)).toBe(true)
 		expect(['foo', 'bar'].includes(nodes[1].id)).toBe(true)
-	}))
+	})
 
-	it('should return the total number of nodes by filter', aa(async () =>
+	it('should return the total number of nodes by filter', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', name: 'foo'}),
@@ -118,9 +115,9 @@ describe('Node', () =>
 		const result = await Node.count({ name: 'foo' })
 
 		expect(result).toBe(2)
-	}))
+	})
 
-	it('should return the total number of nodes by query', aa(async () =>
+	it('should return the total number of nodes by query', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', name: 'foo'}),
@@ -133,9 +130,9 @@ describe('Node', () =>
 		const result = await Node.count('(n)-[:knows]->({ name: {name}})', { name: 'foo' })
 
 		expect(result).toBe(2)
-	}))
+	})
 
-	it('should find a node by a Regular expression', aa(async () =>
+	it('should find a node by a Regular expression', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', name: 'foo'}),
@@ -154,9 +151,9 @@ describe('Node', () =>
 		const ids = nodes[0].id + nodes[1].id
 
 		expect(expected.includes(ids)).toBe(true)
-	}))
+	})
 
-	it('should find a node with a `where` clause', aa(async () =>
+	it('should find a node with a `where` clause', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', qux: 1}),
@@ -168,9 +165,9 @@ describe('Node', () =>
 
 		expect(nodes.length).toBe(1)
 		expect(nodes[0].id).toBe('baz')
-	}))
+	})
 
-	it('should find a node with multiple `where` clauses', aa(async () =>
+	it('should find a node with multiple `where` clauses', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', qux: 1}),
@@ -185,9 +182,9 @@ describe('Node', () =>
 
 		expect(nodes.length).toBe(1)
 		expect(nodes[0].id).toBe('baz')
-	}))
+	})
 
-	it('should find a node by a query', aa(async () =>
+	it('should find a node by a query', async () =>
 	{
 		await DB.query(`
 			CREATE (n1:Node {id: 'foo', qux: 1}),
@@ -202,9 +199,9 @@ describe('Node', () =>
 
 		expect(nodes.length).toBe(1)
 		expect(nodes[0].id).toBe('baz')
-	}))
+	})
 
-	it('should save a new entry and set a valid id', aa(async () =>
+	it('should save a new entry and set a valid id', async () =>
 	{
 		const node = new Node()
 		const shortid = require('shortid')
@@ -221,9 +218,9 @@ describe('Node', () =>
 		const total = await Node.count()
 
 		expect(total).toBe(1)
-	}))
+	})
 
-	it('should update an existing node', aa(async () =>
+	it('should update an existing node', async () =>
 	{
 		const node = new Node()
 
@@ -244,9 +241,9 @@ describe('Node', () =>
 		results = await Node.find({ foo: 'foo' })
 
 		expect(results.length).toBe(0)
-	}))
+	})
 
-	it('should delete a new entry', aa(async () =>
+	it('should be deleted', async () =>
 	{
 		const node = new Node()
 
@@ -263,5 +260,89 @@ describe('Node', () =>
 		expect(total).toBe(0)
 		expect(node.id).toBe(null)
 		expect(node.$entity).toBe(null)
-	}))
+	})
+
+	it('should throw an error when deleting an unsaved node', async () =>
+	{
+		const node = new Node()
+
+		try
+		{
+			await node.delete()
+
+			fail('An error should have been thrown')
+		}
+		catch (error)
+		{
+			expect(error).toBe('Can not delete a node without ID')
+		}
+	})
+
+	it('should order nodes', async () =>
+	{
+		await DB.query(`
+			CREATE (n1:Node { name: 'foo' }),
+			(n2:Node { name: 'bar' }),
+			(n3:Node { name: 'baz' })
+		`)
+
+		const nodes = await Node.all({
+			orderBy: 'n.name'
+		})
+
+		expect(nodes.length).toBe(3)
+		expect(nodes[0].name).toBe('bar')
+		expect(nodes[1].name).toBe('baz')
+		expect(nodes[2].name).toBe('foo')
+	})
+
+	it('should skip nodes', async () =>
+	{
+		await DB.query(`
+			CREATE (n1:Node { name: 'foo' }),
+			(n2:Node { name: 'bar' }),
+			(n3:Node { name: 'baz' })
+		`)
+
+		const nodes = await Node.all({
+			orderBy: 'n.name',
+			skip: 1
+		})
+
+		expect(nodes.length).toBe(2)
+		expect(nodes[0].name).toBe('baz')
+		expect(nodes[1].name).toBe('foo')
+	})
+
+	it('should limit nodes', async () =>
+	{
+		await DB.query(`
+			CREATE (n1:Node { name: 'foo' }),
+			(n2:Node { name: 'bar' }),
+			(n3:Node { name: 'baz' })
+		`)
+
+		const nodes = await Node.all({
+			orderBy: 'n.name',
+			limit: 2
+		})
+
+		expect(nodes.length).toBe(2)
+		expect(nodes[0].name).toBe('bar')
+		expect(nodes[1].name).toBe('baz')
+	})
+
+	it('should throw an error for an invalid filter object', async () =>
+	{
+		try
+		{
+			await Node.find(['foo'])
+
+			fail('An error should have been thrown')
+		}
+		catch (e)
+		{
+			expect(e).toBe('Invalid filter object: foo')
+		}
+	})
 })

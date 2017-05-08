@@ -2,15 +2,18 @@
 
 Neo4j OGM for Node.js using proxified ES6 classes
 
+
 ## Installation
 
 ```sh
 npm install neo-maggoo --save
 ```
 
+
 ## Requirements
 - Node.js >= 6.0.0
 - Neo4j >= 3.0.0
+
 
 ## Usage
 
