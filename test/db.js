@@ -121,7 +121,7 @@ describe('DB', () =>
 
 		it('should not duplicate indexes', async () =>
 		{
-			require('../lib/Node')
+			const Node = require('../lib/Node')
 
 			const indexes1 = await DB.getIndexes()
 

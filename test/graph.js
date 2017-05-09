@@ -9,7 +9,7 @@ describe('Graph', () =>
 	const Graph = require('../lib/Graph')
 	const Node = require('../lib/Node')
 
-	beforeAll(async () =>
+	beforeAll(() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})

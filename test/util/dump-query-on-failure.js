@@ -30,6 +30,7 @@ env.addReporter({
 				console.log('')
 				console.log('> ERROR:', COLOR_RED)
 				console.log(message)
+				console.log(COLOR_CLEAR)
 
 				if (last.error.code)
 				{

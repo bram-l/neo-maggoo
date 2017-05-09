@@ -158,4 +158,36 @@ describe('Related', () =>
 
 		expect(foo2.bars[0].$rel.foo).toBe('foo')
 	})
+
+	it('should be saved by name', async () =>
+	{
+		class Bar extends Node {}
+
+		class Foo extends Node
+		{
+			static get relationships()
+			{
+				return {
+					bars: {
+						Model: Bar,
+						direction: Relationship.OUT,
+						type: 'is_related_to'
+					}
+				}
+			}
+		}
+
+		const foo = new Foo({ id: 'foo' })
+
+		const bar1 = new Bar()
+		const bar2 = new Bar()
+
+		foo.bars = [bar1, bar2]
+
+		await foo.save('bars')
+
+		const result = await Foo.get('foo', { with: 'bars' })
+
+		expect(result.bars.length).toBe(2)
+	})
 })

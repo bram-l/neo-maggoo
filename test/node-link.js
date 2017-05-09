@@ -116,4 +116,47 @@ describe('Link', () =>
 		expect(nodes[1].other.id).toEqual(nodes[0].id)
 		expect(nodes[1].other.name).toEqual(nodes[0].name)
 	})
+
+	it('should be created using a custom model', async () =>
+	{
+		await DB.query(`
+			CREATE (a:Foo { id: 'foo', name: 'foo' }),
+				   (b:Foo { id: 'bar', name: 'foo' }),
+				   (c:Foo { id: 'baz', name: 'foo' }),
+				   (d:Foo { id: 'qux', name: 'qux' })
+		`)
+
+		class Foo extends Node {}
+
+		const nodes = await Node.query(`
+			MATCH (n:Foo), (other:Foo)
+			WHERE n.name = other.name
+			AND NOT n = other
+		`, {}, {
+			return: 'n, collect(other) as others',
+			models: {
+				others: Foo.Collection
+			},
+			links: {
+				others: {
+					start: 'n',
+					end: 'others'
+				}
+			}
+		})
+
+		expect(nodes.length).toBe(3)
+		expect(nodes[0].name).toBe('foo')
+		expect(nodes[1].name).toBe('foo')
+		expect(nodes[2].name).toBe('foo')
+
+		expect(nodes[0].$graph.nodes.size).toBe(3)
+		expect(nodes[0].$graph.relationships.size).toBe(0)
+
+		expect(nodes[0].others.length).toEqual(2)
+		expect(nodes[0].others[0].name).toEqual('foo')
+		expect(nodes[0].others[0].id).not.toEqual(nodes[0].id)
+		expect(nodes[0].others[1].id).not.toEqual(nodes[0].id)
+		expect(nodes[0].others[0].id).not.toEqual(nodes[0].others[1].id)
+	})
 })
