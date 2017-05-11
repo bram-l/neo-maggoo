@@ -28,7 +28,6 @@
     "esdoc-node": "^1.0.0",
     "jasmine": "^2.6.0",
     "jasmine-fail-fast": "^2.0.0",
-    "jasmine-promises": "^0.4.1",
     "jasmine-spec-reporter": "^4.1.0",
     "nyc": "^10.3.2"
   },
