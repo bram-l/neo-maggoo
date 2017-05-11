@@ -1,6 +1,6 @@
 {
   "name": "neo-maggoo",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Futuristic Models & Collections for Neo4j",
   "directories": {
     "test": "test"
