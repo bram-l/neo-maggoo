@@ -576,6 +576,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "lib/node.js~node#$base",
+    "class/lib/Node.js~Node.html#instance-get-$base",
+    "lib/Node.js~Node#$base",
+    "member"
+  ],
+  [
     "lib/node.js~node#$dirty",
     "class/lib/Node.js~Node.html#instance-get-$dirty",
     "lib/Node.js~Node#$dirty",
@@ -622,6 +628,18 @@ window.esdocSearchIndex = [
     "class/lib/Node.js~Node.html#instance-member-[_labels]",
     "lib/Node.js~Node#[_labels]",
     "member"
+  ],
+  [
+    "lib/node.js~node#addlabel",
+    "class/lib/Node.js~Node.html#instance-method-addLabel",
+    "lib/Node.js~Node#addLabel",
+    "method"
+  ],
+  [
+    "lib/node.js~node#addlabels",
+    "class/lib/Node.js~Node.html#instance-method-addLabels",
+    "lib/Node.js~Node#addLabels",
+    "method"
   ],
   [
     "lib/node.js~node#addrelated",
@@ -700,6 +718,18 @@ window.esdocSearchIndex = [
     "class/lib/Node.js~Node.html#instance-get-id",
     "lib/Node.js~Node#id",
     "member"
+  ],
+  [
+    "lib/node.js~node#removelabel",
+    "class/lib/Node.js~Node.html#instance-method-removeLabel",
+    "lib/Node.js~Node#removeLabel",
+    "method"
+  ],
+  [
+    "lib/node.js~node#removelabels",
+    "class/lib/Node.js~Node.html#instance-method-removeLabels",
+    "lib/Node.js~Node#removeLabels",
+    "method"
   ],
   [
     "lib/node.js~node#save",
@@ -1069,13 +1099,13 @@ window.esdocSearchIndex = [
   ],
   [
     "lib/relationship.js~relationship.direction",
-    "class/lib/Relationship.js~Relationship.html#static-get-direction",
+    "class/lib/Relationship.js~Relationship.html#static-set-direction",
     "lib/Relationship.js~Relationship.direction",
     "member"
   ],
   [
     "lib/relationship.js~relationship.direction",
-    "class/lib/Relationship.js~Relationship.html#static-set-direction",
+    "class/lib/Relationship.js~Relationship.html#static-get-direction",
     "lib/Relationship.js~Relationship.direction",
     "member"
   ],
