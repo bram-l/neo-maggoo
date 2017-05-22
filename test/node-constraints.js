@@ -2,7 +2,7 @@
 
 require('./util/reporter')
 
-describe('Fetch related', () =>
+describe('Constraints', () =>
 {
 	const config = require('./util/config')
 	const DB = require('../lib/DB')

@@ -244,7 +244,7 @@ describe('Graph', () =>
 		}
 		catch (e)
 		{
-			expect(e).toBe('Node not found')
+			expect(e.message).toBe('Node not found')
 			done()
 		}
 	})
@@ -260,7 +260,7 @@ describe('Graph', () =>
 		}
 		catch (e)
 		{
-			expect(e).toBe('No map defined for this entity: foo')
+			expect(e.message).toBe('No map defined for this entity: foo')
 		}
 	})
 

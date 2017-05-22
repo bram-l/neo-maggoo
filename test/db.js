@@ -25,7 +25,7 @@ describe('DB', () =>
 			}
 			catch (error)
 			{
-				expect(error).toBe('Database not initialized')
+				expect(error.message).toBe('Database not initialized')
 				done()
 			}
 		})

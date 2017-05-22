@@ -274,7 +274,7 @@ describe('Node', () =>
 		}
 		catch (error)
 		{
-			expect(error).toBe('Can not delete a node without ID')
+			expect(error.message).toBe('Can not delete a node without ID')
 		}
 	})
 
@@ -342,7 +342,7 @@ describe('Node', () =>
 		}
 		catch (e)
 		{
-			expect(e).toBe('Invalid filter object: foo')
+			expect(e.message).toBe('Invalid filter object: foo')
 		}
 	})
 })
