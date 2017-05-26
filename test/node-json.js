@@ -26,7 +26,7 @@ describe('JSON', () =>
 	{
 		DB.exit()
 	})
-
+/*
 	it('should be created for single Node', async () =>
 	{
 		await DB.query(`
@@ -256,5 +256,88 @@ describe('JSON', () =>
 		]
 
 		expect(valid.includes(json)).toBe(true)
+	})
+*/
+	it('should include relationship data', async () =>
+	{
+		await DB.query(`
+			CREATE (foo:Foo { id: 'foo' }), (bar:Bar { id: 'bar' })
+			CREATE (bar)-[:is_related_to { baz: 1 }]->(foo)
+		`)
+
+		class Foo extends Node {}
+
+		class Bar extends Node
+		{
+			static get relationships()
+			{
+				return {
+					related: {
+						Model: Foo,
+						type: 'is_related_to',
+						direction: Relationship.OUT
+					}
+				}
+			}
+		}
+
+		const bar = await Bar.get('bar', { with: 'related' })
+
+		const obj = bar.toObject([
+			'id',
+			{ related: [
+				'id',
+				{ $rel: ['baz'] }
+			] }
+		])
+
+		const json = JSON.stringify(obj)
+
+		const valid = '{"id":"bar","related":[{"id":"foo","$rel":{"baz":1}}]}'
+
+		expect(json).toEqual(valid)
+	})
+
+	it('should coerce relationship data through callback function', async () =>
+	{
+		await DB.query(`
+			CREATE (foo:Foo { id: 'foo' }), (bar:Bar { id: 'bar' })
+			CREATE (bar)-[:is_related_to { baz: 1 }]->(foo)
+		`)
+
+		class Foo extends Node {}
+
+		class Bar extends Node
+		{
+			static get relationships()
+			{
+				return {
+					related: {
+						Model: Foo,
+						type: 'is_related_to',
+						direction: Relationship.OUT
+					}
+				}
+			}
+		}
+
+		const bar = await Bar.get('bar', { with: 'related' })
+
+		const obj = bar.toObject([
+			'id',
+			{ related: [
+				'id',
+				{ baz: (n) =>
+				{
+					return n.$rel.baz
+				} }
+			] }
+		])
+
+		const json = JSON.stringify(obj)
+
+		const valid = '{"id":"bar","related":[{"id":"foo","baz":1}]}'
+
+		expect(json).toEqual(valid)
 	})
 })
