@@ -61,8 +61,8 @@ const _direction = Symbol()
  * Class representing a relationship between two nodes
  * @extends Model
  */
-class Relationship extends Model {
-
+class Relationship extends Model
+{
 	// *** CONSTANTS
 
 	/**
@@ -215,6 +215,22 @@ class Relationship extends Model {
 		this._end = end
 	}
 
+	/**
+	 * Set property value
+	 *
+	 * @param {string} key Property name
+	 * @param {any} value Property value
+	 */
+	setProperty(key, value)
+	{
+		if (value &amp;&amp; value.toNumber)
+		{
+			value = value.toNumber()
+		}
+
+		super.setProperty(key, value)
+	}
+
 	async save(tx)
 	{
 		let session = null
@@ -241,7 +257,7 @@ class Relationship extends Model {
 		}
 
 		const query = `
-			MATCH (start { id: {start} }), (end { id: {end} })
+			MATCH (start:${ this.start.$base } { id: {start} }), (end:${ this.end.$base } { id: {end} })
 			${ create }
 			${ set }
 			RETURN r
@@ -274,7 +290,7 @@ class Relationship extends Model {
 	// *** STATIC METHODS
 
 	/**
-	 * The type of the relationhip, will be used as the name of the relationship created in the graph
+	 * The type of the relationship, will be used as the name of the relationship created in the graph
 	 *
 	 * @static
 	 * @member {string}
@@ -350,6 +366,23 @@ class Relationship extends Model {
 		this[_model] = Class
 	}
 
+	/**
+	 * Alias for Model
+	 *
+	 * @static
+	 * @member {Node|function}
+	 *
+	 * @memberOf Relationship
+	 */
+	static get model()
+	{
+		return this.Model
+	}
+
+	static set model(Class)
+	{
+		this.Model = Class
+	}
 }
 
 module.exports = Relationship

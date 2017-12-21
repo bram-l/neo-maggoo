@@ -49,7 +49,7 @@
 const CONSTRAINT_INDEX = Symbol(&apos;index&apos;)
 const CONSTRAINT_UNIQUE = Symbol(&apos;unique&apos;)
 const REGEX_INDEX = /:(.+)\((.+)\)/
-const REGEX_UNIQUE = /:([^\s\)]+)[\s\)]*ASSERT[^.]+\.([^\s]+)\sIS UNIQUE/i
+const REGEX_UNIQUE = /:([^\s)]+)[\s)]*ASSERT[^.]+\.([^\s]+)\sIS UNIQUE/i
 
 const state = {
 	initialized: false,
@@ -85,7 +85,7 @@ function getSession(mode)
 {
 	if (!state.initialized)
 	{
-		throw &apos;Database not initialized&apos;
+		throw new Error(&apos;Database not initialized&apos;)
 	}
 
 	return state.driver.session(mode)
@@ -102,7 +102,7 @@ function beginTransaction(session = null)
 
 	const run = transaction.run
 
-	transaction.run = async function (query, parameters)
+	transaction.run = async function(query, parameters)
 	{
 		await _ensureRestrictions()
 
@@ -122,7 +122,11 @@ function beginTransaction(session = null)
 
 		if (error)
 		{
-			throw error
+			const e = new Error(error.message || error)
+
+			e.code = error.code
+
+			throw e
 		}
 
 		return result
@@ -164,7 +168,11 @@ async function runQuery(query, parameters, session = null)
 
 	if (error)
 	{
-		throw error
+		const e = new Error(error.message || error)
+
+		e.code = error.code
+
+		throw e
 	}
 
 	return result

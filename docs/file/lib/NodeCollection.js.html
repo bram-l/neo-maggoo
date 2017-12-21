@@ -50,8 +50,8 @@ const { Collection } = require(&apos;maggoo&apos;)
 const DB = require(&apos;./DB&apos;)
 const neo4j = require(&apos;neo4j-driver/lib/v1&apos;)
 
-class NodeCollection extends Collection {
-
+class NodeCollection extends Collection
+{
 	constructor(Model, items)
 	{
 		if (items &amp;&amp; !Array.isArray(items))
@@ -99,7 +99,6 @@ class NodeCollection extends Collection {
 
 		session.close()
 	}
-
 }
 
 module.exports = NodeCollection

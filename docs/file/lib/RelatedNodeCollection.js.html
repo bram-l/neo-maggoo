@@ -49,8 +49,8 @@
 const NodeCollection = require(&apos;./NodeCollection&apos;)
 const RelatedNode = require(&apos;./RelatedNode&apos;)
 
-class RelatedNodeCollection extends NodeCollection {
-
+class RelatedNodeCollection extends NodeCollection
+{
 	constructor(Relationship, items, start)
 	{
 		super(Relationship.Model, items)
@@ -63,7 +63,6 @@ class RelatedNodeCollection extends NodeCollection {
 	{
 		return new RelatedNode(this.$Relationship, this.$start, node, {}, this.$start.$graph)
 	}
-
 }
 
 const proxify = {

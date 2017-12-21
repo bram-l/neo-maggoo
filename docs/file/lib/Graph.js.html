@@ -58,8 +58,8 @@ const _NodeCollection = Symbol(&apos;NodeCollection&apos;)
  *
  * @class Graph
  */
-class Graph {
-
+class Graph
+{
 	static get TYPE_NODE()
 	{
 		return &apos;node&apos;
@@ -160,6 +160,7 @@ class Graph {
 	{
 		this.nodes         = new Map()
 		this.relationships = new Map()
+		this.index         = new Map()
 		this.references    = {}
 		this.models        = models
 		this.links         = links
@@ -303,6 +304,33 @@ class Graph {
 		}
 
 		map.set(id, current)
+
+		if (type === Graph.TYPE_RELATIONSHIP)
+		{
+			this.setRelationshipsIndex(entity)
+		}
+	}
+
+	setRelationshipsIndex(entity)
+	{
+		const id = Graph.getId(entity)
+		const index = this.index
+
+		index[entity.type] = index[entity.type] || {
+			in: {},
+			out: {},
+		}
+
+		const start = Graph.getId(entity.start)
+		const end = Graph.getId(entity.end)
+
+		const map = index[entity.type]
+
+		map.out[start] = map.out[start] || {}
+		map.out[start][end] = id
+
+		map.in[end] = map.in[end] || {}
+		map.in[end][start] = id
 	}
 
 	/**
@@ -432,7 +460,7 @@ class Graph {
 			return this.relationships
 		}
 
-		throw `No map defined for this entity: ${ entity }`
+		throw new Error(`No map defined for this entity: ${ entity }`)
 	}
 
 	/**
@@ -447,34 +475,43 @@ class Graph {
 	 */
 	getRelationship(start, end, $Relationship)
 	{
-		let relationship = null
+		start = Graph.getId(start)
+		end = Graph.getId(end)
 
-		for (const [, item] of this.relationships)
-		{
-			const entity = item.entity
+		let relationshipId = null
 
-			if (entity.type !== $Relationship.type)
-			{
-				continue
-			}
+		const index = this.index[$Relationship.type]
 
-			if (entity.start.equals(start.$id) &amp;&amp; entity.end.equals(end.$id) &amp;&amp; $Relationship.direction === Graph.Relationship.OUT)
-			{
-				relationship = item
-				break
-			}
-
-			if (entity.start.equals(end.$id) &amp;&amp; entity.end.equals(start.$id) &amp;&amp; $Relationship.direction === Graph.Relationship.IN)
-			{
-				relationship = item
-				break
-			}
-		}
-
-		if (!relationship)
+		if (!index)
 		{
 			return null
 		}
+
+		if ($Relationship.direction === Graph.Relationship.OUT)
+		{
+			if (!index.out[start])
+			{
+				return null
+			}
+
+			relationshipId = index.out[start][end]
+		}
+		else if ($Relationship.direction === Graph.Relationship.IN)
+		{
+			if (!index.in[end])
+			{
+				return null
+			}
+
+			relationshipId = index.in[end][start]
+		}
+
+		if (!relationshipId)
+		{
+			return null
+		}
+
+		const relationship = this.relationships.get(relationshipId)
 
 		if (!relationship.model)
 		{
@@ -495,43 +532,41 @@ class Graph {
 	 */
 	getRelated(node, $Relationship)
 	{
-		const entity = node.$entity
-		const results = []
+		const id = Graph.getId(node)
 
-		for (const [, item] of this.relationships)
+		const type = $Relationship.type
+		const direction = $Relationship.direction
+
+		const index = this.index[type]
+		let others = []
+
+		if (!index)
 		{
-			const relationship = item.entity
-			let other = null
-
-			if (relationship.type !== $Relationship.type)
-			{
-				continue
-			}
-
-			// TODO: check relationships with direction &apos;both&apos;
-
-			if ([Graph.Relationship.OUT, Graph.Relationship.ANY].includes($Relationship.direction) &amp;&amp; relationship.start.equals(entity.identity))
-			{
-				other = this.getNodeModel(relationship.end, $Relationship.Model)
-			}
-			else if ([Graph.Relationship.IN, Graph.Relationship.ANY, Graph.Relationship.BOTH].includes($Relationship.direction) &amp;&amp; relationship.end.equals(entity.identity))
-			{
-				other = this.getNodeModel(relationship.start, $Relationship.Model)
-			}
-			else
-			{
-				continue
-			}
-
-			if ($Relationship.singular)
-			{
-				return other
-			}
-
-			results.push(other)
+			return others
 		}
 
-		return results
+		if ([Graph.Relationship.OUT, Graph.Relationship.ANY].includes(direction))
+		{
+			if (id in index.out)
+			{
+				others = others.concat(Object.keys(index.out[id]))
+			}
+		}
+
+		if ([Graph.Relationship.IN, Graph.Relationship.ANY, Graph.Relationship.BOTH].includes(direction))
+		{
+			if (id in index.in)
+			{
+				others = others.concat(Object.keys(index.in[id]))
+			}
+		}
+
+		const results = others.map(other =&gt;
+		{
+			return this.getNodeModel(other, $Relationship.Model)
+		})
+
+		return $Relationship.singular ? results[0] : results
 	}
 
 	getNodeModel(id, $Node)
@@ -541,11 +576,13 @@ class Graph {
 			id = id.toNumber()
 		}
 
+		id = parseInt(id, 10)
+
 		const node = this.nodes.get(id)
 
 		if (!node)
 		{
-			throw &apos;Node not found&apos;
+			throw new Error(&apos;Node not found&apos;)
 		}
 
 		if (!$Node)

@@ -66,7 +66,7 @@ const merge = require(&apos;deepmerge&apos;)
  * @property {Array} variables - All variables used in the query that should be added to the results.
  * @property {String|Array} where - The where clause, arrays are joined by the &apos;AND&apos; operator.
  * @property {Number} limit - The maximum number of results to be returned
- * @property {String} with - The name of relationship to include, use the dot-notation to include mutliple levels
+ * @property {String} with - The name of relationship to include, use the dot-notation to include multiple levels
  * @property {Array} with - An array of names of relationships to include
  * @property {Object.&lt;String, Boolean|Object&gt;} with - Relationships to include (true) or exclude (false) or filter(object)
  */
@@ -81,7 +81,7 @@ const merge = require(&apos;deepmerge&apos;)
  */
 
 const REGEX_LEVEL_SPLIT = /\.(.*)/
-const REGEX_INDEX = /([^\(]*)\(?([^\)]*)\)?/i
+const REGEX_INDEX = /([^(]*)\(?([^)]*)\)?/i
 
 // Private
 const _related = Symbol(&apos;related&apos;)
@@ -92,8 +92,8 @@ const _labels = Symbol(&apos;labels&apos;)
  * @class Node
  * @extends {Model}
  */
-class Node extends Model {
-
+class Node extends Model
+{
 	/**
 	 * Creates an instance of Node.
 	 *
@@ -167,19 +167,18 @@ class Node extends Model {
 	{
 		const self = this
 
-		return class extends NodeCollection {
-
+		return class extends NodeCollection
+		{
 			constructor(items)
 			{
 				super(self, items)
 			}
-
 		}
 	}
 
 	/**
 	 * The node ID.
-	 * This will be automatically genreated when the node is saved
+	 * This will be automatically generated when the node is saved
 	 *
 	 * @type {string}
 	 */
@@ -304,7 +303,7 @@ class Node extends Model {
 	 * Get a Relationship class by name.
 	 *
 	 * @param {string} name The name of the relationship
-	 * @returns {Relationship} The Relastionship class
+	 * @returns {Relationship} The Relationship class
 	 */
 	static getRelationship(name)
 	{
@@ -326,7 +325,7 @@ class Node extends Model {
 	 * Get a Relationship class by name.
 	 *
 	 * @param {string} name The name of the relationship
-	 * @returns {Relationship} The Relastionship class
+	 * @returns {Relationship} The Relationship class
 	 */
 	getRelationship(name)
 	{
@@ -405,7 +404,7 @@ class Node extends Model {
 	/**
 	 * Set related node(s).
 	 *
-	 * @param {string} name The name of the relastionship
+	 * @param {string} name The name of the relationship
 	 * @param {Node|NodeCollection|Node[]} node Node(s)
 	 * @param {any} [properties={}] Properties to set on the relationship(s)
 	 * @param {boolean} [overwrite=true] If set to false existing nodes will not be overwritten unless the relationship is singular
@@ -493,9 +492,14 @@ class Node extends Model {
 		return labels
 	}
 
+	static get baseLabel()
+	{
+		return this.labels[0]
+	}
+
 	get $base()
 	{
-		return this.$labels[0]
+		return this.constructor.baseLabel
 	}
 
 	/**
@@ -653,13 +657,13 @@ class Node extends Model {
 	 * Delete node from the graph database
 	 *
 	 * @param {boolean} [deep=false] Delete related nodes
-	 * @param {Transaction} [tx=null] The current databse transaction
+	 * @param {Transaction} [tx=null] The current database transaction
 	 */
 	async delete(deep = false, tx = null)
 	{
 		if (!this.id)
 		{
-			throw &apos;Can not delete a node without ID&apos;
+			throw new Error(&apos;Can not delete a node without ID&apos;)
 		}
 
 		// Prevent infinite loops in circular graphs
@@ -1021,7 +1025,7 @@ class Node extends Model {
 			if (!property)
 			{
 				property = label
-				label = this.labels[0]
+				label = this.baseLabel
 			}
 
 			o.index = { label, property }
@@ -1120,7 +1124,7 @@ class Node extends Model {
 		}
 		else if (!filters || filters.constructor !== Object)
 		{
-			throw `Invalid filter object: ${ filters }`
+			throw new Error(`Invalid filter object: ${ filters }`)
 		}
 
 		const o = {
@@ -1261,7 +1265,7 @@ class Node extends Model {
 				query += &apos;&gt;&apos;
 			}
 
-			query += `(${ nodeVar }:${ $Relationship.Model.name })`
+			query += `(${ nodeVar }:${ $Relationship.Model.baseLabel })`
 
 			if (!next)
 			{
@@ -1400,7 +1404,6 @@ class Node extends Model {
 
 		this.clearCachedRelationships(relationships)
 	}
-
 }
 
 Node.addIndex(&apos;id&apos;)
