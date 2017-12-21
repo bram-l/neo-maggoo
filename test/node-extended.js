@@ -8,8 +8,8 @@ describe('Extended Node', () =>
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	class Foo extends Node {
-
+	class Foo extends Node
+	{
 		static async find()
 		{
 			return 'foo'
@@ -19,15 +19,14 @@ describe('Extended Node', () =>
 		{
 			return await Node.find.call(this, null, o)
 		}
-
 	}
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -40,14 +39,14 @@ describe('Extended Node', () =>
 		DB.exit()
 	})
 
-	it('should overwrite existing methods', async () =>
+	it('should overwrite existing methods', async() =>
 	{
 		const foo = await Foo.get()
 
 		expect(foo).toBe('foo')
 	})
 
-	it('should be able to call super methods', async () =>
+	it('should be able to call super methods', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Foo), (n2:Foo)
@@ -60,7 +59,8 @@ describe('Extended Node', () =>
 
 	it('should have inherited labels', () =>
 	{
-		class Extended extends Foo {
+		class Extended extends Foo
+		{
 
 		}
 

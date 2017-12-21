@@ -8,12 +8,12 @@ describe('Label', () =>
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -26,7 +26,7 @@ describe('Label', () =>
 		DB.exit()
 	})
 
-	it('should be added to a new node', async () =>
+	it('should be added to a new node', async() =>
 	{
 		const node = new Node()
 
@@ -41,7 +41,7 @@ describe('Label', () =>
 		expect(result.$labels[1]).toBe('Foo')
 	})
 
-	it('should be added to an existing node', async () =>
+	it('should be added to an existing node', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Node { id: 'foo' })
@@ -58,7 +58,7 @@ describe('Label', () =>
 		expect(result.$labels[1]).toBe('Foo')
 	})
 
-	it('should add multiple to an existing node', async () =>
+	it('should add multiple to an existing node', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Node { id: 'foo' })
@@ -79,7 +79,7 @@ describe('Label', () =>
 		expect(result.$labels[2]).toBe('Bar')
 	})
 
-	it('should be removed from a node', async () =>
+	it('should be removed from a node', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Node:Foo { id: 'foo' })
@@ -99,7 +99,7 @@ describe('Label', () =>
 		expect(result.$labels[0]).toBe('Node')
 	})
 
-	it('should remove multiple from a node', async () =>
+	it('should remove multiple from a node', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Node:Foo:Bar { id: 'foo' })

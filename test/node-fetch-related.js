@@ -9,12 +9,12 @@ describe('Fetch related', () =>
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -27,7 +27,7 @@ describe('Fetch related', () =>
 		DB.exit()
 	})
 
-	it('should fetch related items for the current node', async () =>
+	it('should fetch related items for the current node', async() =>
 	{
 		await DB.query(`
 			CREATE (f:Foo { id: 'foo' }),
@@ -37,7 +37,8 @@ describe('Fetch related', () =>
 
 		class Foo extends Node {}
 
-		class Bar extends Node {
+		class Bar extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -64,7 +65,7 @@ describe('Fetch related', () =>
 		expect(bar.$graph.relationships.size).toBe(1)
 	})
 
-	it('should fetch nested related items for the current node', async () =>
+	it('should fetch nested related items for the current node', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Foo:Node { id: 'foo' }),
@@ -74,7 +75,8 @@ describe('Fetch related', () =>
 				   (n2)-[:is_related_to]->(n3)
 		`)
 
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -103,13 +105,14 @@ describe('Fetch related', () =>
 		expect(foo.$graph.relationships.size).toBe(2)
 	})
 
-	it('should clear relationship cache after fecthing related nodes', async () =>
+	it('should clear relationship cache after fecthing related nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Foo:Node { id: 'foo' })
 		`)
 
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -146,7 +149,7 @@ describe('Fetch related', () =>
 		expect(foo.$graph.relationships.size).toBe(1)
 	})
 
-	it('should not affect the graph when clearing the relationship cache', async () =>
+	it('should not affect the graph when clearing the relationship cache', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Foo:Node { id: 'foo' }),
@@ -154,7 +157,8 @@ describe('Fetch related', () =>
 				   (n1)-[:is_related_to]->(n2)
 		`)
 
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {

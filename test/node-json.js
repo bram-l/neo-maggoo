@@ -9,12 +9,12 @@ describe('JSON', () =>
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -26,7 +26,8 @@ describe('JSON', () =>
 	{
 		DB.exit()
 	})
-/*
+
+	/*
 	it('should be created for single Node', async () =>
 	{
 		await DB.query(`
@@ -258,7 +259,7 @@ describe('JSON', () =>
 		expect(valid.includes(json)).toBe(true)
 	})
 */
-	it('should include relationship data', async () =>
+	it('should include relationship data', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Foo { id: 'foo' }), (bar:Bar { id: 'bar' })
@@ -298,7 +299,7 @@ describe('JSON', () =>
 		expect(json).toEqual(valid)
 	})
 
-	it('should coerce relationship data through callback function', async () =>
+	it('should coerce relationship data through callback function', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Foo { id: 'foo' }), (bar:Bar { id: 'bar' })

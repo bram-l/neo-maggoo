@@ -2,7 +2,8 @@
 
 const Node = require('../../../lib/Node')
 
-class Foo extends Node {
+class Foo extends Node
+{
 	static get relationships()
 	{
 		return {

@@ -8,12 +8,12 @@ describe('Node', () =>
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -26,7 +26,7 @@ describe('Node', () =>
 		DB.exit()
 	})
 
-	it('should create a new node if none matches the label', async () =>
+	it('should create a new node if none matches the label', async() =>
 	{
 		const node = await Node.merge({}, { id: 'foo', name: 'bar' })
 
@@ -38,7 +38,7 @@ describe('Node', () =>
 		expect(total).toBe(1)
 	})
 
-	it('should create a new node if none matches the criteria', async () =>
+	it('should create a new node if none matches the criteria', async() =>
 	{
 		const node = await Node.merge({ id: 'foo' }, { name: 'bar' })
 
@@ -50,7 +50,7 @@ describe('Node', () =>
 		expect(total).toBe(1)
 	})
 
-	it('should merge node properties if one matches the criteria', async () =>
+	it('should merge node properties if one matches the criteria', async() =>
 	{
 		await DB.query(`
 			CREATE (:Node {id: 'foo', name: 'foo' })
@@ -66,7 +66,7 @@ describe('Node', () =>
 		expect(total).toBe(1)
 	})
 
-	it('should add created timestamp on a new node if it is created', async () =>
+	it('should add created timestamp on a new node if it is created', async() =>
 	{
 		const node = await Node.merge({ id: 'foo' }, { name: 'bar' }, {
 			onCreate: 'SET n.created = timestamp()',
@@ -83,7 +83,7 @@ describe('Node', () =>
 		expect(total).toBe(1)
 	})
 
-	it('should merge node properties if one matches the criteria', async () =>
+	it('should merge node properties if one matches the criteria', async() =>
 	{
 		await DB.query(`
 			CREATE (:Node {id: 'foo', name: 'foo', created: 1 })

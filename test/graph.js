@@ -14,7 +14,7 @@ describe('Graph', () =>
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -27,7 +27,7 @@ describe('Graph', () =>
 		DB.exit()
 	})
 
-	it('should add nodes from constructor results', async () =>
+	it('should add nodes from constructor results', async() =>
 	{
 		await DB.query(`
 			CREATE (:Node)-[:is_related_to]->(:Node)
@@ -41,7 +41,7 @@ describe('Graph', () =>
 		expect(graph.relationships.size).toBe(1)
 	})
 
-	it('should add nodes from build results', async () =>
+	it('should add nodes from build results', async() =>
 	{
 		await DB.query(`
 			CREATE (:Node)-[:is_related_to]->(:Node)
@@ -53,7 +53,7 @@ describe('Graph', () =>
 		expect(graph.relationships.size).toBe(1)
 	})
 
-	it('should add more nodes', async () =>
+	it('should add more nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' }),
@@ -80,7 +80,7 @@ describe('Graph', () =>
 		expect(graph.relationships.size).toBe(2)
 	})
 
-	it('should remove nodes', async () =>
+	it('should remove nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' })
@@ -100,7 +100,7 @@ describe('Graph', () =>
 		expect(graph.nodes.size).toBe(0)
 	})
 
-	it('should add linked value', async () =>
+	it('should add linked value', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' }),
@@ -112,10 +112,10 @@ describe('Graph', () =>
 			MATCH (n:Node)-[r:is_related_to]->(o:Node)
 			RETURN n, COUNT(o) as others
 		`, {}, {
-			n: Node
-		}, {
-			others: { singular: true }
-		})
+				n: Node
+			}, {
+				others: { singular: true }
+			})
 
 		expect(graph.nodes.size).toBe(1)
 		expect(graph.relationships.size).toBe(0)
@@ -129,7 +129,7 @@ describe('Graph', () =>
 		expect(parseInt(others)).toBe(2)
 	})
 
-	it('should return for undefined links', async () =>
+	it('should return for undefined links', async() =>
 	{
 		await DB.query(`
 			CREATE (:Node)
@@ -142,7 +142,7 @@ describe('Graph', () =>
 		expect(linked).toBe(null)
 	})
 
-	it('should add linked nodes', async () =>
+	it('should add linked nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' }),
@@ -154,12 +154,12 @@ describe('Graph', () =>
 			MATCH (n:Node)-[]->(o:Node)
 			RETURN n, o
 		`, {}, {
-			n: Node
-		}, {
-			others: {
-				end: 'o'
-			}
-		})
+				n: Node
+			}, {
+				others: {
+					end: 'o'
+				}
+			})
 
 		expect(graph.nodes.size).toBe(3)
 		expect(graph.relationships.size).toBe(0)
@@ -179,7 +179,7 @@ describe('Graph', () =>
 		expect(others[0].id).not.toEqual(others[1].id)
 	})
 
-	it('should add more linked nodes', async () =>
+	it('should add more linked nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' }),
@@ -192,8 +192,8 @@ describe('Graph', () =>
 			WHERE n.id = {id}
 			RETURN n
 		`, { id: 'foo' }, {
-			n: Node
-		})
+				n: Node
+			})
 
 		expect(graph.nodes.size).toBe(1)
 		expect(graph.relationships.size).toBe(0)
@@ -205,12 +205,12 @@ describe('Graph', () =>
 			MATCH (n:Node)-[]->(o:Node)
 			RETURN n, o
 		`, {}, {
-			n: Node
-		}, {
-			others: {
-				end: 'o'
-			}
-		})
+				n: Node
+			}, {
+				others: {
+					end: 'o'
+				}
+			})
 
 		expect(graph.nodes.size).toBe(3)
 		expect(graph.relationships.size).toBe(0)
@@ -224,7 +224,7 @@ describe('Graph', () =>
 		expect(others[0].id).not.toEqual(others[1].id)
 	})
 
-	it('should throw an error when a node is not found', async (done) =>
+	it('should throw an error when a node is not found', async(done) =>
 	{
 		await DB.query(`
 			CREATE (foo:Node { id:'foo' }), (bar:Node { id:'bar' }), (baz:Node { id:'baz' }),
@@ -249,7 +249,7 @@ describe('Graph', () =>
 		}
 	})
 
-	it('should throw an error when no map is found', async () =>
+	it('should throw an error when no map is found', async() =>
 	{
 		const graph = new Graph()
 
@@ -264,30 +264,31 @@ describe('Graph', () =>
 		}
 	})
 
-	it('should return null when no entity is found', async () =>
+	it('should return null when no entity is found', async() =>
 	{
 		const entity = Graph.getEntity('foo')
 
 		expect(entity).toBe(null)
 	})
 
-	it('should return null for an invalid id', async () =>
+	it('should return null for an invalid id', async() =>
 	{
 		const foo = Graph.getId('foo')
 
 		expect(foo).toBe(null)
 	})
 
-	it('should return an integer as id', async () =>
+	it('should return an integer as id', async() =>
 	{
 		const id = Graph.getId(1)
 
 		expect(id).toBe(1)
 	})
 
-	it('should return an id for an Node', async () =>
+	it('should return an id for an Node', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			get $id()
 			{
 				return 1

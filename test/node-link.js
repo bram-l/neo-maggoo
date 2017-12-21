@@ -8,12 +8,12 @@ describe('Link', () =>
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -26,14 +26,14 @@ describe('Link', () =>
 		DB.exit()
 	})
 
-	it('should return null if node is not part of a graph', async () =>
+	it('should return null if node is not part of a graph', async() =>
 	{
 		const node = new Node()
 
 		expect(node.getLinked('foo')).toBe(null)
 	})
 
-	it('should return null if no links are defined in the graph', async () =>
+	it('should return null if no links are defined in the graph', async() =>
 	{
 		const node = new Node()
 
@@ -42,7 +42,7 @@ describe('Link', () =>
 		expect(node.getLinked('foo')).toBe(null)
 	})
 
-	it('should be created', async () =>
+	it('should be created', async() =>
 	{
 		await DB.query(`
 			CREATE (a:Node { id: 'foo', name: 'foo' }),
@@ -55,13 +55,13 @@ describe('Link', () =>
 			WHERE n.name = other.name
 			AND NOT n = other
 		`, {}, {
-			return: 'n, other',
-			links: {
-				other: {
-					singular: true
+				return: 'n, other',
+				links: {
+					other: {
+						singular: true
+					}
 				}
-			}
-		})
+			})
 
 		expect(nodes.length).toBe(2)
 		expect(nodes[0].name).toBe('foo')
@@ -76,7 +76,7 @@ describe('Link', () =>
 		expect(nodes[1].other.name).toEqual(nodes[0].name)
 	})
 
-	it('should be created using a custom model', async () =>
+	it('should be created using a custom model', async() =>
 	{
 		await DB.query(`
 			CREATE (a:Foo { id: 'foo', name: 'foo' }),
@@ -91,18 +91,18 @@ describe('Link', () =>
 			WHERE n.name = other.name
 			AND NOT n = other
 		`, {}, {
-			return: 'n, other',
-			models: {
-				other: Foo
-			},
-			links: {
-				other: {
-					start: 'n',
-					end: 'other',
-					singular: true
+				return: 'n, other',
+				models: {
+					other: Foo
+				},
+				links: {
+					other: {
+						start: 'n',
+						end: 'other',
+						singular: true
+					}
 				}
-			}
-		})
+			})
 
 		expect(nodes.length).toBe(2)
 		expect(nodes[0].name).toBe('foo')
@@ -117,7 +117,7 @@ describe('Link', () =>
 		expect(nodes[1].other.name).toEqual(nodes[0].name)
 	})
 
-	it('should be created using a custom model', async () =>
+	it('should be created using a custom model', async() =>
 	{
 		await DB.query(`
 			CREATE (a:Foo { id: 'foo', name: 'foo' }),
@@ -133,17 +133,17 @@ describe('Link', () =>
 			WHERE n.name = other.name
 			AND NOT n = other
 		`, {}, {
-			return: 'n, collect(other) as others',
-			models: {
-				others: Foo.Collection
-			},
-			links: {
-				others: {
-					start: 'n',
-					end: 'others'
+				return: 'n, collect(other) as others',
+				models: {
+					others: Foo.Collection
+				},
+				links: {
+					others: {
+						start: 'n',
+						end: 'others'
+					}
 				}
-			}
-		})
+			})
 
 		expect(nodes.length).toBe(3)
 		expect(nodes[0].name).toBe('foo')

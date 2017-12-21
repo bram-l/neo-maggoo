@@ -9,12 +9,12 @@ describe('Related', () =>
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -27,9 +27,10 @@ describe('Related', () =>
 		DB.exit()
 	})
 
-	it('should save relationships with properties', async () =>
+	it('should save relationships with properties', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -75,9 +76,10 @@ describe('Related', () =>
 		expect(foos[0].bars[0].$rel.$id).not.toBe(null)
 	})
 
-	it('should set multiple relationships', async () =>
+	it('should set multiple relationships', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -120,11 +122,12 @@ describe('Related', () =>
 		expect(foos[1].bars[0].id !== foos[1].bars[1].id).toBe(true)
 	})
 
-	it('should set properties on existing relationships', async () =>
+	it('should set properties on existing relationships', async() =>
 	{
 		class Bar extends Node {}
 
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -159,7 +162,7 @@ describe('Related', () =>
 		expect(foo2.bars[0].$rel.foo).toBe('foo')
 	})
 
-	it('should be saved by name', async () =>
+	it('should be saved by name', async() =>
 	{
 		class Bar extends Node {}
 

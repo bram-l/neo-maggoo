@@ -64,7 +64,7 @@ describe('DB', () =>
 		const config = require('./util/config')
 		const DB = require('../lib/DB')
 
-		beforeEach(async () =>
+		beforeEach(async() =>
 		{
 			DB.init(config.db.server, config.db.user, config.db.pass)
 
@@ -79,7 +79,7 @@ describe('DB', () =>
 			DB.exit()
 		})
 
-		it('should be empty', async () =>
+		it('should be empty', async() =>
 		{
 			const result = await DB.query(`
 				MATCH (n)

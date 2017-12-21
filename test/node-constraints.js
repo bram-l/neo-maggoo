@@ -8,12 +8,12 @@ describe('Constraints', () =>
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -26,7 +26,7 @@ describe('Constraints', () =>
 		DB.exit()
 	})
 
-	it('should not throw an exception for unique names', async () =>
+	it('should not throw an exception for unique names', async() =>
 	{
 		await DB.query(`
 			CREATE (:Foo { name: 'foo' }),
@@ -44,7 +44,7 @@ describe('Constraints', () =>
 		await Foo.dropUnique('name')
 	})
 
-	it('should throw an exception for duplicate names', async (done) =>
+	it('should throw an exception for duplicate names', async(done) =>
 	{
 		await DB.query(`
 			CREATE (:Foo { name: 'foo' }),
@@ -77,7 +77,7 @@ describe('Constraints', () =>
 		done()
 	})
 
-	it('should not throw an exception for unique names after constraint is dropped', async () =>
+	it('should not throw an exception for unique names after constraint is dropped', async() =>
 	{
 		await DB.query(`
 			CREATE (:Foo { name: 'foo' }),
@@ -99,7 +99,7 @@ describe('Constraints', () =>
 		await baz2.save()
 	})
 
-	it('should create and drop indexes', async () =>
+	it('should create and drop indexes', async() =>
 	{
 		class Foo extends Node {}
 
@@ -117,7 +117,7 @@ describe('Constraints', () =>
 		expect('Foo' in indexes2).toBe(false)
 	})
 
-	it('should get a node using a specific index', async () =>
+	it('should get a node using a specific index', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Foo { name: 'foo' })
@@ -132,7 +132,7 @@ describe('Constraints', () =>
 		await Foo.dropIndex('name')
 	})
 
-	it('should get a node using a specific index and label', async () =>
+	it('should get a node using a specific index and label', async() =>
 	{
 		await DB.query(`
 			CREATE (n:Foo { name: 'foo' })

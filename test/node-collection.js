@@ -10,12 +10,12 @@ describe('NodeCollection', () =>
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')
 
-	beforeAll(async () =>
+	beforeAll(async() =>
 	{
 		DB.init(config.db.server, config.db.user, config.db.pass)
 	})
 
-	beforeEach(async () =>
+	beforeEach(async() =>
 	{
 		await DB.query(`
 			MATCH (n)
@@ -28,7 +28,7 @@ describe('NodeCollection', () =>
 		DB.exit()
 	})
 
-	it('should call delete on all nodes', async () =>
+	it('should call delete on all nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Node { id: 'foo' }), (n2:Node { id: 'bar' }), (n3:Node { id: 'baz' })
@@ -45,7 +45,7 @@ describe('NodeCollection', () =>
 		expect(total).toBe(0)
 	})
 
-	it('should call save on all nodes', async () =>
+	it('should call save on all nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Node { id: 'foo' }), (n2:Node { id: 'bar' }), (n3:Node { id: 'baz' })
@@ -62,9 +62,10 @@ describe('NodeCollection', () =>
 		expect(foos.length).toBe(3)
 	})
 
-	it('should call delete on related nodes', async () =>
+	it('should call delete on related nodes', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -92,9 +93,10 @@ describe('NodeCollection', () =>
 		expect(foos.length).toBe(1)
 	})
 
-	it('should call delete deep on related nodes', async () =>
+	it('should call delete deep on related nodes', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -127,9 +129,10 @@ describe('NodeCollection', () =>
 		expect(after.length).toBe(1)
 	})
 
-	it('should call save on related nodes', async () =>
+	it('should call save on related nodes', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
@@ -159,9 +162,10 @@ describe('NodeCollection', () =>
 		expect(foos.length).toBe(2)
 	})
 
-	it('should set the related Model', async () =>
+	it('should set the related Model', async() =>
 	{
-		class Foo extends Node {
+		class Foo extends Node
+		{
 			static get relationships()
 			{
 				return {
