@@ -16,7 +16,12 @@ npm install neo-maggoo --save
 - Neo4j >= 3.0.0
 
 
-## Usage
+## Docs
+
+[https://bram-l.github.io/neo-maggoo/](https://bram-l.github.io/neo-maggoo/)
+
+
+## Examples
 
 ```js
 const { Node, Relationship, DB } = require('neo-maggoo')
