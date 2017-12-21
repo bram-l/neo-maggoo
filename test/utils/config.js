@@ -1,12 +1,14 @@
+/* eslint-disable no-process-env */
 'use strict'
 
-// eslint-disable-next-line no-process-env
 const NEO4J_TEST_PORT = process.env.NEO4J_TEST_PORT || '6482'
+const NEO4J_TEST_USER = process.env.NEO4J_TEST_USER || 'neo4j'
+const NEO4J_TEST_PASS = process.env.NEO4J_TEST_PASS || 'test'
 
 module.exports = {
 	db: {
 		server: `bolt://localhost:${ NEO4J_TEST_PORT }`,
-		user: 'neo4j',
-		pass: 'test'
+		user: NEO4J_TEST_USER,
+		pass: NEO4J_TEST_PASS
 	}
 }
