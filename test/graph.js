@@ -1,10 +1,10 @@
 'use strict'
 
-require('./util/reporter')
+require('./utils/reporter')
 
 describe('Graph', () =>
 {
-	const config = require('./util/config')
+	const config = require('./utils/config')
 	const DB = require('../lib/DB')
 	const Graph = require('../lib/Graph')
 	const Node = require('../lib/Node')

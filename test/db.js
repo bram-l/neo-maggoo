@@ -1,8 +1,8 @@
 'use strict'
 
-require('./util/reporter')
+require('./utils/reporter')
 
-const config = require('./util/config')
+const config = require('./utils/config')
 const DB = require('../lib/DB')
 
 describe('DB', () =>

@@ -1,10 +1,10 @@
 'use strict'
 
-require('./util/reporter')
+require('./utils/reporter')
 
 describe('Fetch related', () =>
 {
-	const config = require('./util/config')
+	const config = require('./utils/config')
 	const DB = require('../lib/DB')
 	const Node = require('../lib/Node')
 	const Relationship = require('../lib/Relationship')

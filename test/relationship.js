@@ -1,11 +1,11 @@
 'use strict'
 
-require('./util/reporter')
+require('./utils/reporter')
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60 * 5
 
 describe('Relationship', () =>
 {
-	const config = require('./util/config')
+	const config = require('./utils/config')
 	const Node = require('../lib/Node')
 	const DB = require('../lib/DB')
 	const Relationship = require('../lib/Relationship')
