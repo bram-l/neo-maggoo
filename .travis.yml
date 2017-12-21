@@ -1,0 +1,21 @@
+language: node_js
+node_js: "node"
+env:
+  global:
+    NEO4J_TEST_PORT=7687
+  matrix:
+    - NEO4J_VERSION="3.0.12"
+    - NEO4J_VERSION="3.1.7"
+    - NEO4J_VERSION="3.2.8"
+    - NEO4J_VERSION="3.3.1"
+
+before_install:
+  - wget dist.neo4j.org/neo4j-community-$NEO4J_VERSION-unix.tar.gz
+  - tar -xzf neo4j-community-$NEO4J_VERSION-unix.tar.gz
+  - neo4j-community-$NEO4J_VERSION/bin/neo4j start
+
+script:
+  - npm run lint
+  - npm test
+
+after_success: npm run coveralls
