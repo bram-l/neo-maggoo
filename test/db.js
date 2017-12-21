@@ -2,20 +2,18 @@
 
 require('./util/reporter')
 
+const config = require('./util/config')
+const DB = require('../lib/DB')
+
 describe('DB', () =>
 {
 	it('should not have an active db connection', () =>
 	{
-		const DB = require('../lib/DB')
-
 		expect(DB.driver).toBeUndefined()
 	})
 
 	describe('connection', () =>
 	{
-		const config = require('./util/config')
-		const DB = require('../lib/DB')
-
 		it('should throw an error before it is initialized', (done) =>
 		{
 			try
@@ -61,9 +59,6 @@ describe('DB', () =>
 
 	describe('content', () =>
 	{
-		const config = require('./util/config')
-		const DB = require('../lib/DB')
-
 		beforeEach(async() =>
 		{
 			DB.init(config.db.server, config.db.user, config.db.pass)
@@ -90,7 +85,7 @@ describe('DB', () =>
 			expect(result.records[0].get(0).toNumber()).toBe(0)
 		})
 
-		it('should thrown an error for an invalid query', async () =>
+		it('should thrown an error for an invalid query', async() =>
 		{
 			try
 			{
@@ -103,7 +98,7 @@ describe('DB', () =>
 			}
 		})
 
-		it('should set an index', async () =>
+		it('should set an index', async() =>
 		{
 			await DB.addIndex('Foo', 'foo')
 
@@ -119,7 +114,7 @@ describe('DB', () =>
 			expect('Foo' in indexes2).toBe(false)
 		})
 
-		it('should not duplicate indexes', async () =>
+		it('should not duplicate indexes', async() =>
 		{
 			require('../lib/Node')
 
@@ -146,7 +141,7 @@ describe('DB', () =>
 			expect(indexes3.Node.includes('id')).toBe(true)
 		})
 
-		it('should drop an index', async () =>
+		it('should drop an index', async() =>
 		{
 			require('../lib/Node')
 
@@ -171,7 +166,7 @@ describe('DB', () =>
 			expect(indexes3.Node.includes('id')).toBe(true)
 		})
 
-		it('should set a unique constraint', async () =>
+		it('should set a unique constraint', async() =>
 		{
 			await DB.addUnique('Foo', 'foo')
 
