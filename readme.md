@@ -1,6 +1,8 @@
 # Neo Maggoo
 
-Neo4j OGM for Node.js using proxified ES6 classes
+[![Build Status](https://travis-ci.org/bram-l/neo-maggoo.svg?branch=master)](https://travis-ci.org/bram-l/neo-maggoo)
+
+### Neo4j OGM for Node.js using proxified ES6 classes
 
 **WARNING: This package is still in an experimental state, currently in active development and could change at any time.**
 
