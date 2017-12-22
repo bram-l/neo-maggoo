@@ -1,6 +1,7 @@
 # Neo Maggoo
 
 [![Build Status](https://travis-ci.org/bram-l/neo-maggoo.svg?branch=master)](https://travis-ci.org/bram-l/neo-maggoo)
+[![Coverage Status](https://coveralls.io/repos/github/bram-l/neo-maggoo/badge.svg?branch=master)](https://coveralls.io/github/bram-l/neo-maggoo?branch=master)
 
 ### Neo4j OGM for Node.js using proxified ES6 classes
 
