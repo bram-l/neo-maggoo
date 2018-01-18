@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "deepmerge": "^1.5.2",
-    "maggoo": "^0.4.0",
+    "maggoo": "^0.4.1",
     "neo4j-driver": "^1.5.1",
     "shortid": "^2.2.8"
   },
