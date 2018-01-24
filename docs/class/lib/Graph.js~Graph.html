@@ -280,114 +280,6 @@
     <td>
       <span class="access" data-ice="access">public</span>
       <span data-ice="static">static</span>
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-member-[_NodeCollection]">[_NodeCollection]</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      <span data-ice="static">static</span>
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-member-[_Node]">[_Node]</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      <span data-ice="static">static</span>
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-member-[_Relationship]">[_Relationship]</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      <span data-ice="static">static</span>
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-member-[_db]">[_db]</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      <span data-ice="static">static</span>
       <span class="kind" data-ice="kind">get</span>
       
       <span class="override" data-ice="override"></span>
@@ -460,13 +352,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-method-getEntity">getEntity</a></span></span><span data-ice="signature">(subject: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-method-getEntity">getEntity</a></span></span><span data-ice="signature">(subject: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>neo4j.types.Node</span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Get the Neo4j node entity</p>
+</div>
       </div>
     </td>
     <td>
@@ -487,13 +380,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-method-getId">getId</a></span></span><span data-ice="signature">(subject: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#static-method-getId">getId</a></span></span><span data-ice="signature">(subject: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Get Neo4j Node id</p>
+</div>
       </div>
     </td>
     <td>
@@ -837,13 +731,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getLinked">getLinked</a></span></span><span data-ice="signature">(node: <span>*</span>, name: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getLinked">getLinked</a></span></span><span data-ice="signature">(node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span>, name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>any</span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Get linked results mapped to Models</p>
+</div>
       </div>
     </td>
     <td>
@@ -892,13 +787,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getNodeModel">getNodeModel</a></span></span><span data-ice="signature">(id: <span>*</span>, $Node: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getNodeModel">getNodeModel</a></span></span><span data-ice="signature">(id: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span> | <span>neo4j.integer</span>, $Node: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>&lt;<span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span>&gt;): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Wrap a Neo4j node in a specified Node model</p>
+</div>
       </div>
     </td>
     <td>
@@ -919,13 +815,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getNodes">getNodes</a></span></span><span data-ice="signature">(reference: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-getNodes">getNodes</a></span></span><span data-ice="signature">(reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>array</span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Get all Nodes for a reference used in the Cypher query</p>
+</div>
       </div>
     </td>
     <td>
@@ -1030,13 +927,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-run">run</a></span></span><span data-ice="signature">(query: <span>*</span>, parameters: <span>*</span>, models: {}, links: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/lib/Graph.js~Graph.html#instance-method-run">run</a></span></span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, models: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, links: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Run a Cypher query and add the result to the current Graph instance</p>
+</div>
       </div>
     </td>
     <td>
@@ -1091,7 +989,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber52">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber53">source</a></span></span>
     </span>
   </h3>
 
@@ -1134,7 +1032,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber72">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber79">source</a></span></span>
     </span>
   </h3>
 
@@ -1177,7 +1075,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber62">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber66">source</a></span></span>
     </span>
   </h3>
 
@@ -1381,178 +1279,6 @@
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-member-[_NodeCollection]">
-    <span class="access" data-ice="access">public</span>
-    <span data-ice="static">static</span>
-    
-    
-    
-    
-    <span data-ice="name">[_NodeCollection]</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber76">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-member-[_Node]">
-    <span class="access" data-ice="access">public</span>
-    <span data-ice="static">static</span>
-    
-    
-    
-    
-    <span data-ice="name">[_Node]</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber56">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-member-[_Relationship]">
-    <span class="access" data-ice="access">public</span>
-    <span data-ice="static">static</span>
-    
-    
-    
-    
-    <span data-ice="name">[_Relationship]</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber66">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-member-[_db]">
-    <span class="access" data-ice="access">public</span>
-    <span data-ice="static">static</span>
-    
-    
-    
-    
-    <span data-ice="name">[_db]</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber47">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-get-db">
     <span class="access" data-ice="access">public</span>
     <span data-ice="static">static</span>
@@ -1564,7 +1290,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber45">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber43">source</a></span></span>
     </span>
   </h3>
 
@@ -1611,7 +1337,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber95">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber103">source</a></span></span>
     </span>
   </h3>
 
@@ -1704,18 +1430,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">getEntity</span><span data-ice="signature">(subject: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getEntity</span><span data-ice="signature">(subject: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>neo4j.types.Node</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber322">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber339">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Get the Neo4j node entity</p>
+</div>
 
   
 
@@ -1729,9 +1456,10 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">subject</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>Anything that could represent a node</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -1743,8 +1471,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span>neo4j.types.Node</span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The Neo4j Node entity</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -1775,18 +1504,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">getId</span><span data-ice="signature">(subject: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getId</span><span data-ice="signature">(subject: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber375">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber396">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Get Neo4j Node id</p>
+</div>
 
   
 
@@ -1800,9 +1530,10 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">subject</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span> | <span>neo4j.types.Node</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>Anything that could represent a node</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -1814,8 +1545,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The Neo4j Node ID as number</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -1850,7 +1582,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber350">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber365">source</a></span></span>
     </span>
   </h3>
 
@@ -1927,7 +1659,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber113">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber119">source</a></span></span>
     </span>
   </h3>
 
@@ -2006,7 +1738,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber117">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber123">source</a></span></span>
     </span>
   </h3>
 
@@ -2049,7 +1781,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber120">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber126">source</a></span></span>
     </span>
   </h3>
 
@@ -2092,7 +1824,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber119">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber125">source</a></span></span>
     </span>
   </h3>
 
@@ -2135,7 +1867,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber115">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber121">source</a></span></span>
     </span>
   </h3>
 
@@ -2178,7 +1910,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber118">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber124">source</a></span></span>
     </span>
   </h3>
 
@@ -2221,7 +1953,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber116">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber122">source</a></span></span>
     </span>
   </h3>
 
@@ -2267,7 +1999,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber213">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber226">source</a></span></span>
     </span>
   </h3>
 
@@ -2335,7 +2067,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber168">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber183">source</a></span></span>
     </span>
   </h3>
 
@@ -2396,7 +2128,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber150">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber165">source</a></span></span>
     </span>
   </h3>
 
@@ -2453,18 +2185,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">getLinked</span><span data-ice="signature">(node: <span>*</span>, name: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getLinked</span><span data-ice="signature">(node: <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span>, name: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>any</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber576">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber611">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Get linked results mapped to Models</p>
+</div>
 
   
 
@@ -2478,15 +2211,17 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">node</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>The start node</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">name</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>The name of the link</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -2498,8 +2233,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span>any</span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The linked result</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -2534,7 +2270,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber403">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber422">source</a></span></span>
     </span>
   </h3>
 
@@ -2604,18 +2340,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">getNodeModel</span><span data-ice="signature">(id: <span>*</span>, $Node: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getNodeModel</span><span data-ice="signature">(id: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span> | <span>neo4j.integer</span>, $Node: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>&lt;<span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span>&gt;): <span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber526">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber548">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Wrap a Neo4j node in a specified Node model</p>
+</div>
 
   
 
@@ -2629,15 +2366,17 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">id</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></span> | <span>neo4j.integer</span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>The Neo4j Node ID</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">$Node</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>&lt;<span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span>&gt;</td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>The Node Model Class</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -2649,8 +2388,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span><a href="class/lib/Graph.js~Graph.html#static-get-Node">Node</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>The Node model</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -2681,18 +2421,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">getNodes</span><span data-ice="signature">(reference: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getNodes</span><span data-ice="signature">(reference: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>array</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber557">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber585">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Get all Nodes for a reference used in the Cypher query</p>
+</div>
 
   
 
@@ -2706,9 +2447,10 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">reference</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>The reference</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -2720,8 +2462,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span>array</span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>An array of nodes</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -2756,7 +2499,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber487">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber502">source</a></span></span>
     </span>
   </h3>
 
@@ -2837,7 +2580,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber430">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber447">source</a></span></span>
     </span>
   </h3>
 
@@ -2925,7 +2668,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber297">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber308">source</a></span></span>
     </span>
   </h3>
 
@@ -2982,18 +2725,19 @@ Map variables returned from the query to Nodes</p>
     
     
     
-    <span data-ice="name">run</span><span data-ice="signature">(query: <span>*</span>, parameters: <span>*</span>, models: {}, links: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span>): <span>*</span></span>
+    <span data-ice="name">run</span><span data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, models: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, links: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber128">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber143">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Run a Cypher query and add the result to the current Graph instance</p>
+</div>
 
   
 
@@ -3007,29 +2751,31 @@ Map variables returned from the query to Nodes</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">query</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>A Cypher query</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">parameters</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="description"><p>Parameters used in the query</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">models</td>
-      <td data-ice="type">{}</td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: {}</li></ul></td>
-      <td data-ice="description"></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="description"><p>Map variables to Models</p>
+</td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">links</td>
-      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
-      <td data-ice="description"></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="description"><p>Link results to a specific Model</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -3041,8 +2787,9 @@ Map variables returned from the query to Nodes</p>
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>A promise</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -3077,7 +2824,7 @@ Map variables returned from the query to Nodes</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber268">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Graph.js.html#lineNumber281">source</a></span></span>
     </span>
   </h3>
 

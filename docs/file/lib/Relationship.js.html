@@ -58,8 +58,7 @@ const _end = Symbol()
 const _direction = Symbol()
 
 /**
- * Class representing a relationship between two nodes
- * @extends Model
+ * Class representing a relationship between two Nodes
  */
 class Relationship extends Model
 {
@@ -68,8 +67,6 @@ class Relationship extends Model
 	/**
 	 * @constant
 	 * @member {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get OUT()
 	{
@@ -79,8 +76,6 @@ class Relationship extends Model
 	/**
 	 * @constant
 	 * @member {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get IN()
 	{
@@ -90,8 +85,6 @@ class Relationship extends Model
 	/**
 	 * @constant
 	 * @type {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get BOTH()
 	{
@@ -101,8 +94,6 @@ class Relationship extends Model
 	/**
 	 * @constant
 	 * @type {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get ANY()
 	{
@@ -112,8 +103,6 @@ class Relationship extends Model
 	/**
 	 * @constant
 	 * @type {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get DEFAULT_TYPE()
 	{
@@ -172,8 +161,6 @@ class Relationship extends Model
 	 *
 	 * @readonly
 	 * @type {boolean}
-	 *
-	 * @memberOf Node
 	 */
 	get $new()
 	{
@@ -185,8 +172,6 @@ class Relationship extends Model
 	 *
 	 * @readonly
 	 * @type {boolean}
-	 *
-	 * @memberOf Node
 	 */
 	get $dirty()
 	{
@@ -200,8 +185,10 @@ class Relationship extends Model
 
 	set start(start)
 	{
+		/**
+		 * @private
+		*/
 		this[_start] = start
-		this._start = start
 	}
 
 	get end()
@@ -211,8 +198,10 @@ class Relationship extends Model
 
 	set end(end)
 	{
+		/**
+		 * @private
+		*/
 		this[_end] = end
-		this._end = end
 	}
 
 	/**
@@ -231,7 +220,12 @@ class Relationship extends Model
 		super.setProperty(key, value)
 	}
 
-	async save(tx)
+	/**
+	 * Save the relationship
+	 *
+	 * @param {any} [tx] Transaction
+	 */
+	async save(tx = null)
 	{
 		let session = null
 
@@ -294,8 +288,6 @@ class Relationship extends Model
 	 *
 	 * @static
 	 * @member {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get type()
 	{
@@ -304,6 +296,9 @@ class Relationship extends Model
 
 	static set type(value)
 	{
+		/**
+		 * @private
+		 */
 		this[_type] = value
 	}
 
@@ -312,8 +307,6 @@ class Relationship extends Model
 	 *
 	 * @static
 	 * @member {boolean}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get singular()
 	{
@@ -322,6 +315,9 @@ class Relationship extends Model
 
 	static set singular(value)
 	{
+		/**
+		 * @private
+		 */
 		this[_singular] = !!value
 	}
 
@@ -330,8 +326,6 @@ class Relationship extends Model
 	 *
 	 * @static
 	 * @member {string}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get direction()
 	{
@@ -340,6 +334,9 @@ class Relationship extends Model
 
 	static set direction(value)
 	{
+		/**
+		 * @private
+		*/
 		this[_direction] = value
 	}
 
@@ -348,8 +345,6 @@ class Relationship extends Model
 	 *
 	 * @static
 	 * @member {Node|function}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get Model()
 	{
@@ -363,6 +358,9 @@ class Relationship extends Model
 
 	static set Model(Class)
 	{
+		/**
+		 * @private
+		*/
 		this[_model] = Class
 	}
 
@@ -371,8 +369,6 @@ class Relationship extends Model
 	 *
 	 * @static
 	 * @member {Node|function}
-	 *
-	 * @memberOf Relationship
 	 */
 	static get model()
 	{

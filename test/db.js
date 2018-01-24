@@ -44,7 +44,7 @@ describe('DB', () =>
 			expect(DB.state.driver).toBe(null)
 		})
 
-		it('should not throw an error when exit is called multiple times', () =>
+		it('should not throw an error when init is called multiple times', () =>
 		{
 			DB.init(config.db.server, config.db.user, config.db.pass)
 			DB.init(config.db.server, config.db.user, config.db.pass)

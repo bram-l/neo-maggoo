@@ -44,13 +44,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import NodeCollection from &apos;<span><a href="file/lib/NodeCollection.js.html#lineNumber7">neo-maggoo/lib/NodeCollection.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import NodeCollection from &apos;<span><a href="file/lib/NodeCollection.js.html#lineNumber10">neo-maggoo/lib/NodeCollection.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/lib/NodeCollection.js.html#lineNumber7">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/lib/NodeCollection.js.html#lineNumber10">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -70,7 +70,8 @@
 
   
   
-  
+  <div class="description" data-ice="description"><p>A Node collection that allows saving &amp; deleting an array of nodes</p>
+</div>
   
 
   
@@ -101,7 +102,7 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(Model: <span>*</span>, items: <span>*</span>)</span>
+          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(Node: <span>*</span>, items: <span>*</span>)</span>
         </p>
       </div>
       <div>
@@ -136,13 +137,14 @@
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-method-delete">delete</a></span></span><span data-ice="signature">(deep: <span>*</span>)</span>
+          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-method-delete">delete</a></span></span><span data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Deletes all Nodes in this collection</p>
+</div>
       </div>
     </td>
     <td>
@@ -163,13 +165,14 @@
         <p>
           <span data-ice="async">async</span>
           
-          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-method-save">save</a></span></span><span data-ice="signature">(deep: <span>*</span>)</span>
+          <span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html#instance-method-save">save</a></span></span><span data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Save all Nodes in this collection</p>
+</div>
       </div>
     </td>
     <td>
@@ -195,11 +198,11 @@
     
     
     
-    <span data-ice="name">constructor</span><span data-ice="signature">(Model: <span>*</span>, items: <span>*</span>)</span>
+    <span data-ice="name">constructor</span><span data-ice="signature">(Node: <span>*</span>, items: <span>*</span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber9">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber12">source</a></span></span>
     </span>
   </h3>
 
@@ -219,7 +222,7 @@
     <tbody>
     
     <tr data-ice="property" data-depth="0">
-      <td data-ice="name" data-depth="0">Model</td>
+      <td data-ice="name" data-depth="0">Node</td>
       <td data-ice="type"><span>*</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
@@ -264,18 +267,19 @@
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">delete</span><span data-ice="signature">(deep: <span>*</span>)</span>
+    <span data-ice="name">delete</span><span data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber43">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber56">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Deletes all Nodes in this collection</p>
+</div>
 
   
 
@@ -289,9 +293,10 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">deep</td>
-      <td data-ice="type"><span>*</span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="description"><p>If true delete all related nodes, or an array of specific relationships</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -323,18 +328,19 @@
     
     <span data-ice="async">async</span>
     
-    <span data-ice="name">save</span><span data-ice="signature">(deep: <span>*</span>)</span>
+    <span data-ice="name">save</span><span data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber29">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/NodeCollection.js.html#lineNumber37">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Save all Nodes in this collection</p>
+</div>
 
   
 
@@ -348,9 +354,10 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">deep</td>
-      <td data-ice="type"><span>*</span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li></ul></td>
+      <td data-ice="description"><p>If true save all related node, or an array of specific relationships</p>
+</td>
     </tr>
 </tbody>
   </table>

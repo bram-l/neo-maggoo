@@ -48,6 +48,9 @@
 
 class RelatedNode {}
 
+/**
+ * Adds relationship data to a special $rel property of the end Node
+ */
 const proxy = new Proxy(RelatedNode, {
 	construct(obj, [$Relationship, start, end, properties = {}, graph = null])
 	{

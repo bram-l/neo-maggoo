@@ -89,8 +89,7 @@ const _linked = Symbol(&apos;linked&apos;)
 const _labels = Symbol(&apos;labels&apos;)
 
 /**
- * @class Node
- * @extends {Model}
+ * Class representing a single node
  */
 class Node extends Model
 {
@@ -614,7 +613,7 @@ class Node extends Model
 	 * Save related nodes and their relationships
 	 *
 	 * @param {Array} [keys] The relationships to be saved (all by default)
-	 * @param {Transaction} [tx] The current databse transaction
+	 * @param {Transaction} [tx] The current database transaction
 	 */
 	async saveRelated(keys = null, tx = null)
 	{
@@ -717,7 +716,7 @@ class Node extends Model
 	/**
 	 * Delete related nodes and their relationships
 	 *
-	 * @param {Transaction} [tx] The current databse transaction
+	 * @param {Transaction} [tx] The current database transaction
 	 */
 	async deleteRelated(tx = null)
 	{
@@ -762,7 +761,7 @@ class Node extends Model
 			`
 		}
 
-		const paramaters = { id: this.id }
+		const parameters = { id: this.id }
 
 		let session = null
 
@@ -772,7 +771,7 @@ class Node extends Model
 			session = tx.session
 		}
 
-		await tx.run(query, paramaters).then(r =&gt; r)
+		await tx.run(query, parameters).then(r =&gt; r)
 
 		const added = labels.filter(label =&gt; !this.$labels.includes(label))
 
@@ -810,7 +809,7 @@ class Node extends Model
 			`
 		}
 
-		const paramaters = { id: this.id }
+		const parameters = { id: this.id }
 
 		let session = null
 
@@ -820,7 +819,7 @@ class Node extends Model
 			session = tx.session
 		}
 
-		await tx.run(query, paramaters).then(r =&gt; r)
+		await tx.run(query, parameters).then(r =&gt; r)
 
 		this.$labels = this.$labels.filter(label =&gt; !labels.includes(label))
 
@@ -1346,14 +1345,14 @@ class Node extends Model
 
 		if (keys.length)
 		{
-			const paramaters = []
+			const parameters = []
 
 			for (const key of keys)
 			{
-				paramaters.push(`${ key }: {criteria}.${ key }`)
+				parameters.push(`${ key }: {criteria}.${ key }`)
 			}
 
-			query += ` {${ paramaters.join(&apos;, &apos;) }}`
+			query += ` {${ parameters.join(&apos;, &apos;) }}`
 		}
 
 		query += &apos;)\n&apos;
@@ -1388,6 +1387,7 @@ class Node extends Model
 	 * Fetch related Nodes connected to the current node.
 	 *
 	 * @param {object|array|string} relationships Similar to &apos;with&apos; option in #Node.find
+	 * @returns {NodeCollection|Object.&lt;string, NodeCollection&gt;} The related nodes
 	 */
 	async fetchRelated(relationships)
 	{
@@ -1403,6 +1403,22 @@ class Node extends Model
 		await this.$graph.run(query, o.parameters)
 
 		this.clearCachedRelationships(relationships)
+
+		const normalized = $static.normalizeRelationshipLevels(relationships)
+		const keys = Object.keys(normalized)
+		const results = {}
+
+		for (const key of keys)
+		{
+			results[key] = this.getRelated(key)
+		}
+
+		if (typeof relationships === &apos;string&apos;)
+		{
+			return results[keys[0]]
+		}
+
+		return results
 	}
 }
 

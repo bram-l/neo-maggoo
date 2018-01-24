@@ -528,30 +528,6 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/graph.js~graph.[_nodecollection]",
-    "class/lib/Graph.js~Graph.html#static-member-[_NodeCollection]",
-    "lib/Graph.js~Graph.[_NodeCollection]",
-    "member"
-  ],
-  [
-    "lib/graph.js~graph.[_node]",
-    "class/lib/Graph.js~Graph.html#static-member-[_Node]",
-    "lib/Graph.js~Graph.[_Node]",
-    "member"
-  ],
-  [
-    "lib/graph.js~graph.[_relationship]",
-    "class/lib/Graph.js~Graph.html#static-member-[_Relationship]",
-    "lib/Graph.js~Graph.[_Relationship]",
-    "member"
-  ],
-  [
-    "lib/graph.js~graph.[_db]",
-    "class/lib/Graph.js~Graph.html#static-member-[_db]",
-    "lib/Graph.js~Graph.[_db]",
-    "member"
-  ],
-  [
     "lib/graph.js~graph.build",
     "class/lib/Graph.js~Graph.html#static-method-build",
     "lib/Graph.js~Graph.build",
@@ -619,13 +595,13 @@ window.esdocSearchIndex = [
   ],
   [
     "lib/node.js~node#$labels",
-    "class/lib/Node.js~Node.html#instance-set-$labels",
+    "class/lib/Node.js~Node.html#instance-get-$labels",
     "lib/Node.js~Node#$labels",
     "member"
   ],
   [
     "lib/node.js~node#$labels",
-    "class/lib/Node.js~Node.html#instance-get-$labels",
+    "class/lib/Node.js~Node.html#instance-set-$labels",
     "lib/Node.js~Node#$labels",
     "member"
   ],
@@ -1002,18 +978,6 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/relationship.js~relationship#[_end]",
-    "class/lib/Relationship.js~Relationship.html#instance-member-[_end]",
-    "lib/Relationship.js~Relationship#[_end]",
-    "member"
-  ],
-  [
-    "lib/relationship.js~relationship#[_start]",
-    "class/lib/Relationship.js~Relationship.html#instance-member-[_start]",
-    "lib/Relationship.js~Relationship#[_start]",
-    "member"
-  ],
-  [
     "lib/relationship.js~relationship#constructor",
     "class/lib/Relationship.js~Relationship.html#instance-constructor-constructor",
     "lib/Relationship.js~Relationship#constructor",
@@ -1045,13 +1009,13 @@ window.esdocSearchIndex = [
   ],
   [
     "lib/relationship.js~relationship#start",
-    "class/lib/Relationship.js~Relationship.html#instance-get-start",
+    "class/lib/Relationship.js~Relationship.html#instance-set-start",
     "lib/Relationship.js~Relationship#start",
     "member"
   ],
   [
     "lib/relationship.js~relationship#start",
-    "class/lib/Relationship.js~Relationship.html#instance-set-start",
+    "class/lib/Relationship.js~Relationship.html#instance-get-start",
     "lib/Relationship.js~Relationship#start",
     "member"
   ],
@@ -1081,13 +1045,13 @@ window.esdocSearchIndex = [
   ],
   [
     "lib/relationship.js~relationship.model",
-    "class/lib/Relationship.js~Relationship.html#static-set-Model",
+    "class/lib/Relationship.js~Relationship.html#static-get-Model",
     "lib/Relationship.js~Relationship.Model",
     "member"
   ],
   [
     "lib/relationship.js~relationship.model",
-    "class/lib/Relationship.js~Relationship.html#static-get-Model",
+    "class/lib/Relationship.js~Relationship.html#static-set-Model",
     "lib/Relationship.js~Relationship.Model",
     "member"
   ],
@@ -1098,27 +1062,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/relationship.js~relationship.[_direction]",
-    "class/lib/Relationship.js~Relationship.html#static-member-[_direction]",
-    "lib/Relationship.js~Relationship.[_direction]",
-    "member"
-  ],
-  [
-    "lib/relationship.js~relationship.[_model]",
-    "class/lib/Relationship.js~Relationship.html#static-member-[_model]",
-    "lib/Relationship.js~Relationship.[_model]",
-    "member"
-  ],
-  [
-    "lib/relationship.js~relationship.[_singular]",
-    "class/lib/Relationship.js~Relationship.html#static-member-[_singular]",
-    "lib/Relationship.js~Relationship.[_singular]",
-    "member"
-  ],
-  [
-    "lib/relationship.js~relationship.[_type]",
-    "class/lib/Relationship.js~Relationship.html#static-member-[_type]",
-    "lib/Relationship.js~Relationship.[_type]",
+    "lib/relationship.js~relationship.direction",
+    "class/lib/Relationship.js~Relationship.html#static-get-direction",
+    "lib/Relationship.js~Relationship.direction",
     "member"
   ],
   [
@@ -1128,9 +1074,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/relationship.js~relationship.direction",
-    "class/lib/Relationship.js~Relationship.html#static-get-direction",
-    "lib/Relationship.js~Relationship.direction",
+    "lib/relationship.js~relationship.model",
+    "class/lib/Relationship.js~Relationship.html#static-get-model",
+    "lib/Relationship.js~Relationship.model",
     "member"
   ],
   [
@@ -1140,9 +1086,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/relationship.js~relationship.model",
-    "class/lib/Relationship.js~Relationship.html#static-get-model",
-    "lib/Relationship.js~Relationship.model",
+    "lib/relationship.js~relationship.singular",
+    "class/lib/Relationship.js~Relationship.html#static-get-singular",
+    "lib/Relationship.js~Relationship.singular",
     "member"
   ],
   [
@@ -1152,20 +1098,14 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "lib/relationship.js~relationship.singular",
-    "class/lib/Relationship.js~Relationship.html#static-get-singular",
-    "lib/Relationship.js~Relationship.singular",
-    "member"
-  ],
-  [
     "lib/relationship.js~relationship.type",
-    "class/lib/Relationship.js~Relationship.html#static-set-type",
+    "class/lib/Relationship.js~Relationship.html#static-get-type",
     "lib/Relationship.js~Relationship.type",
     "member"
   ],
   [
     "lib/relationship.js~relationship.type",
-    "class/lib/Relationship.js~Relationship.html#static-get-type",
+    "class/lib/Relationship.js~Relationship.html#static-set-type",
     "lib/Relationship.js~Relationship.type",
     "member"
   ]

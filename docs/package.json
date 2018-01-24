@@ -1,6 +1,6 @@
 {
   "name": "neo-maggoo",
-  "version": "0.4.1",
+  "version": "0.5.1",
   "description": "Futuristic Models & Collections for Neo4j",
   "directories": {
     "test": "test"
@@ -8,6 +8,7 @@
   "scripts": {
     "test": "NODE_ENV=test JASMINE_CONFIG_PATH=jasmine.json node --harmony node_modules/jasmine/bin/jasmine.js",
     "cover": "NODE_ENV=test JASMINE_CONFIG_PATH=jasmine.json node --harmony ./node_modules/nyc/bin/nyc.js --reporter=lcov node_modules/jasmine/bin/jasmine.js",
+    "coveralls": "NODE_ENV=test JASMINE_CONFIG_PATH=jasmine.json node --harmony ./node_modules/nyc/bin/nyc.js --reporter=text-lcov node_modules/jasmine/bin/jasmine.js | coveralls",
     "docs": "esdoc",
     "lint": "eslint --quiet lib/*"
   },
@@ -19,7 +20,7 @@
   },
   "dependencies": {
     "deepmerge": "^1.5.2",
-    "maggoo": "^0.4.0",
+    "maggoo": "^0.4.1",
     "neo4j-driver": "^1.5.1",
     "shortid": "^2.2.8"
   },
@@ -28,6 +29,7 @@
     "babel-plugin-istanbul": "^4.1.5",
     "babel-preset-es2017": "^6.24.1",
     "babel-register": "^6.26.0",
+    "coveralls": "^3.0.0",
     "esdoc": "^0.5.2",
     "esdoc-node": "^1.0.2",
     "eslint": "^4.13.1",

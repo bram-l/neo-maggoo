@@ -85,11 +85,12 @@ class Graph
 	 *
 	 * @readonly
 	 * @static
-	 *
-	 * @memberOf Graph
 	 */
 	static get db()
 	{
+		/**
+		 * @private
+		 */
 		this[_db] = this[_db] || require(&apos;./DB&apos;)
 
 		return this[_db]
@@ -99,6 +100,9 @@ class Graph
 	{
 		if (!this[_Node])
 		{
+			/**
+			 * @private
+			 */
 			this[_Node] = require(&apos;./Node&apos;)
 		}
 
@@ -109,6 +113,9 @@ class Graph
 	{
 		if (!this[_Relationship])
 		{
+			/**
+			 * @private
+			 */
 			this[_Relationship] = require(&apos;./Relationship&apos;)
 		}
 
@@ -119,6 +126,9 @@ class Graph
 	{
 		if (!this[_NodeCollection])
 		{
+			/**
+			 * @private
+			 */
 			this[_NodeCollection] = require(&apos;./NodeCollection&apos;)
 		}
 
@@ -135,8 +145,6 @@ class Graph
 	 * @param {object} models variables and Node models as key-value pairs.
 	 * @param {object} [links=null] virtual relationships between records
 	 * @returns {Graph} The resulting graph.
-	 *
-	 * @memberOf Graph
 	 */
 	static build(query, parameters, models = {}, links = null)
 	{
@@ -153,8 +161,6 @@ class Graph
 	 * @param {neo4j.Result} result Result of a query.
 	 * @param {object} models variables and Node models as key-value pairs.
 	 * @param {object} [links=null] virtual relationships between records
-	 *
-	 * @memberOf Graph
 	 */
 	constructor(result, models = {}, links = null)
 	{
@@ -171,6 +177,15 @@ class Graph
 		}
 	}
 
+	/**
+	 * Run a Cypher query and add the result to the current Graph instance
+	 *
+	 * @param {string} query A Cypher query
+	 * @param {Object} parameters Parameters used in the query
+	 * @param {Object} [models] Map variables to Models
+	 * @param {Object} [links] Link results to a specific Model
+	 * @returns {Promise} A promise
+	 */
 	run(query, parameters, models = {}, links = null)
 	{
 		Object.assign(this.models, models)
@@ -253,8 +268,6 @@ class Graph
 	 *
 	 * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]} entity One or more entities
 	 * @param {string} key The key associated with this
-	 *
-	 * @memberOf Graph
 	 */
 	add(entity, key)
 	{
@@ -337,8 +350,6 @@ class Graph
 	 * Remove one or more entities from the graph
 	 *
 	 * @param {neo4j.types.Node|neo4j.types.Node[]|neo4j.types.Relationship|neo4j.types.Relationship[]|Node|Node[]|Relationship|Relationship[]} obj One or more objects
-	 *
-	 * @memberOf Graph
 	 */
 	remove(obj)
 	{
@@ -365,6 +376,12 @@ class Graph
 		}
 	}
 
+	/**
+	 * Get the Neo4j node entity
+	 *
+	 * @param {Node|neo4j.types.Node|Object} subject Anything that could represent a node
+	 * @returns {neo4j.types.Node} The Neo4j Node entity
+	 */
 	static getEntity(subject)
 	{
 		if (subject instanceof Graph.Node || subject instanceof Graph.Relationship)
@@ -390,8 +407,6 @@ class Graph
 	 *
 	 * @param {any} entity Entity object
 	 * @returns {string} Graph.TYPE_NODE, Graph.TYPE_RELATIONSHIP, Graph.TYPE_INTEGER or native JS type
-	 *
-	 * @memberOf Graph
 	 */
 	static typeOf(entity)
 	{
@@ -418,6 +433,12 @@ class Graph
 		return typeof entity
 	}
 
+	/**
+	 * Get Neo4j Node id
+	 *
+	 * @param {Node|neo4j.types.Node|Object} subject Anything that could represent a node
+	 * @returns {Number} The Neo4j Node ID as number
+	 */
 	static getId(subject)
 	{
 		if (!isNaN(subject))
@@ -443,8 +464,6 @@ class Graph
 	 *
 	 * @param {any} entity Entity object
 	 * @returns {Map} The entity map
-	 *
-	 * @memberOf Graph
 	 */
 	getMap(entity)
 	{
@@ -470,8 +489,6 @@ class Graph
 	 * @param {Node} end End node
 	 * @param {Function} $Relationship Relationship class
 	 * @returns {Relationship} Relationship or null if no match was found
-	 *
-	 * @memberOf Graph
 	 */
 	getRelationship(start, end, $Relationship)
 	{
@@ -527,8 +544,6 @@ class Graph
 	 * @param {Node} node Start node
 	 * @param {Function} $Relationship Relationship class
 	 * @returns {Node[]} Related nodes
-	 *
-	 * @memberOf Graph
 	 */
 	getRelated(node, $Relationship)
 	{
@@ -569,6 +584,13 @@ class Graph
 		return $Relationship.singular ? results[0] : results
 	}
 
+	/**
+	 * Wrap a Neo4j node in a specified Node model
+	 *
+	 * @param {Number|neo4j.integer} id The Neo4j Node ID
+	 * @param {Function&lt;Node&gt;} $Node The Node Model Class
+	 * @returns {Node} The Node model
+	 */
 	getNodeModel(id, $Node)
 	{
 		if (neo4j.isInt(id))
@@ -600,6 +622,12 @@ class Graph
 		return node.models[$Node.name]
 	}
 
+	/**
+	 * Get all Nodes for a reference used in the Cypher query
+	 *
+	 * @param {string} reference The reference
+	 * @returns {array} An array of nodes
+	 */
 	getNodes(reference)
 	{
 		const ids = this.references[reference]
@@ -619,6 +647,13 @@ class Graph
 		return nodes
 	}
 
+	/**
+	 * Get linked results mapped to Models
+	 *
+	 * @param {Node} node The start node
+	 * @param {string} name The name of the link
+	 * @returns {any} The linked result
+	 */
 	getLinked(node, name)
 	{
 		if (!this.links || !this.links[name] || !this.links[name].items)
