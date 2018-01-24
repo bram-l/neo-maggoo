@@ -58,9 +58,11 @@ describe('Fetch related', () =>
 		expect(bar.$graph.nodes.size).toBe(1)
 		expect(bar.$graph.relationships.size).toBe(0)
 
-		await bar.fetchRelated('foo')
+		const foo = await bar.fetchRelated('foo')
 
-		expect(bar.foo.id).toBe('foo')
+		expect(bar.foo).toBe(foo)
+		expect(foo.id).toBe('foo')
+
 		expect(bar.$graph.nodes.size).toBe(2)
 		expect(bar.$graph.relationships.size).toBe(1)
 	})
@@ -91,21 +93,181 @@ describe('Fetch related', () =>
 
 		const foo = await Foo.get('foo')
 
-		await foo.fetchRelated('related')
+		const related1 = await foo.fetchRelated('related')
 
-		expect(foo.related.id).toBe('bar')
-		expect(foo.related.related).toBe(null)
+		expect(related1.id).toBe('bar')
+		expect(related1.related).toBe(null)
 
-		await foo.fetchRelated('related.related')
+		const related2 = await foo.fetchRelated('related.related')
 
-		expect(foo.related.id).toBe('bar')
-		expect(foo.related.related.id).toBe('baz')
+		expect(related2.id).toBe('bar')
+		expect(related2.related.id).toBe('baz')
 
 		expect(foo.$graph.nodes.size).toBe(3)
 		expect(foo.$graph.relationships.size).toBe(2)
 	})
 
-	it('should clear relationship cache after fecthing related nodes', async() =>
+	it('should fetch an array of related items for the current node', async() =>
+	{
+		await DB.query(`
+			CREATE (foo:Foo { id: 'foo' }),
+				   (bar:Bar { id: 'bar' }),
+				   (baz:Baz { id: 'baz' })
+			MERGE (baz)-[:has_foo]->(foo)
+			MERGE (baz)-[:has_bar]->(bar)
+		`)
+
+		class Foo extends Node { }
+		class Bar extends Node { }
+
+		class Baz extends Node
+		{
+			static get relationships()
+			{
+				return {
+					foo: {
+						Model: Foo,
+						type: 'has_foo',
+						direction: Relationship.OUT,
+						singular: true
+					},
+					bar: {
+						Model: Bar,
+						type: 'has_bar',
+						direction: Relationship.OUT,
+						singular: true
+					}
+				}
+			}
+		}
+
+		const baz = await Baz.get('baz')
+
+		expect(baz.foo).toBe(null)
+		expect(baz.$graph.nodes.size).toBe(1)
+		expect(baz.$graph.relationships.size).toBe(0)
+
+		const { foo, bar } = await baz.fetchRelated(['foo', 'bar'])
+
+		expect(baz.foo).toBe(foo)
+		expect(foo.id).toBe('foo')
+
+		expect(baz.bar).toBe(bar)
+		expect(bar.id).toBe('bar')
+
+		expect(baz.$graph.nodes.size).toBe(3)
+		expect(baz.$graph.relationships.size).toBe(2)
+	})
+
+	it('should fetch filtered related items for the current node', async() =>
+	{
+		await DB.query(`
+			CREATE (foo:Foo { id: 'foo' }),
+				   (bar:Bar { id: 'bar' }),
+				   (baz:Foo { id: 'baz' })
+			MERGE (bar)-[:has_foo]->(foo)
+			MERGE (bar)-[:has_foo]->(baz)
+		`)
+
+		class Foo extends Node { }
+		class Bar extends Node
+		{
+			static get relationships()
+			{
+				return {
+					foo: {
+						Model: Foo,
+						type: 'has_foo',
+						direction: Relationship.OUT,
+						singular: true
+					}
+				}
+			}
+		}
+
+		const bar = await Bar.get('bar')
+
+		expect(bar.foo).toBe(null)
+		expect(bar.$graph.nodes.size).toBe(1)
+		expect(bar.$graph.relationships.size).toBe(0)
+
+		const { foo } = await bar.fetchRelated({ foo: { id: 'foo' } })
+
+		expect(bar.foo).toBe(foo)
+		expect(foo.id).toBe('foo')
+
+		expect(bar.$graph.nodes.size).toBe(2)
+		expect(bar.$graph.relationships.size).toBe(1)
+	})
+
+	it('should fetch an object of related items for the current node', async() =>
+	{
+		await DB.query(`
+			CREATE (foo:Foo { id: 'foo' }),
+				   (bar:Bar { id: 'bar' }),
+				   (baz:Baz { id: 'baz' }),
+				   (qux:Qux { id: 'qux' })
+			MERGE (qux)-[:has_baz]->(baz)
+			MERGE (baz)-[:has_foo]->(foo)
+			MERGE (baz)-[:has_bar]->(bar)
+		`)
+
+		class Foo extends Node { }
+		class Bar extends Node { }
+
+		class Baz extends Node
+		{
+			static get relationships()
+			{
+				return {
+					foo: {
+						Model: Foo,
+						type: 'has_foo',
+						direction: Relationship.OUT,
+						singular: true
+					},
+					bar: {
+						Model: Bar,
+						type: 'has_bar',
+						direction: Relationship.OUT,
+						singular: true
+					}
+				}
+			}
+		}
+
+		class Qux extends Node
+		{
+			static get relationships()
+			{
+				return {
+					baz: {
+						Model: Baz,
+						type: 'has_baz',
+						direction: Relationship.OUT,
+						singular: true
+					}
+				}
+			}
+		}
+
+		const qux = await Qux.get('qux')
+
+		expect(qux.baz).toBe(null)
+
+		const { baz: { foo, bar } } = await qux.fetchRelated({ baz: { with: ['foo', 'bar'] } })
+
+		expect(qux.baz.foo).toBe(foo)
+		expect(foo.id).toBe('foo')
+
+		expect(qux.baz.bar).toBe(bar)
+		expect(bar.id).toBe('bar')
+
+		expect(qux.$graph.nodes.size).toBe(4)
+		expect(qux.$graph.relationships.size).toBe(3)
+	})
+
+	it('should clear relationship cache after fetching related nodes', async() =>
 	{
 		await DB.query(`
 			CREATE (n1:Foo:Node { id: 'foo' })
@@ -140,10 +302,10 @@ describe('Fetch related', () =>
 				   (n1)-[:is_related_to]->(n2)
 		`)
 
-		await foo.fetchRelated('related')
+		const related = await foo.fetchRelated('related')
 
-		expect(foo.related).not.toBe(null)
-		expect(foo.related.id).toBe('bar')
+		expect(related).not.toBe(null)
+		expect(related.id).toBe('bar')
 
 		expect(foo.$graph.nodes.size).toBe(2)
 		expect(foo.$graph.relationships.size).toBe(1)
@@ -173,9 +335,9 @@ describe('Fetch related', () =>
 
 		const foo = await Foo.get('foo')
 
-		await foo.fetchRelated('related')
+		const related = await foo.fetchRelated('related')
 
-		expect(foo.related.id).toBe('bar')
+		expect(related.id).toBe('bar')
 
 		expect(foo.$graph.nodes.size).toBe(2)
 		expect(foo.$graph.relationships.size).toBe(1)
@@ -185,6 +347,6 @@ describe('Fetch related', () =>
 		expect(foo.$graph.nodes.size).toBe(2)
 		expect(foo.$graph.relationships.size).toBe(1)
 
-		expect(foo.related.id).toBe('bar')
+		expect(related.id).toBe('bar')
 	})
 })
