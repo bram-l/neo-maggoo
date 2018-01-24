@@ -991,6 +991,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1009,7 +1010,6 @@
                 },
                 "name": "OUT"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1137,6 +1137,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1155,7 +1156,6 @@
                 },
                 "name": "IN"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1267,6 +1267,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1285,7 +1286,6 @@
                 },
                 "name": "BOTH"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1397,6 +1397,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1415,7 +1416,6 @@
                 },
                 "name": "ANY"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1527,6 +1527,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1545,7 +1546,6 @@
                 },
                 "name": "DEFAULT_TYPE"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1673,6 +1673,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1692,7 +1693,6 @@
                 "name": "constructor",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "constructor",
               "id": null,
               "generator": false,
@@ -2321,6 +2321,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2339,7 +2340,6 @@
                 },
                 "name": "$direction"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -2475,6 +2475,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2493,7 +2494,6 @@
                 },
                 "name": "$type"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -2648,6 +2648,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2666,7 +2667,6 @@
                 },
                 "name": "$id"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -2966,6 +2966,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2984,7 +2985,6 @@
                 },
                 "name": "$new"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -3144,6 +3144,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3162,7 +3163,6 @@
                 },
                 "name": "$dirty"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -3347,6 +3347,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3365,7 +3366,6 @@
                 },
                 "name": "start"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -3468,6 +3468,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3486,7 +3487,6 @@
                 },
                 "name": "start"
               },
-              "static": false,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -3661,6 +3661,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3679,7 +3680,6 @@
                 },
                 "name": "end"
               },
-              "static": false,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -3782,6 +3782,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3800,7 +3801,6 @@
                 },
                 "name": "end"
               },
-              "static": false,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -3994,6 +3994,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -4013,7 +4014,6 @@
                 "name": "setProperty",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -4470,6 +4470,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -4488,7 +4489,6 @@
                 },
                 "name": "save"
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -6975,7 +6975,41 @@
                                   "name": "$data"
                                 },
                                 "computed": false
-                              }
+                              },
+                              "trailingComments": [
+                                {
+                                  "type": "CommentLine",
+                                  "value": " console.log('save relationship', query, parameters)",
+                                  "start": 3359,
+                                  "end": 3413,
+                                  "loc": {
+                                    "start": {
+                                      "line": 220,
+                                      "column": 2
+                                    },
+                                    "end": {
+                                      "line": 220,
+                                      "column": 56
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "CommentLine",
+                                  "value": " console.time('save relationship')",
+                                  "start": 3416,
+                                  "end": 3452,
+                                  "loc": {
+                                    "start": {
+                                      "line": 221,
+                                      "column": 2
+                                    },
+                                    "end": {
+                                      "line": 221,
+                                      "column": 38
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           ],
                           "trailingComments": null
@@ -7063,8 +7097,7 @@
                             },
                             "identifierName": "result"
                           },
-                          "name": "result",
-                          "leadingComments": null
+                          "name": "result"
                         },
                         "init": {
                           "type": "AwaitExpression",
@@ -7286,45 +7319,10 @@
                               }
                             ]
                           }
-                        },
-                        "leadingComments": null
+                        }
                       }
                     ],
-                    "kind": "const",
-                    "leadingComments": [
-                      {
-                        "type": "CommentLine",
-                        "value": " console.log('save relationship', query, parameters)",
-                        "start": 3359,
-                        "end": 3413,
-                        "loc": {
-                          "start": {
-                            "line": 220,
-                            "column": 2
-                          },
-                          "end": {
-                            "line": 220,
-                            "column": 56
-                          }
-                        }
-                      },
-                      {
-                        "type": "CommentLine",
-                        "value": " console.time('save relationship')",
-                        "start": 3416,
-                        "end": 3452,
-                        "loc": {
-                          "start": {
-                            "line": 221,
-                            "column": 2
-                          },
-                          "end": {
-                            "line": 221,
-                            "column": 38
-                          }
-                        }
-                      }
-                    ]
+                    "kind": "const"
                   },
                   {
                     "type": "ExpressionStatement",
@@ -8082,6 +8080,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8100,7 +8099,6 @@
                 },
                 "name": "type"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -8301,6 +8299,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8319,7 +8318,6 @@
                 },
                 "name": "type"
               },
-              "static": true,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -8513,6 +8511,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8531,7 +8530,6 @@
                 },
                 "name": "singular"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -8684,6 +8682,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8702,7 +8701,6 @@
                 },
                 "name": "singular"
               },
-              "static": true,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -8936,6 +8934,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8954,7 +8953,6 @@
                 },
                 "name": "direction"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -9139,6 +9137,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -9157,7 +9156,6 @@
                 },
                 "name": "direction"
               },
-              "static": true,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -9351,6 +9349,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -9369,7 +9368,6 @@
                 },
                 "name": "Model"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -9931,6 +9929,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -9949,7 +9948,6 @@
                 },
                 "name": "Model"
               },
-              "static": true,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -10143,6 +10141,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -10161,7 +10160,6 @@
                 },
                 "name": "model"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -10282,6 +10280,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -10300,7 +10299,6 @@
                 },
                 "name": "model"
               },
-              "static": true,
               "kind": "set",
               "id": null,
               "generator": false,
@@ -10573,6 +10571,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -10591,7 +10590,6 @@
                   },
                   "name": "OUT"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -10719,6 +10717,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -10737,7 +10736,6 @@
                   },
                   "name": "IN"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -10849,6 +10847,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -10867,7 +10866,6 @@
                   },
                   "name": "BOTH"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -10979,6 +10977,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -10997,7 +10996,6 @@
                   },
                   "name": "ANY"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -11109,6 +11107,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -11127,7 +11126,6 @@
                   },
                   "name": "DEFAULT_TYPE"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -11255,6 +11253,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -11274,7 +11273,6 @@
                   "name": "constructor",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "constructor",
                 "id": null,
                 "generator": false,
@@ -11903,6 +11901,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -11921,7 +11920,6 @@
                   },
                   "name": "$direction"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -12057,6 +12055,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -12075,7 +12074,6 @@
                   },
                   "name": "$type"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -12230,6 +12228,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -12248,7 +12247,6 @@
                   },
                   "name": "$id"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -12548,6 +12546,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -12566,7 +12565,6 @@
                   },
                   "name": "$new"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -12726,6 +12724,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -12744,7 +12743,6 @@
                   },
                   "name": "$dirty"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -12929,6 +12927,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -12947,7 +12946,6 @@
                   },
                   "name": "start"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -13050,6 +13048,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -13068,7 +13067,6 @@
                   },
                   "name": "start"
                 },
-                "static": false,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -13243,6 +13241,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -13261,7 +13260,6 @@
                   },
                   "name": "end"
                 },
-                "static": false,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -13364,6 +13362,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -13382,7 +13381,6 @@
                   },
                   "name": "end"
                 },
-                "static": false,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -13576,6 +13574,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -13595,7 +13594,6 @@
                   "name": "setProperty",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -14052,6 +14050,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -14070,7 +14069,6 @@
                   },
                   "name": "save"
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -16557,7 +16555,41 @@
                                     "name": "$data"
                                   },
                                   "computed": false
-                                }
+                                },
+                                "trailingComments": [
+                                  {
+                                    "type": "CommentLine",
+                                    "value": " console.log('save relationship', query, parameters)",
+                                    "start": 3359,
+                                    "end": 3413,
+                                    "loc": {
+                                      "start": {
+                                        "line": 220,
+                                        "column": 2
+                                      },
+                                      "end": {
+                                        "line": 220,
+                                        "column": 56
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "CommentLine",
+                                    "value": " console.time('save relationship')",
+                                    "start": 3416,
+                                    "end": 3452,
+                                    "loc": {
+                                      "start": {
+                                        "line": 221,
+                                        "column": 2
+                                      },
+                                      "end": {
+                                        "line": 221,
+                                        "column": 38
+                                      }
+                                    }
+                                  }
+                                ]
                               }
                             ],
                             "trailingComments": null
@@ -16645,8 +16677,7 @@
                               },
                               "identifierName": "result"
                             },
-                            "name": "result",
-                            "leadingComments": null
+                            "name": "result"
                           },
                           "init": {
                             "type": "AwaitExpression",
@@ -16868,45 +16899,10 @@
                                 }
                               ]
                             }
-                          },
-                          "leadingComments": null
+                          }
                         }
                       ],
-                      "kind": "const",
-                      "leadingComments": [
-                        {
-                          "type": "CommentLine",
-                          "value": " console.log('save relationship', query, parameters)",
-                          "start": 3359,
-                          "end": 3413,
-                          "loc": {
-                            "start": {
-                              "line": 220,
-                              "column": 2
-                            },
-                            "end": {
-                              "line": 220,
-                              "column": 56
-                            }
-                          }
-                        },
-                        {
-                          "type": "CommentLine",
-                          "value": " console.time('save relationship')",
-                          "start": 3416,
-                          "end": 3452,
-                          "loc": {
-                            "start": {
-                              "line": 221,
-                              "column": 2
-                            },
-                            "end": {
-                              "line": 221,
-                              "column": 38
-                            }
-                          }
-                        }
-                      ]
+                      "kind": "const"
                     },
                     {
                       "type": "ExpressionStatement",
@@ -17664,6 +17660,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -17682,7 +17679,6 @@
                   },
                   "name": "type"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -17883,6 +17879,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -17901,7 +17898,6 @@
                   },
                   "name": "type"
                 },
-                "static": true,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -18095,6 +18091,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -18113,7 +18110,6 @@
                   },
                   "name": "singular"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -18266,6 +18262,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -18284,7 +18281,6 @@
                   },
                   "name": "singular"
                 },
-                "static": true,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -18518,6 +18514,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -18536,7 +18533,6 @@
                   },
                   "name": "direction"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -18721,6 +18717,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -18739,7 +18736,6 @@
                   },
                   "name": "direction"
                 },
-                "static": true,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -18933,6 +18929,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -18951,7 +18948,6 @@
                   },
                   "name": "Model"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -19513,6 +19509,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -19531,7 +19528,6 @@
                   },
                   "name": "Model"
                 },
-                "static": true,
                 "kind": "set",
                 "id": null,
                 "generator": false,
@@ -19725,6 +19721,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -19743,7 +19740,6 @@
                   },
                   "name": "model"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -19864,6 +19860,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -19882,7 +19879,6 @@
                   },
                   "name": "model"
                 },
-                "static": true,
                 "kind": "set",
                 "id": null,
                 "generator": false,

@@ -1,15 +1,20 @@
 {
 	"source": "./lib",
 	"destination": "./docs",
-	"unexportIdentifier": false,
-	"autoPrivate": true,
-	"access": ["public"],
-  	"plugins": [
-		  {"name": "esdoc-node"}
-	],
-	"experimentalProposal": {
-		"objectRestSpread": true,
-		"functionBind": true,
-		"asyncGenerators": true
-	}
+	"plugins": [
+		{
+			"name": "esdoc-standard-plugin",
+			"option": {
+				"accessor": {
+					"access": [
+						"public",
+						"protected"
+					],
+					"autoPrivate": true
+				}
+			}
+		}, {
+			"name": "esdoc-node"
+		}
+	]
 }

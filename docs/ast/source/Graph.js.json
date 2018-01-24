@@ -630,6 +630,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -648,7 +649,6 @@
                 },
                 "name": "TYPE_NODE"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -723,6 +723,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -741,7 +742,6 @@
                 },
                 "name": "TYPE_RELATIONSHIP"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -816,6 +816,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -834,7 +835,6 @@
                 },
                 "name": "TYPE_INTEGER"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -909,6 +909,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -927,7 +928,6 @@
                 },
                 "name": "TYPE_ARRAY"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1021,6 +1021,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1039,7 +1040,6 @@
                 },
                 "name": "db"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1378,6 +1378,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1396,7 +1397,6 @@
                 },
                 "name": "Node"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -1755,6 +1755,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -1773,7 +1774,6 @@
                 },
                 "name": "Relationship"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -2132,6 +2132,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2150,7 +2151,6 @@
                 },
                 "name": "NodeCollection"
               },
-              "static": true,
               "kind": "get",
               "id": null,
               "generator": false,
@@ -2528,6 +2528,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -2546,7 +2547,6 @@
                 },
                 "name": "build"
               },
-              "static": true,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -3104,6 +3104,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -3123,7 +3124,6 @@
                 "name": "constructor",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "constructor",
               "id": null,
               "generator": false,
@@ -4183,6 +4183,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -4202,7 +4203,6 @@
                 "name": "run",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -5329,6 +5329,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -5348,7 +5349,6 @@
                 "name": "addRecords",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -5918,6 +5918,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -5937,7 +5938,6 @@
                 "name": "addLinks",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -8566,6 +8566,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -8585,7 +8586,6 @@
                 "name": "add",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -11583,6 +11583,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -11601,7 +11602,6 @@
                 },
                 "name": "setRelationshipsIndex"
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -13495,6 +13495,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -13514,7 +13515,6 @@
                 "name": "remove",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -14877,6 +14877,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -14895,7 +14896,6 @@
                 },
                 "name": "getEntity"
               },
-              "static": true,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -15764,6 +15764,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -15782,7 +15783,6 @@
                 },
                 "name": "typeOf"
               },
-              "static": true,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -16725,6 +16725,7 @@
                   "column": 2
                 }
               },
+              "static": true,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -16743,7 +16744,6 @@
                 },
                 "name": "getId"
               },
-              "static": true,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -17716,6 +17716,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -17735,7 +17736,6 @@
                 "name": "getMap",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -18750,6 +18750,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -18769,7 +18770,6 @@
                 "name": "getRelationship",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -21134,6 +21134,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -21153,7 +21154,6 @@
                 "name": "getRelated",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -23784,6 +23784,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -23803,7 +23804,6 @@
                 "name": "getNodeModel",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -25450,6 +25450,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -25469,7 +25470,6 @@
                 "name": "getNodes",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -26309,6 +26309,7 @@
                   "column": 2
                 }
               },
+              "static": false,
               "computed": false,
               "key": {
                 "type": "Identifier",
@@ -26328,7 +26329,6 @@
                 "name": "getLinked",
                 "leadingComments": null
               },
-              "static": false,
               "kind": "method",
               "id": null,
               "generator": false,
@@ -29365,6 +29365,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -29383,7 +29384,6 @@
                   },
                   "name": "TYPE_NODE"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -29458,6 +29458,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -29476,7 +29477,6 @@
                   },
                   "name": "TYPE_RELATIONSHIP"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -29551,6 +29551,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -29569,7 +29570,6 @@
                   },
                   "name": "TYPE_INTEGER"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -29644,6 +29644,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -29662,7 +29663,6 @@
                   },
                   "name": "TYPE_ARRAY"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -29756,6 +29756,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -29774,7 +29775,6 @@
                   },
                   "name": "db"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -30113,6 +30113,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -30131,7 +30132,6 @@
                   },
                   "name": "Node"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -30490,6 +30490,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -30508,7 +30509,6 @@
                   },
                   "name": "Relationship"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -30867,6 +30867,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -30885,7 +30886,6 @@
                   },
                   "name": "NodeCollection"
                 },
-                "static": true,
                 "kind": "get",
                 "id": null,
                 "generator": false,
@@ -31263,6 +31263,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -31281,7 +31282,6 @@
                   },
                   "name": "build"
                 },
-                "static": true,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -31839,6 +31839,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -31858,7 +31859,6 @@
                   "name": "constructor",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "constructor",
                 "id": null,
                 "generator": false,
@@ -32918,6 +32918,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -32937,7 +32938,6 @@
                   "name": "run",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -34064,6 +34064,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -34083,7 +34084,6 @@
                   "name": "addRecords",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -34653,6 +34653,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -34672,7 +34673,6 @@
                   "name": "addLinks",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -37301,6 +37301,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -37320,7 +37321,6 @@
                   "name": "add",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -40318,6 +40318,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -40336,7 +40337,6 @@
                   },
                   "name": "setRelationshipsIndex"
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -42230,6 +42230,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -42249,7 +42250,6 @@
                   "name": "remove",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -43612,6 +43612,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -43630,7 +43631,6 @@
                   },
                   "name": "getEntity"
                 },
-                "static": true,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -44499,6 +44499,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -44517,7 +44518,6 @@
                   },
                   "name": "typeOf"
                 },
-                "static": true,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -45460,6 +45460,7 @@
                     "column": 2
                   }
                 },
+                "static": true,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -45478,7 +45479,6 @@
                   },
                   "name": "getId"
                 },
-                "static": true,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -46451,6 +46451,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -46470,7 +46471,6 @@
                   "name": "getMap",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -47485,6 +47485,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -47504,7 +47505,6 @@
                   "name": "getRelationship",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -49869,6 +49869,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -49888,7 +49889,6 @@
                   "name": "getRelated",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -52519,6 +52519,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -52538,7 +52539,6 @@
                   "name": "getNodeModel",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -54185,6 +54185,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -54204,7 +54205,6 @@
                   "name": "getNodes",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,
@@ -55044,6 +55044,7 @@
                     "column": 2
                   }
                 },
+                "static": false,
                 "computed": false,
                 "key": {
                   "type": "Identifier",
@@ -55063,7 +55064,6 @@
                   "name": "getLinked",
                   "leadingComments": null
                 },
-                "static": false,
                 "kind": "method",
                 "id": null,
                 "generator": false,

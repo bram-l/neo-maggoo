@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "deepmerge": "^1.5.2",
+    "esdoc-standard-plugin": "^1.0.0",
     "maggoo": "^0.4.1",
     "neo4j-driver": "^1.5.1",
     "shortid": "^2.2.8"
@@ -30,7 +31,7 @@
     "babel-preset-es2017": "^6.24.1",
     "babel-register": "^6.26.0",
     "coveralls": "^3.0.0",
-    "esdoc": "^0.5.2",
+    "esdoc": "^1.0.4",
     "esdoc-node": "^1.0.2",
     "eslint": "^4.13.1",
     "jasmine": "^2.8.0",
