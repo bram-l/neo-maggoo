@@ -24,7 +24,7 @@ describe('Relationship', () =>
 
 		static get direction()
 		{
-			return Relationship.OUT
+			return Relationship.ANY
 		}
 	}
 
@@ -45,7 +45,12 @@ describe('Relationship', () =>
 					type: 'is_mother_of',
 					direction: Relationship.IN,
 					singular: true
-				}
+				},
+				children: {
+					Model: Person,
+					type: 'has_child',
+					direction: Relationship.OUT
+				},
 			}
 		}
 	}
@@ -68,6 +73,47 @@ describe('Relationship', () =>
 		DB.exit()
 	})
 
+	it('should use the default values for unspecified relationships', () =>
+	{
+		class Foo extends Node
+		{
+			static get relationships()
+			{
+				return {
+					bar: {}
+				}
+			}
+		}
+
+		const $Relationship = Foo.getRelationship('bar')
+
+		expect($Relationship.Model).toBe(Node)
+		expect($Relationship.direction).toBe(Relationship.OUT)
+		expect($Relationship.singular).toBe(false)
+	})
+
+	it('should use the model alias for specifying relationships', () =>
+	{
+		class Bar extends Node {}
+
+		class Foo extends Node
+		{
+			static get relationships()
+			{
+				return {
+					bar: {
+						model: Bar
+					}
+				}
+			}
+		}
+
+		const $Relationship = Foo.getRelationship('bar')
+
+		expect($Relationship.Model).toBe(Bar)
+		expect($Relationship.model).toBe(Bar)
+	})
+
 	it('should be set using extended Class', () =>
 	{
 		expect(Person.relationships.relatives.type).toBe('is_related_to')
@@ -75,7 +121,7 @@ describe('Relationship', () =>
 		const $Relationship = Person.getRelationship('relatives')
 
 		expect($Relationship.Model).toBe(Person)
-		expect($Relationship.direction).toBe(Relationship.OUT)
+		expect($Relationship.direction).toBe(Relationship.ANY)
 		expect($Relationship.singular).toBe(false)
 	})
 
@@ -90,31 +136,145 @@ describe('Relationship', () =>
 		expect($Relationship.singular).toBe(true)
 	})
 
-	it('should be found', async() =>
+	it('should be found in outward direction for relationships that can be in "any" direction', async() =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
-			MERGE (a)-[:is_related_to]->(b)
-			MERGE (a)<-[:is_related_to]-(b)
+			MERGE (a)-[:is_related_to { id: 'foo-bar' }]->(b)
 		`)
 
 		const foo = await Person.get('foo', { with: 'relatives' })
 
 		expect(foo.relatives.length).toBe(1)
+		expect(foo.relatives[0].$rel.id).toBe('foo-bar')
+	})
+
+	it('should be found in inward direction for relationships that can be in "any" direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
+			MERGE (b)-[:is_related_to { id: 'bar-foo' }]->(a)
+		`)
+
+		const foo = await Person.get('foo', { with: 'relatives' })
+
+		expect(foo.relatives.length).toBe(1)
+		expect(foo.relatives[0].$rel.id).toBe('bar-foo')
+	})
+
+	it('should be found for relationships that are in the outward direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
+			MERGE (a)-[:has_child { id: 'foo-bar' }]->(b)
+		`)
+
+		const foo = await Person.get('foo', { with: 'children' })
+
+		expect(foo.children.length).toBe(1)
+		expect(foo.children[0].$rel.id).toBe('foo-bar')
+	})
+
+	it('should be found for relationships that are in the inward direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' })
+			MERGE (b)-[:is_father_of { id: 'foo-bar' }]->(a)
+		`)
+
+		const foo = await Person.get('foo', { with: 'father' })
+
+		expect(foo.father).not.toBeNull()
+		expect(foo.father.$rel.id).toBe('foo-bar')
+	})
+
+	it('should return null for missing relationships that can be in "any" direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
+			MERGE (a)-[:is_related_to { id: 'foo-bar' }]->(b)
+		`)
+
+		const people = await Person.all({ with: 'relatives' })
+
+		const foo = people.find((person) => person.id === 'foo')
+		const bar = people.find((person) => person.id === 'bar')
+		const baz = people.find((person) => person.id === 'baz')
+
+		const graph = foo.$graph
+		const RelationshipModel = foo.getRelationship('relatives')
+
+		const fooBarRelationship = graph.getRelationship(foo.$id, bar.$id, RelationshipModel)
+		const fooBazRelationship = graph.getRelationship(foo.$id, baz.$id, RelationshipModel)
+
+		expect(fooBarRelationship.id).toBe('foo-bar')
+		expect(fooBazRelationship).toBeNull()
+	})
+
+	it('should return null for missing relationships in the "out" direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
+			MERGE (a)-[:has_child { id: 'foo-bar' }]->(b)
+		`)
+
+		const people = await Person.all({ with: 'children' })
+
+		const foo = people.find((person) => person.id === 'foo')
+		const bar = people.find((person) => person.id === 'bar')
+		const baz = people.find((person) => person.id === 'baz')
+
+		const graph = foo.$graph
+		const RelationshipModel = foo.getRelationship('children')
+
+		const fooBarRelationship = graph.getRelationship(foo.$id, bar.$id, RelationshipModel)
+		const barFooRelationship = graph.getRelationship(bar.$id, foo.$id, RelationshipModel)
+		const fooBazRelationship = graph.getRelationship(foo.$id, baz.$id, RelationshipModel)
+
+		expect(fooBarRelationship.id).toBe('foo-bar')
+		expect(barFooRelationship).toBeNull()
+		expect(fooBazRelationship).toBeNull()
+	})
+
+	it('should return null for missing relationships in the "in" direction', async() =>
+	{
+		await DB.query(`
+			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
+			MERGE (b)-[:is_father_of { id: 'foo-bar' }]->(a)
+		`)
+
+		const people = await Person.all({ with: 'father' })
+
+		const foo = people.find((person) => person.id === 'foo')
+		const bar = people.find((person) => person.id === 'bar')
+		const baz = people.find((person) => person.id === 'baz')
+
+		const graph = foo.$graph
+		const RelationshipModel = foo.getRelationship('father')
+
+		const fooBarRelationship = graph.getRelationship(foo.$id, bar.$id, RelationshipModel)
+		const barFooRelationship = graph.getRelationship(bar.$id, foo.$id, RelationshipModel)
+		const fooBazRelationship = graph.getRelationship(foo.$id, baz.$id, RelationshipModel)
+
+		expect(fooBarRelationship.id).toBe('foo-bar')
+		expect(barFooRelationship).toBeNull()
+		expect(fooBazRelationship).toBeNull()
 	})
 
 	it('should be found when nested', async() =>
 	{
 		await DB.query(`
 			CREATE (a:Person { id: 'foo' }), (b:Person { id: 'bar' }), (c:Person { id: 'baz' })
-			MERGE (a)<-[:is_father_of]-(b)
-			MERGE (b)<-[:is_father_of]-(c)
+			MERGE (b)-[:is_father_of { id: 'bar-foo' }]->(a)
+			MERGE (c)-[:is_father_of { id: 'baz-bar' }]->(b)
 		`)
 
 		const foo = await Person.get('foo', { with: 'father.father' })
 
 		expect(foo.father.id).toBe('bar')
+		expect(foo.father.$rel.id).toBe('bar-foo')
 		expect(foo.father.father.id).toBe('baz')
+		expect(foo.father.father.$rel.id).toBe('baz-bar')
 		expect(foo.$graph.nodes.size).toBe(3)
 	})
 
@@ -203,7 +363,8 @@ describe('Relationship', () =>
 
 		expect(expected.includes(ids)).toBe(true)
 
-		expect(foo.relatives[0].relatives.length + foo.relatives[1].relatives.length).toBe(4)
+		expect(foo.relatives[0].relatives.length).toBe(2)
+		expect(foo.relatives[1].relatives.length).toBe(2)
 	})
 
 	it('should be made', async() =>
