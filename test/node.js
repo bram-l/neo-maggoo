@@ -87,6 +87,8 @@ describe('Node', () =>
 		const bar = await Node.get(foo.$id)
 
 		expect(foo.id).toBe(bar.id)
+
+		expect(foo.$graph.getNodeModel(foo.$entity.identity)).toBe(foo)
 	})
 
 	it('should find a node by a filter', async() =>
