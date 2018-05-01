@@ -103,4 +103,36 @@ describe('Node', () =>
 
 		expect(total).toBe(1)
 	})
+
+	it('should merge a node and add id if none is specified in the criteria', async() =>
+	{
+		await DB.query(`
+			CREATE (:Node {id: 'foo', name: 'foo' })
+		`)
+
+		const node = await Node.merge({ name: 'bar' })
+
+		expect(node.id).not.toBe(null)
+		expect(node.name).toBe('bar')
+
+		const total = await Node.count()
+
+		expect(total).toBe(2)
+	})
+
+	it('should merge a node and not add id for merged nodes', async() =>
+	{
+		await DB.query(`
+			CREATE (:Node {id: 'foo', name: 'foo' })
+		`)
+
+		const node = await Node.merge({ name: 'foo' })
+
+		expect(node.id).not.toBe(null)
+		expect(node.name).toBe('foo')
+
+		const total = await Node.count()
+
+		expect(total).toBe(1)
+	})
 })
