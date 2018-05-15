@@ -34,6 +34,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NodeLink">NodeLink</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -282,7 +283,7 @@ class Graph
 		const id = Graph.getId(entity)
 
 		this.references[key] = this.references[key] || []
-		this.references[key].push(id ? id : entity)
+		this.references[key].push(id !== null ? id : entity)
 
 		if (type !== Graph.TYPE_NODE &amp;&amp; type !== Graph.TYPE_RELATIONSHIP)
 		{
@@ -503,24 +504,37 @@ class Graph
 
 		if ($Relationship.direction === Graph.Relationship.OUT)
 		{
-			if (!index.out[start])
+			if (index.out[start] &amp;&amp; index.out[start][end] &gt;= 0)
+			{
+				relationshipId = index.out[start][end]
+			}
+			else
 			{
 				return null
 			}
-
-			relationshipId = index.out[start][end]
 		}
 		else if ($Relationship.direction === Graph.Relationship.IN)
 		{
-			if (!index.in[end])
+			if (index.in[start] &amp;&amp; index.in[start][end] &gt;= 0)
+			{
+				relationshipId = index.in[start][end]
+			}
+			else
 			{
 				return null
 			}
-
-			relationshipId = index.in[end][start]
 		}
-
-		if (!relationshipId)
+		// At this point the relationship could be in any direction so,
+		// we simply check if a matching relationship is found in the index.
+		else if (index.out[start] &amp;&amp; index.out[start][end] &gt;= 0)
+		{
+			relationshipId = index.out[start][end]
+		}
+		else if (index.in[start] &amp;&amp; index.in[start][end] &gt;= 0)
+		{
+			relationshipId = index.in[start][end]
+		}
+		else
 		{
 			return null
 		}
@@ -573,7 +587,9 @@ class Graph
 			}
 		}
 
-		const results = others.map(other =&gt;
+		const unique = others.filter((other, position, array) =&gt; array.indexOf(other) === position)
+
+		const results = unique.map(other =&gt;
 		{
 			return this.getNodeModel(other, $Relationship.Model)
 		})

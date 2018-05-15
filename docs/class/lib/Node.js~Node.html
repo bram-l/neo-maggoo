@@ -34,6 +34,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NodeLink">NodeLink</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -41,13 +42,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Node from &apos;<span><a href="file/lib/Node.js.html#lineNumber48">neo-maggoo/lib/Node.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Node from &apos;<span><a href="file/lib/Node.js.html#lineNumber56">neo-maggoo/lib/Node.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/lib/Node.js.html#lineNumber48">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/lib/Node.js.html#lineNumber56">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -1474,7 +1475,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
           
           <span data-ice="async">async</span>
           
-          <span class="code" data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-save">save</a></span></span><span class="code" data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, tx: <span>any</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/lib/Node.js~Node.html#instance-method-save">save</a></span></span><span class="code" data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span><span>[]</span></span>, tx: <span>any</span>)</span>
         </p>
       </div>
       <div>
@@ -1625,7 +1626,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber119">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber127">source</a></span></span>
     </span>
   </h3>
 
@@ -1668,7 +1669,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber448">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber456">source</a></span></span>
     </span>
   </h3>
 
@@ -1711,7 +1712,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber426">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber434">source</a></span></span>
     </span>
   </h3>
 
@@ -1754,7 +1755,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber797">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber805">source</a></span></span>
     </span>
   </h3>
 
@@ -1798,7 +1799,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber250">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber258">source</a></span></span>
     </span>
   </h3>
 
@@ -1845,7 +1846,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber99">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber107">source</a></span></span>
     </span>
   </h3>
 
@@ -1923,7 +1924,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber104">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber112">source</a></span></span>
     </span>
   </h3>
 
@@ -2001,7 +2002,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber836">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber844">source</a></span></span>
     </span>
   </h3>
 
@@ -2082,7 +2083,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber970">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber978">source</a></span></span>
     </span>
   </h3>
 
@@ -2156,7 +2157,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1144">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1152">source</a></span></span>
     </span>
   </h3>
 
@@ -2246,7 +2247,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber109">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber117">source</a></span></span>
     </span>
   </h3>
 
@@ -2305,7 +2306,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber114">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber122">source</a></span></span>
     </span>
   </h3>
 
@@ -2364,7 +2365,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber902">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber910">source</a></span></span>
     </span>
   </h3>
 
@@ -2465,7 +2466,7 @@ nodes[0].relatives</code></pre>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber820">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber828">source</a></span></span>
     </span>
   </h3>
 
@@ -2558,7 +2559,7 @@ nodes[0].relatives</code></pre>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber261">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber269">source</a></span></span>
     </span>
   </h3>
 
@@ -2632,7 +2633,7 @@ nodes[0].relatives</code></pre>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1178">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1186">source</a></span></span>
     </span>
   </h3>
 
@@ -2746,7 +2747,7 @@ Mostly intended for internal usage.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1291">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1299">source</a></span></span>
     </span>
   </h3>
 
@@ -2835,7 +2836,7 @@ Mostly intended for internal usage.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1258">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1266">source</a></span></span>
     </span>
   </h3>
 
@@ -2906,7 +2907,7 @@ Mostly intended for internal usage.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1068">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1076">source</a></span></span>
     </span>
   </h3>
 
@@ -2987,7 +2988,7 @@ Mostly intended for internal usage.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber856">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber864">source</a></span></span>
     </span>
   </h3>
 
@@ -3088,7 +3089,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber94">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber102">source</a></span></span>
     </span>
   </h3>
 
@@ -3145,7 +3146,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber875">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber883">source</a></span></span>
     </span>
   </h3>
 
@@ -3246,7 +3247,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber56">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber64">source</a></span></span>
     </span>
   </h3>
 
@@ -3317,7 +3318,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber453">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber461">source</a></span></span>
     </span>
   </h3>
 
@@ -3360,7 +3361,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber175">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber183">source</a></span></span>
     </span>
   </h3>
 
@@ -3404,7 +3405,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber67">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber75">source</a></span></span>
     </span>
   </h3>
 
@@ -3447,7 +3448,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber87">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber95">source</a></span></span>
     </span>
   </h3>
 
@@ -3490,7 +3491,7 @@ By default returns results for &apos;n&apos; as Node collection</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber155">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber163">source</a></span></span>
     </span>
   </h3>
 
@@ -3535,7 +3536,7 @@ Note that this could change over time, use id instead.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber464">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber472">source</a></span></span>
     </span>
   </h3>
 
@@ -3580,7 +3581,7 @@ By default it uses the constructor name.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber487">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber495">source</a></span></span>
     </span>
   </h3>
 
@@ -3625,7 +3626,7 @@ By default it uses the constructor name.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber165">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber173">source</a></span></span>
     </span>
   </h3>
 
@@ -3669,7 +3670,7 @@ By default it uses the constructor name.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber138">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber146">source</a></span></span>
     </span>
   </h3>
 
@@ -3714,7 +3715,7 @@ This will be automatically generated when the node is saved</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber143">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber151">source</a></span></span>
     </span>
   </h3>
 
@@ -3760,7 +3761,7 @@ This will be automatically generated when the node is saved</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber694">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber702">source</a></span></span>
     </span>
   </h3>
 
@@ -3826,7 +3827,7 @@ This will be automatically generated when the node is saved</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber699">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber707">source</a></span></span>
     </span>
   </h3>
 
@@ -3892,7 +3893,7 @@ This will be automatically generated when the node is saved</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber352">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber360">source</a></span></span>
     </span>
   </h3>
 
@@ -3969,7 +3970,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber404">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber412">source</a></span></span>
     </span>
   </h3>
 
@@ -4029,7 +4030,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber615">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber623">source</a></span></span>
     </span>
   </h3>
 
@@ -4099,7 +4100,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber675">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber683">source</a></span></span>
     </span>
   </h3>
 
@@ -4160,7 +4161,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1346">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber1359">source</a></span></span>
     </span>
   </h3>
 
@@ -4234,7 +4235,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber202">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber210">source</a></span></span>
     </span>
   </h3>
 
@@ -4308,7 +4309,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber322">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber330">source</a></span></span>
     </span>
   </h3>
 
@@ -4382,7 +4383,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber294">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber302">source</a></span></span>
     </span>
   </h3>
 
@@ -4456,7 +4457,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber283">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber291">source</a></span></span>
     </span>
   </h3>
 
@@ -4530,7 +4531,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber236">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber244">source</a></span></span>
     </span>
   </h3>
 
@@ -4601,7 +4602,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber742">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber750">source</a></span></span>
     </span>
   </h3>
 
@@ -4667,7 +4668,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber747">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber755">source</a></span></span>
     </span>
   </h3>
 
@@ -4729,11 +4730,11 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     
     <span data-ice="async">async</span>
     
-    <span class="code" data-ice="name">save</span><span class="code" data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, tx: <span>any</span>)</span>
+    <span class="code" data-ice="name">save</span><span class="code" data-ice="signature">(deep: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span><span>[]</span></span>, tx: <span>any</span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber505">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber513">source</a></span></span>
     </span>
   </h3>
 
@@ -4755,10 +4756,10 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">deep</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span><span>[]</span></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: false</li></ul></td>
-      <td data-ice="description"><p>If true save all related nodes</p>
+      <td data-ice="description"><p>If true save all related nodes, or specific relationships defined as an array of strings.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
@@ -4803,7 +4804,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber572">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber580">source</a></span></span>
     </span>
   </h3>
 
@@ -4871,7 +4872,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber226">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber234">source</a></span></span>
     </span>
   </h3>
 
@@ -4952,7 +4953,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber186">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber194">source</a></span></span>
     </span>
   </h3>
 
@@ -5020,7 +5021,7 @@ Existing nodes will not be overwritten unless the relationship is singular.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber365">source</a></span></span>
+      <span data-ice="source"><span><a href="file/lib/Node.js.html#lineNumber373">source</a></span></span>
     </span>
   </h3>
 

@@ -34,6 +34,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/NodeCollection.js~NodeCollection.html">NodeCollection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/lib/Relationship.js~Relationship.html">Relationship</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Model">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NodeLink">NodeLink</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-QueryOptions">QueryOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RelationshipDefinition">RelationshipDefinition</a></span></span></li>
 </ul>
@@ -58,14 +59,22 @@ const merge = require(&apos;deepmerge&apos;)
 /**
  * Query options object
  * @typedef {Object} QueryOptions
- * @property {Object.&lt;String, *&gt;} parameters - Parameters used in the query.
- * @property {String} variable - The variable used to identify the Node in the query, &apos;n&apos; by default.
- * @property {Array} variables - All variables used in the query that should be added to the results.
- * @property {String|Array} where - The where clause, arrays are joined by the &apos;AND&apos; operator.
- * @property {Number} limit - The maximum number of results to be returned
- * @property {String} with - The name of relationship to include, use the dot-notation to include multiple levels
- * @property {Array} with - An array of names of relationships to include
- * @property {Object.&lt;String, Boolean|Object&gt;} with - Relationships to include (true) or exclude (false) or filter(object)
+ * @property {Object.&lt;String, *&gt;} [parameters] - Parameters used in the query.
+ * @property {String} [variable] - The variable used to identify the Node in the query, &apos;n&apos; by default.
+ * @property {Array} [variables] - All variables used in the query that should be added to the results.
+ * @property {String|Array} [where] - The where clause, arrays are joined by the &apos;AND&apos; operator.
+ * @property {Number} [limit] - The maximum number of results to be returned
+ * @property {String} [with] - The name of relationship to include, use the dot-notation to include multiple levels
+ * @property {Array} [with] - An array of names of relationships to include
+ * @property {Object.&lt;String, Boolean|Object&gt;} [with] - Relationships to include (true) or exclude (false) or filter(object)
+ * @property {Object.&lt;String, NodeLink&gt;} [links] - Linked results to connect to this model
+ */
+
+/**
+ * @typedef {Object} NodeLink
+ * @property {String} [start] Reference to the start node (defaults to &apos;n&apos;)
+ * @property {String} end Reference to the end node
+ * @property {Boolean} [singular] Only one result per record is returned (eg. when using scalar values or by using `collect`)
  */
 
 /**
@@ -542,7 +551,7 @@ class Node extends Model
 	/**
 	 * Save the Node to the graph database.
 	 *
-	 * @param {boolean} [deep=false] If true save all related nodes
+	 * @param {boolean|string[]} [deep=false] If true save all related nodes, or specific relationships defined as an array of strings.
 	 * @param {any} [tx=null] The current database transaction
 	 */
 	async save(deep = false, tx = null)
@@ -689,14 +698,14 @@ class Node extends Model
 
 		await tx.run(query, parameters).then(r =&gt; r)
 
-		if (this.$graph)
-		{
-			this.$graph.remove(this.$entity)
-		}
-
 		if (deep)
 		{
 			await this.deleteRelated(tx)
+		}
+
+		if (this.$graph)
+		{
+			this.$graph.remove(this.$entity)
 		}
 
 		this.$entity = null
@@ -1340,6 +1349,11 @@ class Node extends Model
 		let query = `MERGE (${ o.variable }:${ this.labels.join(&apos;:&apos;) }`
 		const keys = Object.keys(criteria)
 
+		const queryParameters = {
+			criteria,
+			properties,
+		}
+
 		if (keys.length)
 		{
 			const parameters = []
@@ -1354,7 +1368,11 @@ class Node extends Model
 
 		query += &apos;)\n&apos;
 
-		query += `ON CREATE SET ${ o.variable }.id={id}\n`
+		if (!criteria.id &amp;&amp; (!properties || !properties.id))
+		{
+			queryParameters.id = this.uuid()
+			query += `ON CREATE SET ${ o.variable }.id={id}\n`
+		}
 
 		if (o.onCreate)
 		{
@@ -1373,11 +1391,7 @@ class Node extends Model
 			o.set.push(`${ o.variable } += {properties}`)
 		}
 
-		return await this.query(query, {
-			criteria,
-			properties,
-			id: this.uuid()
-		}, o)
+		return await this.query(query, queryParameters, o)
 	}
 
 	/**
